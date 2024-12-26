@@ -13,9 +13,6 @@ dist
 __pycache__
 *.pyc
 
-# scrape
-/utils/scraper/data
-
 # proc
 *.pid
 /data

@@ -1,0 +1,4 @@
+python-dotenv
+bs4
+trafilatura
+aiohttp

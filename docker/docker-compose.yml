@@ -1,95 +1,71 @@
 version: '3.8'
 
+x-healthcheck: &default-healthcheck
+  interval: 30s
+  retries: 5
+
+x-service-defaults: &service-defaults
+  build:
+    args:
+      BUILD_ENV: production
+
 services:
-  python-base:
-    build:
-      context: ..
-      dockerfile: docker/dockerfiles/Dockerfile.base
-      target: python-base
-    image: python-base:latest
-
-  api:
-    build:
-      context: ..
-      dockerfile: docker/dockerfiles/Dockerfile.api
-      args:
-        - BUILD_ENV=production
-    ports:
-      - "8000:8000"
-    env_file: 
-      - .env.docker
-    depends_on:
-      elasticsearch:
-        condition: service_started
-      python-base:
-        condition: service_completed_successfully
-    restart: unless-stopped
-    networks:
-      - backend
-      - frontend
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  webclient:
-    build:
-      context: ..
-      dockerfile: docker/dockerfiles/Dockerfile.webclient
-      args:
-        - BUILD_ENV=production
-    ports:
-      - "5000:5000"
-    env_file: 
-      - .env.docker
-    depends_on:
-      api:
-        condition: service_started
-      python-base:
-        condition: service_completed_successfully
-    restart: unless-stopped
-    networks:
-      - frontend
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.11.1"
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     ports:
       - 9200:9200
-    restart: on-failure
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
       - backend
     healthcheck:
-      test: curl --fail http://localhost:9200/_cat/health || exit 1
-      interval: 10s
-      timeout: 1s
-      retries: 10
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
     deploy:
       resources:
         limits:
           memory: 16g
+          
+  rest-api:
+    <<: *service-defaults
+    build:
+      context: ../services/rest-api
+    ports:
+      - 8000:8000
+    env_file: ../services/rest-api/.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+
+  web-app:
+    <<: *service-defaults
+    build:
+      context: ../services/web-app
+    ports:
+      - 5000:5000
+    env_file: ../services/web-app/.env
+    depends_on:
+      rest-api:
+        condition: service_healthy
+    networks:
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
 
 networks:
   frontend:
-    driver: bridge
   backend:
-    driver: bridge
 
 volumes:
   elasticsearch-data:
-    driver: local

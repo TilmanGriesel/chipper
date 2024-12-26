@@ -1,0 +1,4 @@
+haystack-ai
+ollama-haystack
+elasticsearch-haystack
+python-dotenv
