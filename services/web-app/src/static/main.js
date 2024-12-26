@@ -71,10 +71,10 @@ function createMessageElement(content, type = "chipper", timestamp) {
 
   switch (type) {
     case "user":
-      messageDiv.classList.add("bg-blue-600", "text-white", "user-message");
+      messageDiv.classList.add("bg-zinc-900", "text-white", "user-message");
       break;
     case "chipper":
-      messageDiv.classList.add("bg-gray-200", "chipper-message");
+      messageDiv.classList.add("bg-zinc-200", "chipper-message");
       break;
     case "error":
       messageDiv.classList.add("bg-red-600", "text-white", "error-message");
@@ -148,13 +148,11 @@ async function sendMessage() {
     }
 
     if (data.command_response) {
-      // Handle command response from server
       data.replies.forEach((reply) => {
         chatMessages.appendChild(createMessageElement(reply, "system"));
         scrollToBottom(false);
       });
     } else if (Array.isArray(data.replies)) {
-      // Handle normal chat responses
       data.replies.forEach((reply) => {
         chatMessages.appendChild(createMessageElement(reply, "chipper"));
         scrollToBottom(false);
