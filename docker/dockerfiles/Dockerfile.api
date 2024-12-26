@@ -1,0 +1,29 @@
+FROM python-base AS builder
+
+WORKDIR /app
+
+COPY src/core ./src/core/
+COPY src/web/rest_server.py ./src/web/
+COPY requirements.txt .
+
+ARG BUILD_ENV=production
+RUN if [ "$BUILD_ENV" = "production" ]; then \
+    pip install --no-cache-dir gunicorn; \
+    fi
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY --from=builder /app/src ./src
+
+RUN useradd -m -u 1000 apiuser && \
+    chown -R apiuser:apiuser /app
+USER apiuser
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--timeout", "120", "src.web.rest_server:app"]

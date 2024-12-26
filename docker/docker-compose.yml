@@ -1,6 +1,62 @@
 version: '3.8'
 
 services:
+  python-base:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.base
+      target: python-base
+    image: python-base:latest
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.api
+      args:
+        - BUILD_ENV=production
+    ports:
+      - "8000:8000"
+    env_file: 
+      - .env.docker
+    depends_on:
+      elasticsearch:
+        condition: service_started
+      python-base:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - backend
+      - frontend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  webclient:
+    build:
+      context: ..
+      dockerfile: docker/dockerfiles/Dockerfile.webclient
+      args:
+        - BUILD_ENV=production
+    ports:
+      - "5000:5000"
+    env_file: 
+      - .env.docker
+    depends_on:
+      api:
+        condition: service_started
+      python-base:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - frontend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   elasticsearch:
     image: "docker.elastic.co/elasticsearch/elasticsearch:8.11.1"
     ports:
@@ -13,7 +69,7 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      - elastic
+      - backend
     healthcheck:
       test: curl --fail http://localhost:9200/_cat/health || exit 1
       interval: 10s
@@ -28,10 +84,12 @@ services:
         limits:
           memory: 16g
 
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
 volumes:
   elasticsearch-data:
     driver: local
-
-networks:
-  elastic:
-    driver: bridge

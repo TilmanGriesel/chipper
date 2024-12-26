@@ -1,15 +1,13 @@
 #!/bin/bash
 set -e
 
-# Configuration
 VENV_NAME="venv"
-PYTHON_VERSION="3.11"
+PYTHON_VERSION="3.12"
 REQUIREMENTS_FILE="requirements.txt"
 
-# Colors for web
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${BLUE}Setting up Python virtual environment for Chipper project...${NC}"
 
@@ -19,18 +17,15 @@ if ! command -v python$PYTHON_VERSION &> /dev/null; then
     exit 1
 fi
 
-# Create and activate virtual environment
 echo -e "${BLUE}Creating virtual environment...${NC}"
 python$PYTHON_VERSION -m venv $VENV_NAME
 
-# Determine the correct activate script based on OS
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+if [[ "$OSTYPE" == "win32" ]]; then
     source $VENV_NAME/Scripts/activate
 else
     source $VENV_NAME/bin/activate
 fi
 
-# Upgrade pip
 echo -e "${BLUE}Upgrading pip...${NC}"
 pip install --upgrade pip
 

@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := web-client-web
+.DEFAULT_GOAL := web-client-serve
 
 .PHONY: local-es-up local-es-down local-es-down-volumes embed-gui rest-api-serve \
         web-client-cli web-client-serve web-client-build-css \

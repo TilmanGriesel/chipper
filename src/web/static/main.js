@@ -105,7 +105,7 @@ function createMessageElement(content, type = "chipper", timestamp) {
   }
 
   const contentDiv = document.createElement("div");
-  contentDiv.className = "prose prose-sm max-w-none leading-tight";
+  contentDiv.className = "prose prose-sm max-w-none";
   contentDiv.innerHTML = marked.parse(content);
 
   contentDiv.querySelectorAll("pre code").forEach((block) => {
