@@ -67,7 +67,7 @@ body {
 }
 
 pre[class*="language-"] {
-  border-radius: theme("radius.rounded-2xl");;
+  border-radius: 16px;
 }
 
 .code-toolbar {

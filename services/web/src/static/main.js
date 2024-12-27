@@ -210,14 +210,18 @@ document.addEventListener("DOMContentLoaded", () => {
               outputDiv.innerHTML = marked.parse(parsedContentBuffer);
 
               outputDiv.querySelectorAll("code").forEach((block) => {
-                if (
-                  !Array.from(block.classList).some((cls) =>
-                    cls.startsWith("language-")
-                  )
-                ) {
-                  block.classList.add("language-plaintext");
+                const lineCount = block.textContent.split("\n").length;
+                if (lineCount > 1) {
+                  if (
+                    !Array.from(block.classList).some((cls) =>
+                      cls.startsWith("language-")
+                    )
+                  ) {
+                    block.classList.add("language-plaintext");
+                  }
+
+                  Prism.highlightElement(block);
                 }
-                Prism.highlightElement(block);
               });
 
               scrollToBottom(false);
