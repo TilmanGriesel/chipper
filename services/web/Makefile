@@ -1,7 +1,7 @@
 .PHONY: build-dev run-dev stop-dev clean-dev dev build-css build-watch-css
 
-IMAGE_NAME = webapp-dev
-CONTAINER_NAME = webapp-dev
+IMAGE_NAME = web-dev
+CONTAINER_NAME = web-dev
 DEV_DOCKERFILE = Dockerfile.dev
 
 TAILWIND = npx tailwindcss
@@ -23,6 +23,7 @@ run-dev:
 	docker run \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src" \
+		-p 5000:5000 \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 

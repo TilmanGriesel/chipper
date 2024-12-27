@@ -921,18 +921,12 @@ body {
   font-family: ui-monospace, monospace;
 }
 
-.prose pre {
-  background-color: #2d2d2d;
-  padding: 1em;
-  border-radius: 0.5em;
-  overflow-x: auto;
-  margin: 1em 0;
+.system-message .prose code:not([class*="language-"]) {
+  background-color: #6b21a8;
 }
 
-.prose pre code {
-  background-color: transparent;
-  padding: 0;
-  color: #fff;
+pre[class*="language-"] {
+  border-radius: 16px;
 }
 
 .code-toolbar {

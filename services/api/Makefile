@@ -1,7 +1,7 @@
 .PHONY: build-dev run-dev stop-dev clean-dev dev
 
-IMAGE_NAME = rest-api-dev
-CONTAINER_NAME = rest-api-dev
+IMAGE_NAME = api-dev
+CONTAINER_NAME = api-dev
 DEV_DOCKERFILE = Dockerfile.dev
 
 WEB_BASE_DIR = src

@@ -75,6 +75,17 @@ class WebScraper:
         async with self.semaphore:
             for attempt in range(self.config.max_retries):
                 try:
+                    if url.startswith("file://"):
+                        path = urlparse(url).path
+                        try:
+                            with open(path, "r", encoding="utf-8") as f:
+                                return f.read()
+                        except Exception as e:
+                            self.logger.error(
+                                f"Error reading local file {path}: {str(e)}"
+                            )
+                            return None
+
                     timeout = aiohttp.ClientTimeout(total=self.config.timeout)
                     async with session.get(url, timeout=timeout) as response:
                         if response.status == 200:

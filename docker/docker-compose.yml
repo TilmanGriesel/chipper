@@ -30,13 +30,13 @@ services:
         limits:
           memory: 16g
           
-  rest-api:
+  api:
     <<: *service-defaults
     build:
-      context: ../services/rest-api
+      context: ../services/api
     ports:
       - 8000:8000
-    env_file: ../services/rest-api/.env
+    env_file: ../services/api/.env
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -47,15 +47,15 @@ services:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
 
-  web-app:
+  web:
     <<: *service-defaults
     build:
-      context: ../services/web-app
+      context: ../services/web
     ports:
       - 5000:5000
-    env_file: ../services/web-app/.env
+    env_file: ../services/web/.env
     depends_on:
-      rest-api:
+      api:
         condition: service_healthy
     networks:
       - frontend

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := up
 
-.PHONY: up down logs ps rebuild clean
+.PHONY: up down logs ps rebuild clean format
 
 up:
 	docker-compose -f docker/docker-compose.yml up -d
@@ -20,3 +20,8 @@ rebuild:
 
 clean:
 	docker-compose -f docker/docker-compose.yml down -v --remove-orphans
+
+format:
+	@echo "Running pre-commit hooks for formatting..."
+	@$(PRECOMMIT) run --all-files
+	@echo "Formatting completed successfully!"

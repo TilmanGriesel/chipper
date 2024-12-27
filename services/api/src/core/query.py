@@ -8,6 +8,7 @@ import elasticsearch
 import requests
 from haystack import Document, Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
+from haystack.dataclasses import StreamingChunk
 from haystack_integrations.components.embedders.ollama import \
     OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
@@ -131,6 +132,7 @@ class RAGQueryPipeline:
         temperature: float = 0.7,
         seed: int = 0,
         top_k: int = 5,
+        streaming_callback=None,
     ):
         logging.basicConfig(
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -152,6 +154,7 @@ class RAGQueryPipeline:
             top_k=int(os.getenv("TOP_K", "5")),
         )
 
+        self._streaming_callback = streaming_callback
         self._log_configuration()
         self.document_store = self._initialize_document_store()
         self._initialize_query()
@@ -305,6 +308,9 @@ class RAGQueryPipeline:
         )
         return retriever
 
+    def _streaming_callback(self, chunk: StreamingChunk):
+        return
+
     def _create_ollama_generator(self) -> OllamaGenerator:
         self.logger.info(f"- Initializing Ollama Generator")
         generation_kwargs = {
@@ -319,6 +325,7 @@ class RAGQueryPipeline:
             model=self.config.model_name,
             url=self.config.ollama_url,
             generation_kwargs=generation_kwargs,
+            streaming_callback=self._streaming_callback,
         )
         self._log_generator_config()
         return generator

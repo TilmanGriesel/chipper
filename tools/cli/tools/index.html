@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Streaming Query Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #queryInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #sendButton {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #output {
+            white-space: pre-wrap;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        #loadingIndicator {
+            display: none;
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Streaming Query Test</h1>
+    <div class="input-container">
+        <label for="queryInput" style="display: none;">Enter your query:</label>
+        <input type="text" id="queryInput" placeholder="Enter your query" aria-label="Query Input">
+        <button id="sendButton">Send Query</button>
+    </div>
+    <div id="loadingIndicator">Loading...</div>
+    <div id="output"></div>
+    
+    <script>
+        async function queryStreamWithUI(query, apiKey) {
+            const outputDiv = document.getElementById('output');
+            const sendButton = document.getElementById('sendButton');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            outputDiv.textContent = ''; // Clear previous output
+            loadingIndicator.style.display = 'block'; // Show loading indicator
+            sendButton.disabled = true; // Disable send button
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/query/stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        conversation: [],
+                        es_index: 'default',
+                        model_name: 'llama3.2'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+
+                if (!response.body) {
+                    throw new Error('ReadableStream not supported in this browser.');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    // Decode the chunk and add it to our buffer
+                    buffer += decoder.decode(value, { stream: true });
+                    
+                    // Process any complete messages in the buffer
+                    let newlineIndex;
+                    while ((newlineIndex = buffer.indexOf('\n\n')) >= 0) {
+                        const message = buffer.slice(0, newlineIndex).trim();
+                        buffer = buffer.slice(newlineIndex + 2);
+                        
+                        if (message.startsWith('data: ')) {
+                            const jsonString = message.slice(6).trim();
+                            if (!jsonString) continue; // Skip if no JSON content
+                            
+                            let data;
+                            try {
+                                data = JSON.parse(jsonString);
+                            } catch (parseError) {
+                                console.error('Failed to parse JSON:', parseError);
+                                outputDiv.textContent += '\nError parsing response.';
+                                continue;
+                            }
+                            
+                            if (data.chunk) {
+                                outputDiv.textContent += data.chunk;
+                                // Scroll to the bottom as new content arrives
+                                outputDiv.scrollTop = outputDiv.scrollHeight;
+                                continue;
+                            }
+
+                            if (data.done) {
+                                console.log('Stream completed:', data.full_response);
+                                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                                sendButton.disabled = false; // Re-enable send button
+                                return;
+                            }
+                            
+                            if (data.error) {
+                                outputDiv.textContent += `\nError: ${data.error}`;
+                                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                                sendButton.disabled = false; // Re-enable send button
+                                return;
+                            }
+                        } else {
+                            // Handle messages without 'data: ' prefix if necessary
+                            console.warn('Unknown message format:', message);
+                        }
+                    }
+                }
+
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                sendButton.disabled = false; // Re-enable send button
+            } catch (error) {
+                outputDiv.textContent += `\nConnection error: ${error.message}`;
+                console.error('Stream error:', error);
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
+                sendButton.disabled = false; // Re-enable send button
+            }
+        }
+
+        // Replace with your actual API key. 
+        // **Warning:** Hardcoding API keys on the client side is insecure. 
+        // For production, handle API keys securely on the server side.
+        const API_KEY = 'DEMO-API-KEY-123';
+
+        const sendButton = document.getElementById('sendButton');
+        const queryInput = document.getElementById('queryInput');
+
+        sendButton.addEventListener('click', () => {
+            const query = queryInput.value.trim();
+            if (query === '') {
+                alert('Please enter a query.');
+                return;
+            }
+            queryStreamWithUI(query, API_KEY);
+            queryInput.value = ''; // Clear input field after sending
+        });
+
+        // Allow pressing Enter to send the query
+        queryInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
