@@ -6,7 +6,7 @@ from functools import wraps
 
 from core.query import RAGQueryPipeline
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -108,15 +108,7 @@ def process_query():
 
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}", exc_info=True)
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": "An error occurred while processing your request",
-                }
-            ),
-            500,
-        )
+        abort(500)
 
 
 def require_api_key(f):
@@ -124,7 +116,7 @@ def require_api_key(f):
     def decorated_function(*args, **kwargs):
         api_key = request.headers.get("X-API-Key")
         if not api_key or api_key != API_KEY:
-            return jsonify({"error": "Invalid or missing API key"}), 401
+            abort(401)
         return f(*args, **kwargs)
 
     return decorated_function
@@ -137,7 +129,7 @@ def before_request():
         os.getenv("WEB_REQUIRE_SECURE", "False").lower() == "true"
         and not request.is_secure
     ):
-        return jsonify({"error": "HTTPS required"}), 403
+        abort(403)
 
 
 @app.after_request
@@ -160,6 +152,11 @@ def query_endpoint():
 @app.route("/health", methods=["GET"])
 def health_check():
     return jsonify({"status": "healthy", "timestamp": datetime.utcnow().isoformat()})
+
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return "", 404
 
 
 if __name__ == "__main__":

@@ -11,8 +11,7 @@ from urllib.parse import urljoin
 
 import requests
 from dotenv import load_dotenv
-from flask import (Flask, jsonify, render_template, request,
-                   send_from_directory, session)
+from flask import Flask, jsonify, render_template, request, send_from_directory, session
 from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
@@ -463,12 +462,12 @@ def create_app():
     @app.errorhandler(404)
     def not_found_error(error):
         logger.warning(f"404 error: {request.url}")
-        return jsonify({"error": "Resource not found"}), 404
+        return "", 404
 
     @app.errorhandler(500)
     def internal_error(error):
         logger.error(f"500 error: {str(error)}")
-        return jsonify({"error": "Internal server error"}), 500
+        return "", 500
 
     @app.route("/uploads/<path:filename>")
     def serve_upload(filename):
