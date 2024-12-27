@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const header = document.createElement("div");
     header.className = `font-bold text-sm ${
-      type === "chipper" ? "text-gray-700" : "text-white"
+      type === "chipper" ? "text-zinc-800" : "text-white"
     } mb-2`;
     header.textContent =
       {
@@ -148,11 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
     setBusy(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/query/stream", {
+      const response = await fetch("/api/query/stream", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": "DEMO-API-KEY-123",
         },
         body: JSON.stringify({
           query: message,

@@ -9,6 +9,9 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict
 from urllib.parse import urljoin
+import requests
+from requests.exceptions import ConnectionError, RequestException, Timeout
+from flask import Flask, Response, abort, jsonify, request, stream_with_context
 
 from dotenv import load_dotenv
 from flask import (
@@ -19,7 +22,7 @@ from flask import (
     send_from_directory,
     session,
 )
-from requests.exceptions import ConnectionError, RequestException, Timeout
+
 
 load_dotenv()
 
@@ -151,6 +154,70 @@ def create_app():
             "asset_url": asset_config.asset_url,
             "get_asset_url": asset_config.get_asset_url,
         }
+
+    @app.route("/api/query", methods=["POST"])
+    def query():
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "Invalid JSON payload"}), 400
+
+            response = requests.post(
+                os.getenv("API_URL", "http://localhost:8000") + "/api/query",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-API-Key": os.getenv("API_KEY", "DEMO-API-KEY-123"),
+                },
+                json=data,
+                timeout=30,
+            )
+            response.raise_for_status()
+            return jsonify(response.json())
+        except (ConnectionError, Timeout) as e:
+            logger.error(f"Connection error: {str(e)}")
+            return jsonify({"error": "Connection error"}), 503
+        except RequestException as e:
+            logger.error(f"Request error: {str(e)}")
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/api/query/stream", methods=["POST"])
+    def stream_query():
+        try:
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "Invalid JSON payload"}), 400
+
+            api_response = requests.post(
+                os.getenv("API_URL", "http://localhost:8000") + "/api/query/stream",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-API-Key": os.getenv("API_KEY", "DEMO-API-KEY-123"),
+                },
+                json=data,
+                stream=True,
+            )
+            api_response.raise_for_status()
+
+            def generate():
+                for chunk in api_response.iter_lines():
+                    if chunk:
+                        yield chunk.decode() + "\n\n"
+
+            return Response(
+                stream_with_context(generate()),
+                mimetype="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                    "Connection": "keep-alive",
+                },
+            )
+        except (ConnectionError, Timeout) as e:
+            logger.error(f"Connection error: {str(e)}")
+            return jsonify({"error": "Connection error"}), 503
+        except RequestException as e:
+            logger.error(f"Request error: {str(e)}")
+            return jsonify({"error": str(e)}), 500
 
     @app.route("/")
     def index():
