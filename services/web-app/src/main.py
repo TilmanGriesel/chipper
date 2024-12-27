@@ -11,7 +11,8 @@ from urllib.parse import urljoin
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request, send_from_directory, session
+from flask import (Flask, jsonify, render_template, request,
+                   send_from_directory, session)
 from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
