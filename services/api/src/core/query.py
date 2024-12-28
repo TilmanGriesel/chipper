@@ -1,12 +1,11 @@
 import logging
 import os
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Dict, List, Optional
 
 import elasticsearch
 import requests
-from haystack import Document, Pipeline
+from haystack import Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
 from haystack.dataclasses import StreamingChunk
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
@@ -37,67 +36,6 @@ class QueryPipelineConfig(PipelineConfig):
     top_k: int
 
 
-class MetricsTracker:
-    def __init__(self):
-        self.metrics = {
-            "total_queries": 0,
-            "successful_queries": 0,
-            "failed_queries": 0,
-            "avg_response_time": 0,
-            "total_tokens_used": 0,
-            "retrieval_stats": {
-                "total_documents_retrieved": 0,
-                "avg_relevance_score": 0,
-            },
-        }
-
-    def update_query_metrics(self, response: Dict, execution_time: float, logger):
-        try:
-            self.metrics["total_queries"] += 1
-            self.metrics["successful_queries"] += 1
-
-            n = self.metrics["successful_queries"]
-            current_avg = self.metrics["avg_response_time"]
-            self.metrics["avg_response_time"] = (
-                current_avg * (n - 1) + execution_time
-            ) / n
-
-            retrieved_docs = response.get("retriever", {}).get("documents", [])
-            num_docs = len(retrieved_docs)
-            self.metrics["retrieval_stats"]["total_documents_retrieved"] += num_docs
-
-            avg_score = 0.0
-            if num_docs > 0:
-                scores = [doc.score for doc in retrieved_docs if hasattr(doc, "score")]
-                if scores:
-                    avg_score = sum(scores) / len(scores)
-                    self.metrics["retrieval_stats"]["avg_relevance_score"] = (
-                        self.metrics["retrieval_stats"]["avg_relevance_score"] * (n - 1)
-                        + avg_score
-                    ) / n
-
-            self._log_execution_metrics(
-                execution_time, num_docs, avg_score, response, logger
-            )
-
-        except Exception as e:
-            logger.error(f"Error logging metrics: {str(e)}", exc_info=True)
-
-    @staticmethod
-    def _log_execution_metrics(
-        execution_time: float, num_docs: int, avg_score: float, response: Dict, logger
-    ):
-        logger.info("\nQuery Execution Metrics:")
-        logger.info(f"- Execution time: {execution_time:.2f} seconds")
-        logger.info(f"- Retrieved documents: {num_docs}")
-        if avg_score > 0:
-            logger.info(f"- Average relevance score: {avg_score:.4f}")
-
-        if "llm" in response and response["llm"].get("replies"):
-            response_length = len(response["llm"]["replies"][0])
-            logger.info(f"- Response length: {response_length} characters")
-
-
 class RAGQueryPipeline:
     QUERY_TEMPLATE = """
         {% if conversation %}
@@ -120,16 +58,7 @@ class RAGQueryPipeline:
 
     def __init__(
         self,
-        es_url: str = None,
-        es_index: str = None,
-        ollama_url: str = None,
-        model_name: str = None,
-        embedding_model: str = None,
-        system_prompt: str = None,
-        context_window: int = 4096,
-        temperature: float = 0.7,
-        seed: int = 0,
-        top_k: int = 5,
+        config: QueryPipelineConfig,
         streaming_callback=None,
     ):
         logging.basicConfig(
@@ -138,26 +67,12 @@ class RAGQueryPipeline:
         )
         self.logger = logging.getLogger(__name__)
 
-        self.config = QueryPipelineConfig(
-            es_url=es_url or os.getenv("ES_URL"),
-            es_index=es_index or os.getenv("ES_INDEX"),
-            ollama_url=ollama_url or os.getenv("OLLAMA_URL"),
-            embedding_model=embedding_model or os.getenv("EMBEDDING_MODEL"),
-            model_name=model_name or os.getenv("MODEL_NAME"),
-            system_prompt=system_prompt
-            or os.getenv("SYSTEM_PROMPT", "You are a helpful assistant."),
-            context_window=int(os.getenv("CONTEXT_WINDOW", "4096")),
-            temperature=float(os.getenv("TEMPERATURE", "0.8")),
-            seed=int(os.getenv("SEED", "0")),
-            top_k=int(os.getenv("TOP_K", "5")),
-        )
-
+        self.config = config
         self._streaming_callback = streaming_callback
         self._log_configuration()
         self.document_store = self._initialize_document_store()
         self._initialize_query()
         self.query_pipeline = None
-        self.metrics_tracker = MetricsTracker()
 
     def _log_configuration(self):
         self.logger.info("\nQuery Pipeline Configuration:")
@@ -172,14 +87,8 @@ class RAGQueryPipeline:
             health_response = requests.get(self.config.ollama_url)
 
             if health_response.status_code == 200:
-                self.logger.info(
-                    f"Successfully connected to the Ollama server, Response: {health_response.text}"
-                )
+                self.logger.info("Successfully connected to the Ollama server")
             else:
-                self.logger.error(
-                    f"Failed to connect to the Ollama server. "
-                    f"Status code: {health_response.status_code}, Response: {health_response.text}"
-                )
                 raise Exception("Ollama server connectivity check failed.")
 
         except Exception as e:
@@ -211,7 +120,6 @@ class RAGQueryPipeline:
                         f"Embedding model '{self.config.model_name}' pulled successfully."
                     )
                 else:
-                    self.logger.error(f"Failed to pull model: {pull_response.text}")
                     raise Exception(f"Model pull failed: {pull_response.text}")
             else:
                 self.logger.info(
@@ -233,15 +141,6 @@ class RAGQueryPipeline:
             doc_count = document_store.count_documents()
             self.logger.info(
                 f"Document store initialized successfully with {doc_count} documents"
-            )
-
-            index_stats = document_store.client.indices.stats()
-            self.logger.info("Index Statistics:")
-            self.logger.info(
-                f"- Total size: {index_stats['_all']['total']['store']['size_in_bytes'] / 1024 / 1024:.2f} MB"
-            )
-            self.logger.info(
-                f"- Document count: {index_stats['_all']['total']['docs']['count']}"
             )
             return document_store
 
@@ -285,29 +184,16 @@ class RAGQueryPipeline:
         self.logger.info(
             f"- Initializing Text Embedder with model: {self.config.embedding_model}"
         )
-        embedder = OllamaTextEmbedder(
+        return OllamaTextEmbedder(
             model=self.config.embedding_model, url=self.config.ollama_url
         )
-        self.logger.info(f"- Ollama Text Embedder Configuration:")
-        self.logger.info(f"  - Model: {self.config.embedding_model}")
-        self.logger.info(f"  - URL: {self.config.ollama_url}")
-        return embedder
 
     def _create_retriever(self) -> ElasticsearchEmbeddingRetriever:
         self.logger.info("- Initializing Elasticsearch Retriever")
-        retriever = ElasticsearchEmbeddingRetriever(
+        return ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
             top_k=self.config.top_k,
         )
-        self.logger.info(f"Retriever configuration:")
-        self.logger.info(f"- Document store URL: {self.config.es_url}")
-        self.logger.info(
-            f"- Number of documents in store: {self.document_store.count_documents()}"
-        )
-        return retriever
-
-    def _streaming_callback(self, chunk: StreamingChunk):
-        return
 
     def _create_ollama_generator(self) -> OllamaGenerator:
         self.logger.info(f"- Initializing Ollama Generator")
@@ -319,25 +205,12 @@ class RAGQueryPipeline:
         if self.config.seed != 0:
             generation_kwargs["seed"] = self.config.seed
 
-        generator = OllamaGenerator(
+        return OllamaGenerator(
             model=self.config.model_name,
             url=self.config.ollama_url,
             generation_kwargs=generation_kwargs,
             streaming_callback=self._streaming_callback,
         )
-        self._log_generator_config()
-        return generator
-
-    def _log_generator_config(self):
-        self.logger.info(f"- Ollama Generator Configuration:")
-        self.logger.info(f"  - Model: {self.config.model_name}")
-        self.logger.info(f"  - URL: {self.config.ollama_url}")
-        self.logger.info(f"  - Temperature: {self.config.temperature}")
-        self.logger.info(f"  - Context Length: {self.config.context_window}")
-        if self.config.seed != 0:
-            self.logger.info(f"  - Seed: {self.config.seed}")
-        else:
-            self.logger.info("  - Seed: Not applied")
 
     def _connect_pipeline_components(self, pipeline: Pipeline):
         pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
@@ -347,64 +220,32 @@ class RAGQueryPipeline:
     def run_query(
         self, query: str, conversation: List[dict] = None, print_response: bool = False
     ) -> Optional[dict]:
-        self.logger.info(f"\nProcessing Query:")
-        self.logger.info(f"- Query text: {query}")
-        self.logger.info(
-            f"- Conversation history length: {len(conversation) if conversation else 0}"
-        )
+        self.logger.info(f"\nProcessing Query: {query}")
 
         if not self.query_pipeline:
             self.create_query_pipeline()
 
         try:
-            start_time = datetime.now()
-            self.logger.info("Running pipeline steps...")
-
-            try:
-                response = self.query_pipeline.run(
-                    {
-                        "text_embedder": {"text": query},
-                        "prompt_builder": {
-                            "query": query,
-                            "system_prompt": self.config.system_prompt,
-                            "conversation": conversation or [],
-                        },
-                    }
-                )
-            except elasticsearch.BadRequestError as e:
-                self.logger.error(f"Elasticsearch bad request error: {e}")
-                raise
-            except Exception as e:
-                self.logger.error(f"Unexpected error in query pipeline: {e}")
-                raise
-
-            execution_time = (datetime.now() - start_time).total_seconds()
-            self.metrics_tracker.update_query_metrics(
-                response, execution_time, self.logger
+            response = self.query_pipeline.run(
+                {
+                    "text_embedder": {"text": query},
+                    "prompt_builder": {
+                        "query": query,
+                        "system_prompt": self.config.system_prompt,
+                        "conversation": conversation or [],
+                    },
+                }
             )
 
-            if print_response:
-                reply = (
-                    response["llm"]["replies"][0]
-                    if response["llm"]["replies"]
-                    else "No response"
-                )
-                self.logger.info("\nGenerated Response:")
-                print(reply)
+            if print_response and response["llm"]["replies"]:
+                print(response["llm"]["replies"][0])
                 print("\n")
 
             return response
 
-        except Exception as e:
-            self.metrics_tracker.metrics["failed_queries"] += 1
-            self.logger.error(f"Query execution failed: {str(e)}", exc_info=True)
+        except elasticsearch.BadRequestError as e:
+            self.logger.error(f"Elasticsearch bad request error: {e}")
             raise
-
-    def get_pipeline_stats(self) -> Dict:
-        return {
-            "pipeline_metrics": self.metrics_tracker.metrics,
-            "document_store": {
-                "total_documents": self.document_store.count_documents(),
-                "index_stats": self.document_store.client.indices.stats(),
-            },
-        }
+        except Exception as e:
+            self.logger.error(f"Unexpected error in query pipeline: {e}")
+            raise

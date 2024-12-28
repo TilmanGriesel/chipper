@@ -30,7 +30,7 @@ export class ChatCommandHandler {
         this.onStreamChange(enabled);
         return {
           type: "system",
-          content: `Streaming is ${enabled ? "enabled" : "disabled"}`,
+          content: `Streaming is \`${enabled ? "enabled" : "disabled"}\``,
         };
       },
       "/clear": () => {

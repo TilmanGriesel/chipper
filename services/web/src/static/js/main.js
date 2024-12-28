@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   );
 
-  // Setup input history navigation
   elements.messageInput.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") {
       e.preventDefault();
