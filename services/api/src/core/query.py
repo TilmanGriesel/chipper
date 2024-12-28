@@ -9,13 +9,14 @@ import requests
 from haystack import Document, Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
 from haystack.dataclasses import StreamingChunk
-from haystack_integrations.components.embedders.ollama import \
-    OllamaTextEmbedder
+from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
-from haystack_integrations.components.retrievers.elasticsearch import \
-    ElasticsearchEmbeddingRetriever
-from haystack_integrations.document_stores.elasticsearch import \
-    ElasticsearchDocumentStore
+from haystack_integrations.components.retrievers.elasticsearch import (
+    ElasticsearchEmbeddingRetriever,
+)
+from haystack_integrations.document_stores.elasticsearch import (
+    ElasticsearchDocumentStore,
+)
 
 
 @dataclass
@@ -347,7 +348,7 @@ class RAGQueryPipeline:
         pipeline.connect("prompt_builder.prompt", "llm.prompt")
 
     def run_query(
-        self, query: str, conversation: List[dict] = None, print_response: bool = True
+        self, query: str, conversation: List[dict] = None, print_response: bool = False
     ) -> Optional[dict]:
         self.logger.info(f"\nProcessing Query:")
         self.logger.info(f"- Query text: {query}")

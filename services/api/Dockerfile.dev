@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN pip install --no-cache-dir watchdog[watchmedo] pytest pytest-watch ipython
 
+COPY .systemprompt /app
+
 ENV FLASK_DEBUG=1
 ENV FLASK_APP=src/main.py
 

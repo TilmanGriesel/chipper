@@ -159,7 +159,7 @@ def create_app():
         api_url = os.getenv("API_URL", "http://localhost:8000")
         headers = {
             "Content-Type": "application/json",
-            "X-API-Key": os.getenv("API_KEY", "DEMO-API-KEY-123"),
+            "X-API-Key": os.getenv("API_KEY", "DEV-API-KEY-12345678-ABCDEFGHIJKLMNOP"),
         }
 
         try:
@@ -279,9 +279,9 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
-    debug_mode = os.getenv("WEB_CLIENT_DEBUG", str(args.debug)).lower() == "true"
-    host = os.getenv("WEB_CLIENT_HOST", args.host)
-    port = int(os.getenv("WEB_CLIENT_PORT", args.port))
+    debug_mode = os.getenv("DEBUG", str(args.debug)).lower() == "true"
+    host = os.getenv("HOST", args.host)
+    port = int(os.getenv("PORT", args.port))
 
     if debug_mode:
         app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0

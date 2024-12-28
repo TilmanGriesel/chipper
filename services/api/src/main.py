@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from pathlib import Path
 import queue
 import secrets
 import threading
@@ -32,28 +33,63 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-API_KEY = os.getenv("WEB_API_KEY")
+API_KEY = os.getenv("API_KEY")
 if not API_KEY:
     API_KEY = secrets.token_urlsafe(32)
     logger.info(f"Generated API key: {API_KEY}")
 
 
-def initialize():
+def load_systemprompt(base_path: str) -> str:
+    file = Path(base_path) / ".systemprompt"
+    default_prompt = ""
+
+    if not file.exists():
+        logger.info("No .systemprompt file found. Using default prompt.")
+        return default_prompt
+
+    try:
+        with open(file, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+
+        if not content:
+            logger.warning("System prompt file is empty. Using default prompt.")
+            return default_prompt
+
+        logger.info(
+            f"Successfully loaded system prompt from {file}; content: '{content}'"
+        )
+        return content
+
+    except UnicodeDecodeError as e:
+        logger.error(f"Unicode decode error reading system prompt file: {e}")
+        return default_prompt
+    except PermissionError as e:
+        logger.error(f"Permission denied accessing system prompt file: {e}")
+        return default_prompt
+    except Exception as e:
+        logger.error(f"Unexpected error reading system prompt file: {e}")
+        return default_prompt
+
+
+system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcwd()))
+
+
+def run_test_query() -> bool:
     rag = RAGQueryPipeline(
         es_url=os.getenv("ES_URL"),
         es_index=os.getenv("ES_INDEX"),
         ollama_url=os.getenv("OLLAMA_URL"),
         model_name=os.getenv("MODEL_NAME"),
         embedding_model=os.getenv("EMBEDDING_MODEL"),
-        system_prompt=os.getenv("SYSTEM_PROMPT"),
-        context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
-        temperature=float(os.getenv("TEMPERATURE", 0.7)),
-        seed=int(os.getenv("SEED", 0)),
-        top_k=int(os.getenv("TOP_K", 5)),
+        system_prompt=system_prompt_value,
     )
 
-    result = rag.run_query(query="hello world", conversation=[], print_response=True)
-    logging.info(f"Test query compled, result: {result}")
+    result = rag.run_query(
+        query="Respond with one word that describes the sky.",
+        conversation=[],
+        print_response=False,
+    )
+    return result["llm"]["replies"]
 
 
 def require_api_key(f):
@@ -70,10 +106,7 @@ def require_api_key(f):
 @app.before_request
 def before_request():
     logger.info(f"Request {request.method} {request.path} from {request.remote_addr}")
-    if (
-        os.getenv("WEB_REQUIRE_SECURE", "False").lower() == "true"
-        and not request.is_secure
-    ):
+    if os.getenv("REQUIRE_SECURE", "False").lower() == "true" and not request.is_secure:
         abort(403)
 
 
@@ -103,10 +136,10 @@ def chat():
         options = data.get("options", {})
         index = options.get("index")
 
-        if index is None or "":
+        if not index:
             index = os.getenv("ES_INDEX")
 
-        if model is None or "":
+        if not model:
             model = os.getenv("MODEL_NAME")
 
         if not model or not index:
@@ -122,6 +155,9 @@ def chat():
         conversation = messages[:-1] if len(messages) > 1 else []
 
         if stream:
+            # ----------------------------------------------------------------
+            # Streaming (Server-Sent Events)
+            # ----------------------------------------------------------------
             q = queue.Queue()
 
             def streaming_callback(chunk):
@@ -139,7 +175,8 @@ def chat():
                 ollama_url=os.getenv("OLLAMA_URL"),
                 model_name=model,
                 embedding_model=os.getenv("EMBEDDING_MODEL"),
-                system_prompt=os.getenv("SYSTEM_PROMPT"),
+                # Use the loaded system prompt here
+                system_prompt=system_prompt_value,
                 context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
                 temperature=float(os.getenv("TEMPERATURE", 0.7)),
                 seed=int(os.getenv("SEED", 0)),
@@ -166,10 +203,10 @@ def chat():
             def generate():
                 while True:
                     try:
-                        data = q.get(timeout=30)
-                        yield data
+                        data_item = q.get(timeout=30)
+                        yield data_item
 
-                        json_data = json.loads(data.replace("data: ", "").strip())
+                        json_data = json.loads(data_item.replace("data: ", "").strip())
                         if json_data.get("done") is True:
                             logger.info("Streaming completed.")
                             break
@@ -179,7 +216,7 @@ def chat():
                         yield heartbeat
                         logger.warning("Queue timeout. Sending heartbeat.")
                     except json.JSONDecodeError as e:
-                        logger.error(f"JSON decode error: {e} | Data: {data}")
+                        logger.error(f"JSON decode error: {e} | Data: {data_item}")
                         error_message = {
                             "error": "Invalid JSON format received.",
                             "done": True,
@@ -198,14 +235,16 @@ def chat():
             )
 
         else:
-            # Non-streaming response
+            # ----------------------------------------------------------------
+            # Non-streaming (JSON response)
+            # ----------------------------------------------------------------
             rag = RAGQueryPipeline(
                 es_url=os.getenv("ES_URL"),
                 es_index=index,
                 ollama_url=os.getenv("OLLAMA_URL"),
                 model_name=model,
                 embedding_model=os.getenv("EMBEDDING_MODEL"),
-                system_prompt=os.getenv("SYSTEM_PROMPT"),
+                system_prompt=system_prompt_value,
                 context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
                 temperature=float(os.getenv("TEMPERATURE", 0.7)),
                 seed=int(os.getenv("SEED", 0)),
@@ -222,7 +261,7 @@ def chat():
                 success = False
                 logger.error(f"Error in RAG pipeline: {e}", exc_info=True)
 
-            if success:
+            if success and result:
                 latest_message = {
                     "role": "assistant",
                     "content": result["llm"]["replies"][0],
@@ -255,10 +294,13 @@ def not_found_error(error):
     return "", 404
 
 
+if not run_test_query():
+    exit(1)
+
+
 if __name__ == "__main__":
-    initialize()
     app.run(
-        host=os.getenv("WEB_API_HOST", "0.0.0.0"),
-        port=int(os.getenv("WEB_API_PORT", "8000")),
-        debug=os.getenv("WEB_DEBUG", "False").lower() == "true",
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8000")),
+        debug=os.getenv("DEBUG", "False").lower() == "true",
     )
