@@ -8,14 +8,13 @@ import requests
 from haystack import Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
 from haystack.dataclasses import StreamingChunk
-from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
+from haystack_integrations.components.embedders.ollama import \
+    OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
-from haystack_integrations.components.retrievers.elasticsearch import (
-    ElasticsearchEmbeddingRetriever,
-)
-from haystack_integrations.document_stores.elasticsearch import (
-    ElasticsearchDocumentStore,
-)
+from haystack_integrations.components.retrievers.elasticsearch import \
+    ElasticsearchEmbeddingRetriever
+from haystack_integrations.document_stores.elasticsearch import \
+    ElasticsearchDocumentStore
 
 
 @dataclass

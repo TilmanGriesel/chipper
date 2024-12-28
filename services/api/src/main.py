@@ -8,7 +8,7 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 
-from core.query import RAGQueryPipeline, QueryPipelineConfig
+from core.query import QueryPipelineConfig, RAGQueryPipeline
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_cors import CORS

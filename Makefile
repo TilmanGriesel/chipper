@@ -23,5 +23,5 @@ clean:
 
 format:
 	@echo "Running pre-commit hooks for formatting..."
-	@$(PRECOMMIT) run --all-files
+	@pre-commit	 run --all-files
 	@echo "Formatting completed successfully!"
