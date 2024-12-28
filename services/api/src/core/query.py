@@ -66,13 +66,17 @@ class RAGQueryPipeline:
             level=logging.INFO,
         )
         self.logger = logging.getLogger(__name__)
+        self.logger.info("Initializing RAGQueryPipeline")
 
         self.config = config
         self._streaming_callback = streaming_callback
+        self.logger.info("Pipeline configuration loaded successfully")
+
         self._log_configuration()
         self.document_store = self._initialize_document_store()
         self._initialize_query()
         self.query_pipeline = None
+        self.logger.info("RAGQueryPipeline initialization completed")
 
     def _log_configuration(self):
         self.logger.info("\nQuery Pipeline Configuration:")
@@ -89,8 +93,17 @@ class RAGQueryPipeline:
             if health_response.status_code == 200:
                 self.logger.info("Successfully connected to the Ollama server")
             else:
+                self.logger.error(
+                    f"Ollama server returned status code: {health_response.status_code}"
+                )
                 raise Exception("Ollama server connectivity check failed.")
 
+        except requests.ConnectionError as e:
+            self.logger.error(
+                f"Connection error while checking Ollama server: {str(e)}",
+                exc_info=True,
+            )
+            raise
         except Exception as e:
             self.logger.error(
                 f"Error during Ollama server connectivity check: {str(e)}",
@@ -102,14 +115,18 @@ class RAGQueryPipeline:
         try:
             self._check_server_health()
 
-            self.logger.info(f"Checking model: {self.config.model_name}")
+            self.logger.info(
+                f"Checking availability of model: {self.config.model_name}"
+            )
             show_response = requests.post(
                 f"{self.config.ollama_url}/api/show",
                 json={"model": self.config.model_name},
             )
 
             if show_response.status_code != 200:
-                self.logger.info(f"Pulling model '{self.config.model_name}'...")
+                self.logger.info(
+                    f"Model '{self.config.model_name}' not found locally, initiating pull..."
+                )
                 pull_response = requests.post(
                     f"{self.config.ollama_url}/api/pull",
                     json={"model": self.config.model_name},
@@ -117,13 +134,16 @@ class RAGQueryPipeline:
 
                 if pull_response.status_code == 200:
                     self.logger.info(
-                        f"Embedding model '{self.config.model_name}' pulled successfully."
+                        f"Model '{self.config.model_name}' pulled successfully"
                     )
                 else:
+                    self.logger.error(
+                        f"Model pull failed with status code: {pull_response.status_code}"
+                    )
                     raise Exception(f"Model pull failed: {pull_response.text}")
             else:
                 self.logger.info(
-                    f"Model '{self.config.model_name}' is already available."
+                    f"Model '{self.config.model_name}' is already available locally"
                 )
 
         except Exception as e:
@@ -134,16 +154,25 @@ class RAGQueryPipeline:
 
     def _initialize_document_store(self) -> ElasticsearchDocumentStore:
         try:
+            self.logger.info(
+                f"Initializing Elasticsearch document store at {self.config.es_url}"
+            )
             document_store = ElasticsearchDocumentStore(
                 hosts=self.config.es_url,
                 index=self.config.es_index,
             )
             doc_count = document_store.count_documents()
             self.logger.info(
-                f"Document store initialized successfully with {doc_count} documents"
+                f"Document store initialized successfully. Index '{self.config.es_index}' contains {doc_count} documents"
             )
             return document_store
 
+        except elasticsearch.ConnectionError as e:
+            self.logger.error(
+                f"Failed to connect to Elasticsearch at {self.config.es_url}: {str(e)}",
+                exc_info=True,
+            )
+            raise
         except Exception as e:
             self.logger.error(
                 f"Failed to initialize document store: {str(e)}", exc_info=True
@@ -155,22 +184,29 @@ class RAGQueryPipeline:
 
         try:
             query_pipeline = Pipeline()
+            self.logger.info("Created new Pipeline instance")
 
             text_embedder = self._create_text_embedder()
             query_pipeline.add_component("text_embedder", text_embedder)
+            self.logger.info("Text embedder component added to pipeline")
 
             retriever = self._create_retriever()
             query_pipeline.add_component("retriever", retriever)
+            self.logger.info("Retriever component added to pipeline")
 
             prompt_builder = PromptBuilder(template=self.QUERY_TEMPLATE)
             query_pipeline.add_component("prompt_builder", prompt_builder)
+            self.logger.info("Prompt builder component added to pipeline")
 
             ollama_generator = self._create_ollama_generator()
             query_pipeline.add_component("llm", ollama_generator)
+            self.logger.info("Ollama generator component added to pipeline")
 
             self._connect_pipeline_components(query_pipeline)
+            self.logger.info("Pipeline components successfully connected")
+
             self.query_pipeline = query_pipeline
-            self.logger.info("Query Pipeline successfully created")
+            self.logger.info("Query Pipeline creation completed successfully")
 
             return query_pipeline
 
@@ -182,21 +218,29 @@ class RAGQueryPipeline:
 
     def _create_text_embedder(self) -> OllamaTextEmbedder:
         self.logger.info(
-            f"- Initializing Text Embedder with model: {self.config.embedding_model}"
+            f"Initializing Text Embedder with model: {self.config.embedding_model}"
         )
-        return OllamaTextEmbedder(
+        embedder = OllamaTextEmbedder(
             model=self.config.embedding_model, url=self.config.ollama_url
         )
+        self.logger.info("Text Embedder initialized successfully")
+        return embedder
 
     def _create_retriever(self) -> ElasticsearchEmbeddingRetriever:
-        self.logger.info("- Initializing Elasticsearch Retriever")
-        return ElasticsearchEmbeddingRetriever(
+        self.logger.info(
+            f"Initializing Elasticsearch Retriever with top_k={self.config.top_k}"
+        )
+        retriever = ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
             top_k=self.config.top_k,
         )
+        self.logger.info("Elasticsearch Retriever initialized successfully")
+        return retriever
 
     def _create_ollama_generator(self) -> OllamaGenerator:
-        self.logger.info(f"- Initializing Ollama Generator")
+        self.logger.info(
+            f"Initializing Ollama Generator with model: {self.config.model_name}"
+        )
         generation_kwargs = {
             "temperature": self.config.temperature,
             "context_length": self.config.context_window,
@@ -204,28 +248,36 @@ class RAGQueryPipeline:
 
         if self.config.seed != 0:
             generation_kwargs["seed"] = self.config.seed
+            self.logger.info(f"Using seed value: {self.config.seed}")
 
-        return OllamaGenerator(
+        generator = OllamaGenerator(
             model=self.config.model_name,
             url=self.config.ollama_url,
             generation_kwargs=generation_kwargs,
             streaming_callback=self._streaming_callback,
         )
+        self.logger.info("Ollama Generator initialized successfully")
+        return generator
 
     def _connect_pipeline_components(self, pipeline: Pipeline):
+        self.logger.info("Connecting pipeline components...")
         pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
         pipeline.connect("retriever.documents", "prompt_builder.documents")
         pipeline.connect("prompt_builder.prompt", "llm.prompt")
+        self.logger.info("Pipeline components connected successfully")
 
     def run_query(
         self, query: str, conversation: List[dict] = None, print_response: bool = False
     ) -> Optional[dict]:
         self.logger.info(f"\nProcessing Query: {query}")
+        self.logger.info(f"Conversation history present: {bool(conversation)}")
 
         if not self.query_pipeline:
+            self.logger.info("Query pipeline not initialized. Creating new pipeline...")
             self.create_query_pipeline()
 
         try:
+            self.logger.info("Executing query pipeline...")
             response = self.query_pipeline.run(
                 {
                     "text_embedder": {"text": query},
@@ -236,6 +288,7 @@ class RAGQueryPipeline:
                     },
                 }
             )
+            self.logger.info("Query pipeline execution completed successfully")
 
             if print_response and response["llm"]["replies"]:
                 print(response["llm"]["replies"][0])
