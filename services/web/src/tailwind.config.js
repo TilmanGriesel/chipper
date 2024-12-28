@@ -1,4 +1,4 @@
 module.exports = {
-  content: ["templates/index.html", "static/main.js"],
+  content: ["templates/*.html", "static/js/*.js"],
   plugins: [],
-}
+};

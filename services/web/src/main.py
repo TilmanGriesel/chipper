@@ -27,7 +27,6 @@ from flask import (
 
 load_dotenv()
 
-# Configure Logging
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -79,9 +78,7 @@ class SessionManager:
         new_session_id = secrets.token_urlsafe(32)
         session["session_id"] = new_session_id
         session["created_at"] = datetime.now().isoformat()
-        session["messages"] = (
-            []
-        )  # Using messages instead of context for Ollama compatibility
+        session["messages"] = []
         logger.info(
             f"New session initialized: {old_session_id[:8]}... → {new_session_id[:8]}..."
         )
@@ -203,7 +200,7 @@ def create_app():
             if not data:
                 return jsonify({"error": "Invalid JSON payload"}), 400
 
-            # If stream is requested, handle streaming response
+            # streaming response
             if data.get("stream", True):
                 api_response = make_api_request("/api/chat", data, stream=True)
 
@@ -222,7 +219,7 @@ def create_app():
                     },
                 )
             else:
-                # Handle non-streaming response
+                # non-streaming response
                 response = make_api_request("/api/chat", data)
                 return jsonify(response.json())
 

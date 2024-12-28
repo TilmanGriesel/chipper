@@ -588,10 +588,6 @@ video {
   }
 }
 
-.m-2 {
-  margin: 0.5rem;
-}
-
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -603,14 +599,6 @@ video {
 
 .mb-4 {
   margin-bottom: 1rem;
-}
-
-.me-4 {
-  margin-inline-end: 1rem;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
 }
 
 .block {
@@ -625,12 +613,25 @@ video {
   display: none;
 }
 
+.size-6 {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 .h-5 {
   height: 1.25rem;
 }
 
 .h-screen {
   height: 100vh;
+}
+
+.max-h-14 {
+  max-height: 3.5rem;
+}
+
+.max-h-72 {
+  max-height: 18rem;
 }
 
 .w-5 {
@@ -657,10 +658,6 @@ video {
   max-width: none;
 }
 
-.max-w-screen-xl {
-  max-width: 1280px;
-}
-
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -673,12 +670,12 @@ video {
   cursor: not-allowed;
 }
 
-.flex-col {
-  flex-direction: column;
+.resize-none {
+  resize: none;
 }
 
-.flex-wrap {
-  flex-wrap: wrap;
+.flex-col {
+  flex-direction: column;
 }
 
 .items-center {
@@ -782,6 +779,10 @@ video {
   background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
 }
 
+.p-2 {
+  padding: 0.5rem;
+}
+
 .p-4 {
   padding: 1rem;
 }
@@ -791,14 +792,14 @@ video {
   padding-right: 1rem;
 }
 
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .text-sm {
@@ -806,32 +807,13 @@ video {
   line-height: 1.25rem;
 }
 
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-
 .font-bold {
   font-weight: 700;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
 
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
-}
-
-.text-red-500 {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 
 .text-white {
@@ -998,10 +980,6 @@ pre[class*="language-"] {
   background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:underline:hover {
-  text-decoration-line: underline;
-}
-
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -1016,39 +994,4 @@ pre[class*="language-"] {
 .focus\:ring-zinc-900:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(24 24 27 / var(--tw-ring-opacity, 1));
-}
-
-@media (min-width: 640px) {
-  .sm\:mt-0 {
-    margin-top: 0px;
-  }
-
-  .sm\:text-center {
-    text-align: center;
-  }
-}
-
-@media (min-width: 768px) {
-  .md\:me-6 {
-    margin-inline-end: 1.5rem;
-  }
-
-  .md\:flex {
-    display: flex;
-  }
-
-  .md\:items-center {
-    align-items: center;
-  }
-
-  .md\:justify-between {
-    justify-content: space-between;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark\:text-gray-400 {
-    --tw-text-opacity: 1;
-    color: rgb(156 163 175 / var(--tw-text-opacity, 1));
-  }
 }

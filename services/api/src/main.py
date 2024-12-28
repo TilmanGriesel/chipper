@@ -101,29 +101,31 @@ def chat():
         messages = data.get("messages", [])
         stream = data.get("stream", True)
         options = data.get("options", {})
-        index = options.get("index", os.getenv("ES_INDEX"))
+        index = options.get("index")
+
+        if index is None or "":
+            index = os.getenv("ES_INDEX")
+
+        if model is None or "":
+            model = os.getenv("MODEL_NAME")
 
         if not model or not index:
             logger.error("Missing required fields in the request.")
             abort(400, description="Missing required fields: 'model', 'index'")
 
-        # Extract the latest query from messages
         if not messages:
             abort(400, description="No messages provided")
         query = messages[-1].get("content")
         if not query:
             abort(400, description="Invalid message format")
 
-        # Convert messages format to conversation format
         conversation = messages[:-1] if len(messages) > 1 else []
 
         if stream:
-            # Initialize a thread-safe queue
             q = queue.Queue()
 
             def streaming_callback(chunk):
                 if chunk.content:
-                    logger.info(f"-> got chunk: {chunk.content}")
                     response_data = {
                         "chunk": chunk.content,
                         "done": False,
