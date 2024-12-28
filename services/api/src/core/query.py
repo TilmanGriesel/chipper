@@ -100,8 +100,6 @@ class MetricsTracker:
 
 class RAGQueryPipeline:
     QUERY_TEMPLATE = """
-        {{ system_prompt }}
-
         {% if conversation %}
         Previous conversation:
         {% for message in conversation %}
@@ -109,8 +107,7 @@ class RAGQueryPipeline:
         {% endfor %}
         {% endif %}
 
-        Given the above conversation and the following information, answer the question.
-        Ignore your own knowledge.
+        {{ system_prompt }}
 
         Context:
         {% for document in documents %}
