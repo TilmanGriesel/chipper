@@ -21,7 +21,13 @@ rebuild: clean
 clean:
 	docker-compose -f docker/docker-compose.yml down -v --remove-orphans
 
+dev-api:
+	cd services/api && make dev
+
+dev-web:
+	cd services/web && make dev
+
 format:
 	@echo "Running pre-commit hooks for formatting..."
-	@pre-commit	 run --all-files
+	@pre-commit run --all-files
 	@echo "Formatting completed successfully!"
