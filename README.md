@@ -10,16 +10,16 @@ If you like what you see, leaving a star would be sweet and will help more peopl
 
 ### Features
 
-- Create embeddings for source code and documents.
-- Break down documents into chunks for faster, smarter searches.
-- Scrape web content with a tool you can tweak to fit your needs.
-- Use ElasticSearch for powerful, scalable searches.
-- Choose between a CLI or a web client interface.
-- Easily deploy it with Docker.
+- Build a powerful knowledge base using ElasticSearch embeddings.
+- Automatically split documents via Haystack.
+- Scrape content from web sources.
+- Transcribe audio files into text.
+- Access via a user-friendly CLI or web client interface.
+- Deploy effortlessly using Docker.
 
 ## Installation and Setup
 
-Use the **Makefile** to set up and run Chipper.
+Use the **manage.sh** to set up and run Chipper.
 
 ## Demo
 
@@ -29,31 +29,12 @@ Use the **Makefile** to set up and run Chipper.
 
 ### Roadmap
 
-1. **Streamlining Docker Setup**
-
-   - Wrap up the current Docker configuration to make deployments easier.
-     - **WIP**
-   - Test it out in different environments to ensure everything works smoothly.
-   - Put together a simple guide to help the team and contributors navigate the setup.
-
-2. **Simplifying Model Management**
-
-   - Set up a system to automatically pull and update Ollama models.
-     - **WIP**
-   - Add support for model versioning so compatibility is never an issue.
-   - Make sure pull operations come with clear logs and handy notifications.
-
-3. **Polishing the Codebase**
-
-   - Tidy up the code to make it cleaner and easier to work with.
-     - **WIP**
-   - Get rid of unnecessary dependencies and redundant pieces of code.
-   - Align with standardized coding practices and bring in linting tools to keep things consistent.
-
-4. **Expanding Parameter Options**
-   - Broaden and fine-tune the settings available for Ollama models.
-   - Introduce more advanced options for tweaking and optimizing.
-   - Test parameter changes with practical scenarios to confirm they deliver results.
+- [x] Basic functionality
+- [x] CLI
+- [x] Web UI
+- [x] Docker
+- [ ] Smart document chunking and embedding
+- [ ] Improved Web UI with better mobile support
 
 ---
 

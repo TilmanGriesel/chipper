@@ -12,8 +12,17 @@ from urllib.parse import urljoin
 
 import requests
 from dotenv import load_dotenv
-from flask import (Flask, Response, abort, jsonify, render_template, request,
-                   send_from_directory, session, stream_with_context)
+from flask import (
+    Flask,
+    Response,
+    abort,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    stream_with_context,
+)
 from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
@@ -159,7 +168,7 @@ def create_app():
                 headers=headers,
                 json=data,
                 stream=stream,
-                timeout=30,
+                timeout=120,
             )
             response.raise_for_status()
             return response

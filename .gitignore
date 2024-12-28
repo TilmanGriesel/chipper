@@ -19,3 +19,4 @@ __pycache__
 # tools
 /tools/whisper-transcriber/models
 /tools/whisper-transcriber/output
+/tools/scrape/output

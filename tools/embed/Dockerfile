@@ -8,6 +8,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
+COPY .ragignore .
+
+RUN mkdir -p /app/data
 
 ENTRYPOINT ["python", "src/main.py"]
-CMD ["--base-url=https://localhost/", "--output-dir=/app/data", "--batch-size=5", "--delay=1.0"]
+CMD []

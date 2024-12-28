@@ -1,9 +1,10 @@
 import asyncio
 import logging
+import random
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Tuple
 from urllib.parse import urljoin, urlparse
 
 import aiohttp
@@ -21,6 +22,11 @@ class ScraperConfig:
     max_retries: int = 2
     timeout: int = 15
     max_concurrent_requests: int = 5
+    retry_403_delay: float = 30.0
+    max_403_retries: int = 3
+    min_delay: float = 0.5
+    max_delay: float = 2.0
+    batch_size_variance: float = 0.5
 
     def __post_init__(self):
         if self.excluded_extensions is None:
@@ -48,6 +54,7 @@ class WebScraper:
         self.base_domain = urlparse(config.base_url).netloc
         self.output_dir = Path(config.output_dir) / self.base_domain
         self.visited_urls = set()
+        self._403_encountered = False
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.semaphore = asyncio.Semaphore(self.config.max_concurrent_requests)
         self._setup_logging()
@@ -69,9 +76,25 @@ class WebScraper:
             filename = "index"
         return f"{filename}.txt"
 
+    async def handle_403(self, url: str, attempt: int) -> None:
+        if not self._403_encountered:
+            self._403_encountered = True
+            self.logger.warning("First 403 error encountered, reducing request rate")
+            self.semaphore = asyncio.Semaphore(
+                max(1, self.config.max_concurrent_requests // 2)
+            )
+
+        delay = round(
+            self.config.retry_403_delay * (2**attempt) * (0.5 + random.random()), 2
+        )
+        self.logger.info(
+            f"Received 403 for {url}, waiting {delay} seconds before retry"
+        )
+        await asyncio.sleep(delay)
+
     async def fetch_page(
         self, session: aiohttp.ClientSession, url: str
-    ) -> Optional[str]:
+    ) -> Tuple[Optional[str], int]:
         async with self.semaphore:
             for attempt in range(self.config.max_retries):
                 try:
@@ -79,29 +102,39 @@ class WebScraper:
                         path = urlparse(url).path
                         try:
                             with open(path, "r", encoding="utf-8") as f:
-                                return f.read()
+                                return f.read(), 200
                         except Exception as e:
                             self.logger.error(
                                 f"Error reading local file {path}: {str(e)}"
                             )
-                            return None
+                            return None, -1
 
                     timeout = aiohttp.ClientTimeout(total=self.config.timeout)
+                    await asyncio.sleep(
+                        random.uniform(self.config.min_delay, self.config.max_delay)
+                    )
+
                     async with session.get(url, timeout=timeout) as response:
                         if response.status == 200:
-                            return await response.text()
-                        self.logger.warning(
-                            f"Failed to fetch {url}, status code: {response.status}, "
-                            f"attempt {attempt + 1}/{self.config.max_retries}"
-                        )
+                            return await response.text(), 200
+                        elif response.status == 403:
+                            if attempt < self.config.max_403_retries:
+                                await self.handle_403(url, attempt)
+                                continue
+                            else:
+                                self.logger.error(f"Max 403 retries exceeded for {url}")
+                                return None, 403
+                        else:
+                            self.logger.warning(
+                                f"Failed to fetch {url}, status code: {response.status}, attempt {attempt + 1}/{self.config.max_retries}"
+                            )
                 except Exception as e:
                     self.logger.error(
-                        f"Error fetching {url}: {str(e)}, "
-                        f"attempt {attempt + 1}/{self.config.max_retries}"
+                        f"Error fetching {url}: {str(e)}, attempt {attempt + 1}/{self.config.max_retries}"
                     )
                 if attempt < self.config.max_retries - 1:
-                    await asyncio.sleep(2**attempt)
-        return None
+                    await asyncio.sleep((2**attempt) * (0.5 + random.random()))
+        return None, -1
 
     def extract_links(self, html: str, current_url: str) -> List[str]:
         if not html:
@@ -132,8 +165,10 @@ class WebScraper:
         self.visited_urls.add(url)
         self.logger.info(f"Processing {url}")
 
-        html = await self.fetch_page(session, url)
+        html, status = await self.fetch_page(session, url)
         if not html:
+            if status == 403:
+                self.logger.warning(f"Skipping {url} due to persistent 403 error")
             return []
 
         content = trafilatura.extract(
@@ -161,15 +196,38 @@ class WebScraper:
         ) as session:
             urls_to_process = [self.base_url]
             while urls_to_process:
-                batch = urls_to_process[: self.config.batch_size]
-                urls_to_process = urls_to_process[self.config.batch_size :]
-                tasks = [self.process_page(session, url) for url in batch]
+                batch_size = max(
+                    1,
+                    int(
+                        self.config.batch_size
+                        * (
+                            1
+                            + random.uniform(
+                                -self.config.batch_size_variance,
+                                self.config.batch_size_variance,
+                            )
+                        )
+                    ),
+                )
+                urls_batch = random.sample(
+                    urls_to_process, min(batch_size, len(urls_to_process))
+                )
+                urls_to_process = [
+                    url for url in urls_to_process if url not in urls_batch
+                ]
+
+                tasks = [self.process_page(session, url) for url in urls_batch]
                 results = await asyncio.gather(*tasks)
+
                 for new_urls in results:
+                    random.shuffle(new_urls)
                     urls_to_process.extend(
                         [url for url in new_urls if url not in self.visited_urls]
                     )
-                await asyncio.sleep(self.config.delay_between_batches)
+
+                delay = self.config.delay_between_batches * (0.5 + random.random())
+                await asyncio.sleep(delay)
+
         self.logger.info(
             f"Scraping completed. Processed {len(self.visited_urls)} pages."
         )

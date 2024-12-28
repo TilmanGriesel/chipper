@@ -11,6 +11,7 @@ if [[ "$OS_TYPE" == *"MINGW"* || "$OS_TYPE" == *"MSYS"* ]]; then
 else
     LOCAL_PATH=$1
 fi
+shift
 
 if [ -z "$LOCAL_PATH" ]; then
     echo "Usage: $0 /path/to/your/local/folder"
@@ -22,8 +23,11 @@ if [ ! -d "$LOCAL_PATH" ]; then
     exit 1
 fi
 
-docker build -t embedding-cli .
+
+IMAGE_NAME="chipper-embedder"
+
+docker build -t $IMAGE_NAME .
 
 docker run --env-file .env \
     -v "$LOCAL_PATH:/app/data" \
-    embedding-cli --stats
+    ${IMAGE_NAME} "$@" 

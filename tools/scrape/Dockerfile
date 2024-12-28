@@ -8,14 +8,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-COPY .ragignore .
-
-RUN mkdir -p /app/data
-
-# Set environment variables (optional defaults)
-# ENV ES_URL=http://host.docker.internal:9200
-# ENV OLLAMA_URL=http://host.docker.internal:11434
-# ENV EMBEDDING_MODEL=your_embedding_model
 
 ENTRYPOINT ["python", "src/main.py"]
-CMD []
+CMD ["--output-dir=/app/data", "--batch-size=5", "--delay=2.0"]

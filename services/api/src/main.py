@@ -193,7 +193,7 @@ def handle_streaming_response(
     def generate():
         while True:
             try:
-                data_item = q.get(timeout=30)
+                data_item = q.get(timeout=120)
                 yield data_item
 
                 json_data = json.loads(data_item.replace("data: ", "").strip())

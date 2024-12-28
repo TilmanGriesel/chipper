@@ -64,7 +64,7 @@ for FILE in "${FILES[@]}"; do
         -v ${PWD}/models:/root/.cache/whisper \
         -v ${PWD}/output:/output \
         -v "$(dirname "$FILE"):/app" \
-        whisper-transcriber whisper "/app/$(basename "$FILE")" --device cuda --model "$MODEL" --language "$LANGUAGE" --output_dir /output --output_format txt
+        ${IMAGE_NAME} whisper "/app/$(basename "$FILE")" --device cuda --model "$MODEL" --language "$LANGUAGE" --output_dir /output --output_format txt
 
 done
 
