@@ -4,9 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const busyIndicator = document.getElementById("busy-indicator");
   const sendButton = document.getElementById("send-button");
 
-  let conversationHistory = [];
-  let currentIndex = "default";
-  let currentModel = "llama3.2";
+  let messages = [];
+  let currentModel = "llama2";
 
   messageInput.focus();
 
@@ -63,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "system",
         content: `### Available Commands
 
-\`/index [name]\` - Switch knowledge base index
 \`/model [name]\` - Change AI model
 \`/help\` - Show this help message
 
@@ -71,18 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
 - Press Enter to send message`,
       };
     }
-    if (parts[0] === "/index") {
-      currentIndex = parts[1] || "default";
-      return { type: "system", content: `Index set to: ${currentIndex}` };
-    }
     if (parts[0] === "/model") {
-      currentModel = parts[1] || "llama3.2";
+      currentModel = parts[1] || "llama2";
       return { type: "system", content: `Model set to: ${currentModel}` };
     }
     return null;
   }
 
-  function createMessageElement(content, type = "chipper") {
+  function createMessageElement(content, type = "assistant") {
     const messageContainer = document.createElement("div");
     messageContainer.className = `flex ${
       type === "user" ? "justify-end" : "justify-start"
@@ -93,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const typeClasses = {
       user: "bg-zinc-900 text-white user-message",
-      chipper: "bg-zinc-200 chipper-message",
+      assistant: "bg-zinc-200 assistant-message",
       error: "bg-red-600 text-white error-message",
       system: "bg-purple-600 text-white system-message",
     };
@@ -103,12 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const header = document.createElement("div");
     header.className = `font-bold text-sm ${
-      type === "chipper" ? "text-zinc-800" : "text-white"
+      type === "assistant" ? "text-zinc-800" : "text-white"
     } mb-2`;
     header.textContent =
       {
         user: "You",
-        chipper: "Chipper",
+        assistant: "Chipper",
         system: "System",
         error: "Error",
       }[type] || "Message";
@@ -147,17 +141,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setBusy(true);
 
+    // Add user message to messages array
+    messages.push({
+      role: "user",
+      content: message,
+    });
+
     try {
-      const response = await fetch("/api/query/stream", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query: message,
-          conversation: conversationHistory,
-          es_index: currentIndex,
-          model_name: currentModel,
+          model: currentModel,
+          messages: messages,
+          stream: true,
         }),
       });
 
@@ -171,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let buffer = "";
       let messageItem = null;
       let outputDiv = null;
-      let parsedContentBuffer = "";
+      let responseContent = "";
 
       while (true) {
         const { done, value } = await reader.read();
@@ -190,23 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = JSON.parse(messageChunk.slice(6).trim());
 
             if (data.chunk) {
-              if (data.command_response) {
-                if (!messageItem) {
-                  messageItem = createMessageElement("", "system");
-                  chatMessages.appendChild(messageItem.container);
-                  outputDiv = messageItem.message;
-                }
-                continue;
-              }
-
               if (!messageItem) {
-                messageItem = createMessageElement("", "chipper");
+                messageItem = createMessageElement("", "assistant");
                 chatMessages.appendChild(messageItem.container);
                 outputDiv = messageItem.message;
               }
 
-              parsedContentBuffer += data.chunk;
-              outputDiv.innerHTML = marked.parse(parsedContentBuffer);
+              responseContent += data.chunk;
+              outputDiv.innerHTML = marked.parse(responseContent);
 
               outputDiv.querySelectorAll("code").forEach((block) => {
                 const lineCount = block.textContent.split("\n").length;
@@ -218,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   ) {
                     block.classList.add("language-plaintext");
                   }
-
                   Prism.highlightElement(block);
                 }
               });
@@ -227,11 +216,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.done) {
-              conversationHistory.push({ role: "user", content: message });
-              conversationHistory.push({
-                role: "assistant",
-                content: data.full_response,
-              });
+              // Add assistant's complete response to messages array
+              if (responseContent) {
+                messages.push({
+                  role: "assistant",
+                  content: responseContent,
+                });
+              }
               break;
             }
 
@@ -241,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 chatMessages.appendChild(messageItem.container);
                 outputDiv = messageItem.message;
               }
-              outputDiv.innerHTML += `<span class="text-red-500">Error: ${data.error}</span>`;
+              outputDiv.innerHTML = marked.parse(`Error: ${data.error}`);
               scrollToBottom();
               return;
             }

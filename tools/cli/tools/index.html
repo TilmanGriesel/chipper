@@ -1,177 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Streaming Query Test</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>API Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-        .input-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        #queryInput {
-            flex: 1;
-            padding: 10px;
-            font-size: 16px;
-        }
-        #sendButton {
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        #output {
-            white-space: pre-wrap;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            padding: 15px;
-            height: 300px;
-            overflow-y: auto;
-            background-color: #f9f9f9;
-        }
-        #loadingIndicator {
-            display: none;
-            margin-top: 10px;
-            color: #555;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        line-height: 1.6;
+      }
+      .input-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      #queryInput {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      #sendButton {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #sendButton:hover {
+        background-color: #0056b3;
+      }
+      #sendButton:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+      #output {
+        white-space: pre-wrap;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 15px;
+        height: 300px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        font-family: monospace;
+      }
+      #loadingIndicator {
+        display: none;
+        margin-top: 10px;
+        color: #555;
+      }
+      .controls {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      select {
+        padding: 8px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
     </style>
-</head>
-<body>
-    <h1>Streaming Query Test</h1>
-    <div class="input-container">
-        <label for="queryInput" style="display: none;">Enter your query:</label>
-        <input type="text" id="queryInput" placeholder="Enter your query" aria-label="Query Input">
-        <button id="sendButton">Send Query</button>
+  </head>
+  <body>
+    <h1>Chat API Test</h1>
+    <div class="controls">
+      <select id="modelSelect">
+        <option value="llama3.2">Llama 3.2</option>
+        <option value="llama2">Llama 2</option>
+        <option value="mistral">Mistral</option>
+      </select>
+      <div class="checkbox-container">
+        <input type="checkbox" id="streamingToggle" checked />
+        <label for="streamingToggle">Streaming</label>
+      </div>
     </div>
-    <div id="loadingIndicator">Loading...</div>
+    <div class="input-container">
+      <label for="queryInput" style="display: none">Enter your query:</label>
+      <input
+        type="text"
+        id="queryInput"
+        placeholder="Enter your query"
+        aria-label="Query Input"
+      />
+      <button id="sendButton">Send</button>
+    </div>
+    <div id="loadingIndicator">Processing...</div>
     <div id="output"></div>
-    
+
     <script>
-        async function queryStreamWithUI(query, apiKey) {
-            const outputDiv = document.getElementById('output');
-            const sendButton = document.getElementById('sendButton');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            outputDiv.textContent = ''; // Clear previous output
-            loadingIndicator.style.display = 'block'; // Show loading indicator
-            sendButton.disabled = true; // Disable send button
-            
-            try {
-                const response = await fetch('http://localhost:8000/api/query/stream', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-Key': apiKey
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        conversation: [],
-                        es_index: 'default',
-                        model_name: 'llama3.2'
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
+      // Store conversation history
+      let conversationHistory = [];
 
-                if (!response.body) {
-                    throw new Error('ReadableStream not supported in this browser.');
-                }
+      async function sendQuery(query, apiKey) {
+        const outputDiv = document.getElementById("output");
+        const sendButton = document.getElementById("sendButton");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const modelSelect = document.getElementById("modelSelect");
+        const streamingToggle = document.getElementById("streamingToggle");
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
+        outputDiv.textContent = "";
+        loadingIndicator.style.display = "block";
+        sendButton.disabled = true;
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    
-                    if (done) break;
-                    
-                    // Decode the chunk and add it to our buffer
-                    buffer += decoder.decode(value, { stream: true });
-                    
-                    // Process any complete messages in the buffer
-                    let newlineIndex;
-                    while ((newlineIndex = buffer.indexOf('\n\n')) >= 0) {
-                        const message = buffer.slice(0, newlineIndex).trim();
-                        buffer = buffer.slice(newlineIndex + 2);
-                        
-                        if (message.startsWith('data: ')) {
-                            const jsonString = message.slice(6).trim();
-                            if (!jsonString) continue; // Skip if no JSON content
-                            
-                            let data;
-                            try {
-                                data = JSON.parse(jsonString);
-                            } catch (parseError) {
-                                console.error('Failed to parse JSON:', parseError);
-                                outputDiv.textContent += '\nError parsing response.';
-                                continue;
-                            }
-                            
-                            if (data.chunk) {
-                                outputDiv.textContent += data.chunk;
-                                // Scroll to the bottom as new content arrives
-                                outputDiv.scrollTop = outputDiv.scrollHeight;
-                                continue;
-                            }
+        try {
+          conversationHistory.push({
+            role: "user",
+            content: query,
+          });
 
-                            if (data.done) {
-                                console.log('Stream completed:', data.full_response);
-                                loadingIndicator.style.display = 'none'; // Hide loading indicator
-                                sendButton.disabled = false; // Re-enable send button
-                                return;
-                            }
-                            
-                            if (data.error) {
-                                outputDiv.textContent += `\nError: ${data.error}`;
-                                loadingIndicator.style.display = 'none'; // Hide loading indicator
-                                sendButton.disabled = false; // Re-enable send button
-                                return;
-                            }
-                        } else {
-                            // Handle messages without 'data: ' prefix if necessary
-                            console.warn('Unknown message format:', message);
-                        }
+          const requestBody = {
+            model: modelSelect.value,
+            messages: conversationHistory,
+            stream: streamingToggle.checked,
+            options: {
+              index: "default",
+            },
+          };
+
+          const response = await fetch("http://localhost:8000/api/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Key": apiKey,
+            },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+          }
+
+          if (streamingToggle.checked) {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let responseContent = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+
+              let newlineIndex;
+              while ((newlineIndex = buffer.indexOf("\n\n")) >= 0) {
+                const message = buffer.slice(0, newlineIndex).trim();
+                buffer = buffer.slice(newlineIndex + 2);
+
+                if (message.startsWith("data: ")) {
+                  const jsonString = message.slice(6).trim();
+                  if (!jsonString) continue;
+
+                  try {
+                    const data = JSON.parse(jsonString);
+
+                    if (data.chunk) {
+                      responseContent += data.chunk;
+                      outputDiv.textContent = responseContent;
                     }
+
+                    if (data.error) {
+                      outputDiv.textContent += `\nError: ${data.error}`;
+                      break;
+                    }
+
+                    if (data.done) {
+                      if (data.full_response) {
+                        conversationHistory.push({
+                          role: "assistant",
+                          content: responseContent,
+                        });
+                      }
+                      break;
+                    }
+
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                  } catch (parseError) {
+                    console.error("Failed to parse JSON:", parseError);
+                    outputDiv.textContent += "\nError parsing response.";
+                  }
                 }
-
-                loadingIndicator.style.display = 'none'; // Hide loading indicator
-                sendButton.disabled = false; // Re-enable send button
-            } catch (error) {
-                outputDiv.textContent += `\nConnection error: ${error.message}`;
-                console.error('Stream error:', error);
-                loadingIndicator.style.display = 'none'; // Hide loading indicator
-                sendButton.disabled = false; // Re-enable send button
+              }
             }
+          } else {
+            const data = await response.json();
+            if (data.success && data.messages) {
+              const lastMessage = data.messages[data.messages.length - 1];
+              if (lastMessage.role === "assistant") {
+                outputDiv.textContent = lastMessage.content;
+                conversationHistory = data.messages;
+              }
+            } else if (data.error) {
+              outputDiv.textContent = `Error: ${data.error}`;
+            }
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+          }
+        } catch (error) {
+          outputDiv.textContent += `\nConnection error: ${error.message}`;
+          console.error("Stream error:", error);
+        } finally {
+          loadingIndicator.style.display = "none";
+          sendButton.disabled = false;
         }
+      }
 
-        // Replace with your actual API key. 
-        // **Warning:** Hardcoding API keys on the client side is insecure. 
-        // For production, handle API keys securely on the server side.
-        const API_KEY = 'DEMO-API-KEY-123';
+      const API_KEY = "DEMO-API-KEY-123";
+      const sendButton = document.getElementById("sendButton");
+      const queryInput = document.getElementById("queryInput");
 
-        const sendButton = document.getElementById('sendButton');
-        const queryInput = document.getElementById('queryInput');
+      sendButton.addEventListener("click", () => {
+        const query = queryInput.value.trim();
+        if (query === "") {
+          alert("Please enter a query.");
+          return;
+        }
+        sendQuery(query, API_KEY);
+        queryInput.value = "";
+      });
 
-        sendButton.addEventListener('click', () => {
-            const query = queryInput.value.trim();
-            if (query === '') {
-                alert('Please enter a query.');
-                return;
-            }
-            queryStreamWithUI(query, API_KEY);
-            queryInput.value = ''; // Clear input field after sending
-        });
-
-        // Allow pressing Enter to send the query
-        queryInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                sendButton.click();
-            }
-        });
+      queryInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          sendButton.click();
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
