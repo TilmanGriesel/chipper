@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import logging
 import os
+import platform
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
@@ -37,7 +38,15 @@ class APIError(Exception):
 
 class Config:
     def __init__(
-        self, base_url, api_key, timeout, verify_ssl, log_level, max_context_size
+        self,
+        base_url,
+        api_key,
+        timeout,
+        verify_ssl,
+        log_level,
+        max_context_size,
+        model=None,
+        index=None,
     ):
         self.base_url = base_url
         self.api_key = api_key
@@ -45,6 +54,8 @@ class Config:
         self.verify_ssl = verify_ssl
         self.log_level = log_level
         self.max_context_size = max_context_size
+        self.model = model
+        self.index = index
         if not self.api_key:
             raise ValueError("API key must be provided.")
 
@@ -90,10 +101,21 @@ class AsyncAPIClient:
     async def query(
         self, query_text: str, conversation_context: List[Dict[str, str]]
     ) -> Dict[str, Any]:
+        messages = []
+        for ctx in conversation_context:
+            messages.append({"role": ctx["role"], "content": ctx["content"]})
+        messages.append({"role": "user", "content": query_text})
+
+        options = {}
+        if self.config.model:
+            options["model"] = self.config.model
+        if self.config.index:
+            options["index"] = self.config.index
+
         return await self._make_request(
             "POST",
-            "/api/query",
-            json={"query": query_text, "conversation": conversation_context},
+            "/api/chat",
+            json={"messages": messages, "stream": False, "options": options},
         )
 
     async def health_check(self) -> Dict[str, Any]:
@@ -106,13 +128,13 @@ class ChatInterface:
         self.config = config
         self.theme = Theme(
             {
-                "user": "bold green",
-                "chipper": "bold blue",
-                "system": "bold blue",
-                "error": "bold red",
+                "user": "green",
+                "chipper": "blue",
+                "system": "yellow",
+                "error": "red",
             }
         )
-        self.console = Console(theme=self.theme)
+        self.console = Console(theme=self.theme, force_terminal=True)
         self.conversation_context: Deque[Dict[str, str]] = deque(
             maxlen=self.config.max_context_size
         )
@@ -123,21 +145,27 @@ class ChatInterface:
             "/history": self._cmd_history,
             "/help": self._cmd_help,
             "/context": self._cmd_context,
+            "/model": self._cmd_model,
+            "/index": self._cmd_index,
+            "/settings": self._cmd_settings,
         }
 
     def display_welcome(self):
         welcome_text = """
 Available commands:
-* /help    - Show this help message
-* /quit    - Exit the application
-* /clear   - Clear the screen
-* /history - Show message history
-* /context - Adjust context size
+* /help     - Show this help message
+* /quit     - Exit the application
+* /clear    - Clear the screen
+* /history  - Show message history
+* /context  - Adjust context size
+* /model    - Set the model name
+* /index    - Set the index name
+* /settings - Show current settings
 
 Type your message and press Enter to chat.
 """
         self.console.print(
-            Panel(Markdown(welcome_text), title="Chipper CLI Chat", border_style="blue")
+            Panel(Markdown(welcome_text), title="Chipper Chat CLI", border_style="blue")
         )
 
     def display_message(self, message: Message):
@@ -189,6 +217,43 @@ Type your message and press Enter to chat.
         self.console.print(f"[blue]Context size updated to {new_size}[/blue]")
         return True
 
+    async def _cmd_model(self) -> bool:
+        current = self.config.model or "default"
+        new_model = Prompt.ask("[blue]Enter model name[/blue]", default=current)
+        if new_model.lower() == "default":
+            self.config.model = None
+            self.console.print("[blue]Model reset to default[/blue]")
+        else:
+            self.config.model = new_model
+            self.console.print(f"[blue]Model updated to {new_model}[/blue]")
+        return True
+
+    async def _cmd_index(self) -> bool:
+        current = self.config.index or "default"
+        new_index = Prompt.ask("[blue]Enter index name[/blue]", default=current)
+        if new_index.lower() == "default":
+            self.config.index = None
+            self.console.print("[blue]Index reset to default[/blue]")
+        else:
+            self.config.index = new_index
+            self.console.print(f"[blue]Index updated to {new_index}[/blue]")
+        return True
+
+    async def _cmd_settings(self) -> bool:
+        self.console.print(
+            Panel(
+                f"""Current Settings:
+- Model: {self.config.model or 'default'}
+- Index: {self.config.index or 'default'}
+- Context Size: {self.config.max_context_size}
+- Base URL: {self.config.base_url}
+            """,
+                title="Settings",
+                border_style="blue",
+            )
+        )
+        return True
+
     async def process_command(self, command: str) -> bool:
         cmd_func = self.commands.get(command.lower())
         if cmd_func:
@@ -219,14 +284,21 @@ Type your message and press Enter to chat.
                             response = await client.query(
                                 user_input, list(self.conversation_context)
                             )
-                            replies = (
-                                response.get("result", {})
-                                .get("llm", {})
-                                .get("replies", ["No response received"])
-                            )
-                        for reply in replies:
-                            assistant_message = Message(reply, MessageType.ASSISTANT)
-                            self.display_message(assistant_message)
+                            if response.get("success"):
+                                result = response.get("result", {})
+                                replies = result.get("llm", {}).get(
+                                    "replies", ["No response received"]
+                                )
+                                for reply in replies:
+                                    chipper_message = Message(
+                                        reply, MessageType.ASSISTANT
+                                    )
+                                    self.display_message(chipper_message)
+                            else:
+                                error_message = Message(
+                                    "Failed to get response from API", MessageType.ERROR
+                                )
+                                self.display_message(error_message)
                     except APIError as e:
                         error_message = Message(f"Error: {str(e)}", MessageType.ERROR)
                         self.display_message(error_message)
@@ -243,7 +315,7 @@ def setup_logging(log_level):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Chipper CLI Chat Application")
+    parser = argparse.ArgumentParser(description="Chat Interface")
     parser.add_argument(
         "--host", default=os.getenv("WEB_API_HOST", "0.0.0.0"), help="API Host"
     )
@@ -272,6 +344,16 @@ def main():
         default=int(os.getenv("MAX_CONTEXT_SIZE", "10")),
         help="Maximum Context Size",
     )
+    parser.add_argument(
+        "--model",
+        default=os.getenv("MODEL_NAME"),
+        help="Model name to use",
+    )
+    parser.add_argument(
+        "--index",
+        default=os.getenv("ES_INDEX"),
+        help="Elasticsearch index to use",
+    )
     args = parser.parse_args()
 
     base_url = f"http://{args.host}:{args.port}"
@@ -282,6 +364,8 @@ def main():
         args.verify_ssl,
         args.log_level,
         args.max_context_size,
+        args.model,
+        args.index,
     )
 
     setup_logging(config.log_level)
