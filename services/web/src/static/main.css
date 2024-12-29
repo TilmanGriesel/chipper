@@ -56,14 +56,14 @@ body {
 
 /* Code Blocks */
 .prose code:not([class*="language-"]) {
-  background-color: theme("colors.zinc.300");
+  @apply bg-zinc-300 dark:bg-zinc-800;
   padding: 0.2em 0.4em;
   border-radius: 0.25em;
   font-family: ui-monospace, monospace;
 }
 
 .system-message .prose code:not([class*="language-"]) {
-  background-color: theme("colors.purple.800");
+  @apply bg-purple-800 dark:bg-purple-700;
 }
 
 pre[class*="language-"] {
@@ -111,13 +111,56 @@ pre[class*="language-"] {
   text-align: left;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-300 dark:bg-zinc-900;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-600 dark:bg-zinc-700;
+}
+
 /* Animations */
+
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+#busy-indicator {
+  @apply bg-gradient-to-r from-purple-500 to-pink-500 transition-opacity opacity-15 duration-1000;
+  animation: spin 3s linear infinite, pulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+#busy-indicator.off {
+  opacity: 0;
+}
+
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
   }
 }
 
-.spinner {
-  animation: spin 1s linear infinite;
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.01);
+  }
 }

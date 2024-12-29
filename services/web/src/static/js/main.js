@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMessages: document.getElementById("chat-messages"),
     busyIndicator: document.getElementById("busy-indicator"),
     sendButton: document.getElementById("send-button"),
+    themeButton: document.getElementById("theme-button"),
   };
 
   const historyManager = new InputHistoryManager({
@@ -28,7 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
     () => {
       chatService.clearMessages();
       elements.chatMessages.innerHTML = "";
-    }
+    },
+    () => uiManager.toggleTheme(),
   );
 
   elements.messageInput.addEventListener("keydown", (e) => {
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           elements.messageInput.selectionStart =
             elements.messageInput.selectionEnd =
-              elements.messageInput.value.length;
+            elements.messageInput.value.length;
         }, 0);
       }
     }
@@ -55,13 +57,13 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           elements.messageInput.selectionStart =
             elements.messageInput.selectionEnd =
-              elements.messageInput.value.length;
+            elements.messageInput.value.length;
         }, 0);
       }
     }
   });
 
-  // Handle message sending
+  // message send handling
   async function sendMessage() {
     const message = elements.messageInput.value.trim();
     if (!message) return;
@@ -125,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Setup event listeners
+  // event listeners
   elements.messageInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -133,8 +135,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  elements.messageInput.addEventListener("input", () =>
-    uiManager.scrollToBottom(false)
-  );
   elements.sendButton.addEventListener("click", sendMessage);
+
+  elements.messageInput.addEventListener("input", () => uiManager.scrollToBottom(false));
+  elements.messageInput.addEventListener("focus", () => uiManager.scrollToBottom(false));
+  elements.messageInput.addEventListener("blur", () => uiManager.scrollToBottom(false));
+  elements.messageInput.addEventListener('touchstart', () => uiManager.scrollToBottom(false));
+  elements.messageInput.addEventListener('click', () => uiManager.scrollToBottom(false));
+
+  elements.themeButton.addEventListener("click", uiManager.toggleTheme);
+
+  // theme handling
+  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
 });

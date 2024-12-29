@@ -7,7 +7,7 @@ DEV_DOCKERFILE = Dockerfile.dev
 TAILWIND = npx tailwindcss
 WEB_BASE_DIR = src
 CSS_INPUT = static/main.css
-CSS_OUTPUT = static/style.css
+CSS_OUTPUT = static/dist/index.css
 TAILWIND_CONFIG = tailwind.config.js
 
 OS_TYPE := $(shell uname -s)

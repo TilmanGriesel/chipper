@@ -1,9 +1,10 @@
 export class ChatCommandHandler {
-  constructor(onModelChange, onIndexChange, onStreamChange, onClear) {
+  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
     this.onStreamChange = onStreamChange;
     this.onClear = onClear;
+    this.onToggleTheme = onToggleTheme;
   }
 
   handleCommand(message) {
@@ -37,6 +38,10 @@ export class ChatCommandHandler {
         this.onClear();
         return { type: "system", content: "Chat history cleared" };
       },
+      "/theme": () => {
+        this.onToggleTheme();
+        return { type: "system", content: "Theme toggled" };
+      },
     };
 
     const command = commands[parts[0]];
@@ -50,6 +55,7 @@ export class ChatCommandHandler {
   \`/index [name]\` - Change knowledge base index
   \`/stream [name]\` - Enable or disable response streaming
   \`/clear\` - Clear chat history
+  \`/theme\` - Toggle theme
   \`/help\` - Show this help message
   
   ### Chat Controls

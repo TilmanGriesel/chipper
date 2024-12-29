@@ -27,27 +27,25 @@ export class MessageRenderer {
 
   createMessageElement(content, type = "assistant") {
     const messageContainer = document.createElement("div");
-    messageContainer.className = `flex ${
-      type === "user" ? "justify-end" : "justify-start"
-    } mb-4`;
+    messageContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"
+      } mb-4`;
 
     const messageDiv = document.createElement("div");
     messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-lg";
 
     const typeClasses = {
       user: "bg-zinc-900 text-white user-message",
-      assistant: "bg-zinc-200 assistant-message",
-      error: "bg-red-600 text-white error-message",
-      system: "bg-purple-600 text-white system-message",
+      assistant: "bg-zinc-200 dark:bg-zinc-700 assistant-message",
+      error: "bg-red-600 dark:bg-red-500 text-white error-message",
+      system: "bg-purple-600 dark:bg-purple-500 text-white system-message",
     };
     messageDiv.classList.add(
       ...(typeClasses[type]?.split(" ") || ["bg-gray-600"])
     );
 
     const header = document.createElement("div");
-    header.className = `font-bold text-sm ${
-      type === "assistant" ? "text-zinc-800" : "text-white"
-    } mb-2`;
+    header.className = `font-bold text-sm ${type === "assistant" ? "text-zinc-800 dark:text-zinc-300" : "text-white"
+      } mb-2`;
     header.textContent =
       {
         user: "You",
