@@ -4,7 +4,7 @@ import os
 import queue
 import secrets
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 
@@ -81,17 +81,6 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         seed=int(os.getenv("SEED", 0)),
         top_k=int(os.getenv("TOP_K", 5)),
     )
-
-
-def run_test_query() -> bool:
-    config = create_pipeline_config()
-    rag = RAGQueryPipeline(config=config)
-    result = rag.run_query(
-        query="Respond with one word that describes the sky.",
-        conversation=[],
-        print_response=False,
-    )
-    return result["llm"]["replies"]
 
 
 def require_api_key(f):
@@ -261,10 +250,11 @@ def handle_standard_response(
     )
 
 
-@app.route("/", methods=["GET"])
 @app.route("/health", methods=["GET"])
 def health_check():
-    return jsonify({"status": "healthy", "timestamp": datetime.utcnow().isoformat()})
+    return jsonify(
+        {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+    )
 
 
 @app.errorhandler(404)
@@ -273,9 +263,6 @@ def not_found_error(error):
 
 
 if __name__ == "__main__":
-    if not run_test_query():
-        exit(1)
-
     app.run(
         host=os.getenv("HOST", "0.0.0.0"),
         port=int(os.getenv("PORT", "8000")),

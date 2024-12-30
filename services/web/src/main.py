@@ -5,7 +5,7 @@ import logging
 import os
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List
 from urllib.parse import urljoin
@@ -220,6 +220,12 @@ def create_app():
             }
         )
 
+    @app.route("/health", methods=["GET"])
+    def health_check():
+        return jsonify(
+            {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+        )
+
     @app.errorhandler(404)
     def not_found_error(error):
         logger.warning(f"404 error: {request.url}")
@@ -229,11 +235,6 @@ def create_app():
     def internal_error(error):
         logger.error(f"500 error: {str(error)}")
         return "", 500
-
-    @app.route("/uploads/<path:filename>")
-    def serve_upload(filename):
-        uploads_dir = os.path.join(app.root_path, "uploads")
-        return send_from_directory(uploads_dir, filename)
 
     return app
 
