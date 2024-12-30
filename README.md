@@ -64,11 +64,11 @@ The CLI chat allows terminal-based interaction with Chipper but is less maintain
 
 ## Demo
 
-<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demo_01.png"alt="Chipper RAG Util Demo Web"/></p>
-<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demo_02.png"alt="Chipper RAG Util Demo Web"/></p>
-<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demo_03.png"alt="Chipper RAG Util Demo Web"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/chipper_demo_win_01.gif"alt="Chipper RAG Util Demo Browser"/></p>
 
-## Project Philosophy
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/chipper_demo_mobile_01.gif"alt="Chipper RAG Util Demo Mobile"/></p>
+
+## Philosophy
 
 At the heart of this project lies my passion for education and exploration. I believe in creating tools that are both approachable for beginners and helpful for experts. My goal is to offer you a well-thought-out service architecture, an a stepping stone for those eager to learn and innovate.
 
@@ -82,9 +82,12 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 - [x] CLI
 - [x] Web UI
 - [x] Docker
+- [x] Improved Web UI with better mobile support
+- [ ] Improve linting and formatting
 - [ ] React based web app
+- [ ] CI test
+- [ ] Docker Hub registry images
 - [ ] Smart document chunking and embedding
-- [ ] Improved Web UI with better mobile support
 
 ---
 
