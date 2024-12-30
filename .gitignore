@@ -19,3 +19,5 @@ __pycache__
 # tools
 models
 output
+docker/user.docker-compose.yml
+/docker/user_files

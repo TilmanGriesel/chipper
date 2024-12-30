@@ -3,9 +3,13 @@
 set -e
 
 DOCKER_COMPOSE_FILE="docker/docker-compose.yml"
+USER_DOCKER_COMPOSE_FILE="docker/user.docker-compose.yml"
 
 function show_usage() {
     echo "Usage: $0 <command> [args]"
+    echo ""
+    echo "Options:"
+    echo "  -f, --file         - Specify custom docker-compose file path"
     echo ""
     echo "Commands:"
     echo "  up                  - Start containers in detached mode"
@@ -44,37 +48,60 @@ function check_make_available() {
     fi
 }
 
+COMPOSE_FILES=(-f "$DOCKER_COMPOSE_FILE")
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -f|--file)
+            if [ -f "$2" ]; then
+                COMPOSE_FILES=(-f "$2")
+            else
+                echo "Error: Docker compose file '$2' not found"
+                exit 1
+            fi
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [ -f "$USER_DOCKER_COMPOSE_FILE" ]; then
+    echo "Found user compose file"
+    COMPOSE_FILES+=(-f "$USER_DOCKER_COMPOSE_FILE")
+fi
+
 case "$1" in
     "up")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" -p chipper up -d
+        docker-compose "${COMPOSE_FILES[@]}" -p chipper up -d
         ;;
         
     "down")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" down
+        docker-compose "${COMPOSE_FILES[@]}" down
         ;;
         
     "logs")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" logs -f
+        docker-compose "${COMPOSE_FILES[@]}" logs -f
         ;;
         
     "ps")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" ps
+        docker-compose "${COMPOSE_FILES[@]}" ps
         ;;
         
     "rebuild")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" down -v --remove-orphans
-        docker-compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
-        docker-compose -f "$DOCKER_COMPOSE_FILE" up -d --force-recreate
+        docker-compose "${COMPOSE_FILES[@]}" down -v --remove-orphans
+        docker-compose "${COMPOSE_FILES[@]}" build --no-cache
+        docker-compose "${COMPOSE_FILES[@]}" up -d --force-recreate
         ;;
         
     "clean")
         check_docker_running
-        docker-compose -f "$DOCKER_COMPOSE_FILE" down -v --remove-orphans
+        docker-compose "${COMPOSE_FILES[@]}" down -v --remove-orphans
         ;;
         
     "embed")
