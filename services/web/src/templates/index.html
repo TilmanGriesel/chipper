@@ -50,13 +50,19 @@
                     enterkeyhint="send" id="message-input" placeholder="How can Chipper help you today?"
                     rows="1"></textarea>
                 <button
-                    class="max-h-12 px-3 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 touch-manipulation"
-                    id="send-button" onclick="sendMessage()">
+                    class="max-h-12 px-3 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 touch-manipulation transition-all duration-200"
+                    id="send-button" data-state="send">
+                    <!-- send -->
                     <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
+                        xmlns="http://www.w3.org/2000/svg" id="send-icon">
                         <path clip-rule="evenodd"
                             d="M11.47 2.47a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06l-6.22-6.22V21a.75.75 0 0 1-1.5 0V4.81l-6.22 6.22a.75.75 0 1 1-1.06-1.06l7.5-7.5Z"
                             fill-rule="evenodd" />
+                    </svg>
+                    <!-- abort -->
+                    <svg class="size-6 hidden" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" id="abort-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>

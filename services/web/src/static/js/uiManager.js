@@ -2,6 +2,7 @@ export class UIManager {
   constructor(elements) {
     this.elements = elements;
     this.setupTextarea();
+    this.isProcessing = false;
   }
 
   setupTextarea() {
@@ -26,11 +27,25 @@ export class UIManager {
   }
 
   setBusy(busy) {
+    this.isProcessing = busy;
     this.elements.busyIndicator.classList.toggle("off", !busy);
     this.elements.messageInput.disabled = busy;
-    this.elements.sendButton.disabled = busy;
-    this.elements.sendButton.classList.toggle("opacity-50", busy);
-    this.elements.sendButton.classList.toggle("cursor-not-allowed", busy);
+
+    const button = this.elements.sendButton;
+    const sendIcon = document.getElementById('send-icon');
+    const abortIcon = document.getElementById('abort-icon');
+
+    if (busy) {
+      // abort state
+      button.dataset.state = 'abort';
+      sendIcon.classList.add('hidden');
+      abortIcon.classList.remove('hidden');
+    } else {
+      // send state
+      button.dataset.state = 'send';
+      sendIcon.classList.remove('hidden');
+      abortIcon.classList.add('hidden');
+    }
   }
 
   updateMessageInput(newValue) {
@@ -38,6 +53,7 @@ export class UIManager {
     const event = new Event("input", { bubbles: true });
     this.elements.messageInput.dispatchEvent(event);
   }
+
 
   toggleTheme() {
     if (document.documentElement.classList.contains('dark')) {
@@ -55,5 +71,9 @@ export class UIManager {
       d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
     `
     }
+  }
+
+  isInProcessingState() {
+    return this.isProcessing;
   }
 }

@@ -6,6 +6,7 @@ import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import Enum
+from threading import Event
 from typing import Any, Dict, List
 
 import requests
@@ -25,6 +26,7 @@ logger = logging.getLogger(__name__)
 class SessionManager:
     def __init__(self, app):
         self.app = app
+        self.abort_flags = {}
         app.secret_key = secrets.token_hex(32)
         logger.info(f"Initialized SessionManager with new secret key")
         app.config.update(
@@ -37,6 +39,21 @@ class SessionManager:
         @app.before_request
         def validate_session():
             self._ensure_valid_session()
+
+    def get_abort_flag(self, session_id: str) -> Event:
+        if session_id not in self.abort_flags:
+            self.abort_flags[session_id] = Event()
+        return self.abort_flags[session_id]
+
+    def abort_chat(self, session_id: str):
+        if session_id in self.abort_flags:
+            self.abort_flags[session_id].set()
+            logger.info(f"Chat aborted for session {session_id[:8]}...")
+
+    def reset_abort_flag(self, session_id: str):
+        if session_id in self.abort_flags:
+            self.abort_flags[session_id] = Event()
+            logger.debug(f"Reset abort flag for session {session_id[:8]}...")
 
     def get_session(self):
         self._ensure_valid_session()
@@ -125,6 +142,31 @@ class Message:
     timestamp: float = None
 
 
+def make_api_request(endpoint: str, data: Dict, stream: bool = False) -> Any:
+    api_url = os.getenv("API_URL", "http://localhost:8000")
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-Key": os.getenv("API_KEY", "DEV-API-KEY-12345678-ABCDEFGHIJKLMNOP"),
+    }
+
+    try:
+        response = requests.post(
+            f"{api_url}{endpoint}",
+            headers=headers,
+            json=data,
+            stream=stream,
+            timeout=120,
+        )
+        response.raise_for_status()
+        return response
+    except (ConnectionError, Timeout) as e:
+        logger.error(f"Connection error: {str(e)}")
+        raise
+    except RequestException as e:
+        logger.error(f"Request error: {str(e)}")
+        raise
+
+
 def create_app():
     app = Flask(
         __name__,
@@ -144,30 +186,6 @@ def create_app():
             "get_asset_url": asset_config.get_asset_url,
         }
 
-    def make_api_request(endpoint: str, data: Dict, stream: bool = False) -> Any:
-        api_url = os.getenv("API_URL", "http://localhost:8000")
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-Key": os.getenv("API_KEY", "DEV-API-KEY-12345678-ABCDEFGHIJKLMNOP"),
-        }
-
-        try:
-            response = requests.post(
-                f"{api_url}{endpoint}",
-                headers=headers,
-                json=data,
-                stream=stream,
-                timeout=120,
-            )
-            response.raise_for_status()
-            return response
-        except (ConnectionError, Timeout) as e:
-            logger.error(f"Connection error: {str(e)}")
-            raise
-        except RequestException as e:
-            logger.error(f"Request error: {str(e)}")
-            raise
-
     @app.route("/api/chat", methods=["POST"])
     def chat():
         try:
@@ -175,14 +193,29 @@ def create_app():
             if not data:
                 return jsonify({"error": "Invalid JSON payload"}), 400
 
+            session_id = session.get("session_id")
+            abort_flag = session_manager.get_abort_flag(session_id)
+            session_manager.reset_abort_flag(session_id)
+
             # streaming response
             if data.get("stream", True):
                 api_response = make_api_request("/api/chat", data, stream=True)
 
                 def generate():
-                    for chunk in api_response.iter_lines():
-                        if chunk:
-                            yield chunk.decode() + "\n\n"
+                    try:
+                        for chunk in api_response.iter_lines():
+                            if abort_flag.is_set():
+                                logger.info(
+                                    f"Aborting stream for session {session_id[:8]}..."
+                                )
+                                api_response.close()
+                                yield 'data: {"type": "abort", "content": "Request aborted"}\n\n'
+                                break
+                            if chunk:
+                                yield chunk.decode() + "\n\n"
+                    except Exception as e:
+                        logger.error(f"Stream error: {str(e)}")
+                        yield f'data: {{"type": "error", "content": "{str(e)}"}}\n\n'
 
                 return Response(
                     stream_with_context(generate()),
@@ -201,6 +234,19 @@ def create_app():
         except (ConnectionError, Timeout):
             return jsonify({"error": "Connection error"}), 503
         except RequestException as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/api/chat/abort", methods=["POST"])
+    def abort_chat():
+        try:
+            session_id = session.get("session_id")
+            if not session_id:
+                return jsonify({"error": "No active session"}), 400
+
+            session_manager.abort_chat(session_id)
+            return jsonify({"status": "success", "message": "Chat aborted"})
+        except Exception as e:
+            logger.error(f"Error aborting chat: {str(e)}")
             return jsonify({"error": str(e)}), 500
 
     @app.route("/")

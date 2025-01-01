@@ -110,10 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
           uiManager.scrollToBottom(false);
         },
         (error) => {
-          elements.chatMessages.appendChild(
-            messageRenderer.createMessageElement(`${error}`, "error").container
-          );
-          uiManager.scrollToBottom();
+          if (error !== 'AbortError') {
+            elements.chatMessages.appendChild(
+              messageRenderer.createMessageElement(`${error}`, "error").container
+            );
+            uiManager.scrollToBottom();
+          }
         }
       );
 
@@ -131,6 +133,20 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.messageInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (uiManager.isInProcessingState()) {
+        chatService.abortCurrentRequest();
+        uiManager.setBusy(false);
+      } else {
+        sendMessage();
+      }
+    }
+  });
+
+  elements.sendButton.addEventListener("click", () => {
+    if (uiManager.isInProcessingState()) {
+      chatService.abortCurrentRequest();
+      uiManager.setBusy(false);
+    } else {
       sendMessage();
     }
   });
