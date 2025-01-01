@@ -5,7 +5,7 @@ set -e
 DOCKER_COMPOSE_FILE="docker/docker-compose.yml"
 USER_DOCKER_COMPOSE_FILE="docker/user.docker-compose.yml"
 PROJECT_NAME="chipper"
-LOCAL_URL="http://localhost:5000"
+LOCAL_URL="http://localhost:21200"
 
 function show_usage() {
     echo "Usage: $0 <command> [args]"

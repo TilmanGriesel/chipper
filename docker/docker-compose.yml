@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     image: ollama/ollama:latest
     ports:
-      - 8434:11434
+      - 21240:11434
     environment:
       - OLLAMA_KEEP_ALIVE=24h
     volumes:
@@ -32,7 +32,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     ports:
-      - 9200:9200
+      - 21220:9200
     environment:
       - node.name=elasticsearch
       - cluster.name=es-chipper-cluster
@@ -56,7 +56,7 @@ services:
   elasticvue:
     image: cars10/elasticvue
     ports:
-      - "8080:8080"
+      - "20030:8080"
     environment:
       ELASTICVUE_CLUSTERS: '[{"name":"es-chipper-cluster","uri":"http://elasticsearch:9200"}]'
     restart: always
@@ -68,7 +68,7 @@ services:
     build:
       context: ../services/api
     ports:
-      - 8000:8000
+      - 21210:8000
     env_file: ../services/api/.env
     depends_on:
       elasticsearch:
@@ -85,7 +85,7 @@ services:
     build:
       context: ../services/web
     ports:
-      - 5000:5000
+      - 21200:5000
     env_file: ../services/web/.env
     depends_on:
       api:
