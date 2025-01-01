@@ -39,6 +39,7 @@ function check_dependency() {
 }
 
 function docker_compose_cmd() {
+    echo ${COMPOSE_FILES[@]}
     docker-compose "${COMPOSE_FILES[@]}" "$@"
 }
 
@@ -88,8 +89,14 @@ case "$1" in
         docker compose -p $PROJECT_NAME down --remove-orphans
         docker_compose_cmd -p $PROJECT_NAME up -d
         ;;
-    "down"|"clean")
-        docker compose -p $PROJECT_NAME down ${1=="clean"? "-v" : ""} --remove-orphans
+    "down")
+        docker compose -p $PROJECT_NAME down --remove-orphans
+        ;;
+    "clean")
+        docker compose -p $PROJECT_NAME down -v --remove-orphans || true
+        echo "Cleaning up volume directories..."
+        rm -rfv docker/volumes
+        echo "Volume directories cleaned"
         ;;
     "logs")
         docker_compose_cmd logs -f
