@@ -317,12 +317,12 @@ def setup_logging(log_level):
 def main():
     parser = argparse.ArgumentParser(description="Chat Interface")
     parser.add_argument(
-        "--host", default=os.getenv("WEB_API_HOST", "0.0.0.0"), help="API Host"
+        "--host", default=os.getenv("API_HOST", "0.0.0.0"), help="API Host"
     )
     parser.add_argument(
-        "--port", default=os.getenv("WEB_API_PORT", "8000"), help="API Port"
+        "--port", default=os.getenv("API_PORT", "8000"), help="API Port"
     )
-    parser.add_argument("--api_key", default=os.getenv("WEB_API_KEY"), help="API Key")
+    parser.add_argument("--api_key", default=os.getenv("API_KEY"), help="API Key")
     parser.add_argument(
         "--timeout",
         type=int,
@@ -332,7 +332,7 @@ def main():
     parser.add_argument(
         "--verify_ssl",
         action="store_true",
-        default=os.getenv("WEB_REQUIRE_SECURE", "False").lower() == "true",
+        default=os.getenv("REQUIRE_SECURE", "False").lower() == "true",
         help="Verify SSL",
     )
     parser.add_argument(

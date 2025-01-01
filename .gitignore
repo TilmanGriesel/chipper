@@ -21,3 +21,4 @@ output
 
 # os
 .DS_Store
+/docker/ollama

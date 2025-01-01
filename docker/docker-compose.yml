@@ -1,6 +1,6 @@
 x-healthcheck: &default-healthcheck
-  interval: 30s
-  retries: 5
+  interval: 1s
+  retries: 60
 
 x-service-defaults: &service-defaults
   build:
@@ -8,6 +8,27 @@ x-service-defaults: &service-defaults
       BUILD_ENV: production
 
 services:
+  ollama:
+    volumes:
+      - ./ollama/data:/root/.ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:latest
+    ports:
+      - 8434:11434
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+    networks:
+      - backend
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     ports:
