@@ -2,88 +2,67 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <script src="static/vendor/marked.min_9_1_6.js"></script>
     <script src="static/vendor/prism.js"></script>
-    <link as="font" crossorigin href="/static/font/FiraCodeNerdFontMono-Regular.ttf" rel="preload" type="font/ttf"/>
-    <link href="static/vendor/prism.css" rel="stylesheet"/>
-    <link href="static/vendor/prism-atom-dark.css" rel="stylesheet"/>
-    <link href="static/dist/index.css" rel="stylesheet"/>
-    <style>
-        /* safe area insets */
-        body {
-          padding-top: env(safe-area-inset-top);
-          padding-bottom: env(safe-area-inset-bottom);
-          padding-left: env(safe-area-inset-left);
-          padding-right: env(safe-area-inset-right);
-        }
-
-        /* improve touch handling */
-        textarea,
-        button {
-          touch-action: manipulation;
-        }
-
-        /* prevent pull-to-refresh on mobile */
-        html,
-        body {
-          overscroll-behavior-y: contain;
-        }
-    </style>
+    <link as="font" crossorigin href="/static/font/FiraCodeNerdFontMono-Regular.ttf" rel="preload" type="font/ttf" />
+    <link href="static/vendor/prism.css" rel="stylesheet" />
+    <link href="static/vendor/prism-atom-dark.css" rel="stylesheet" />
+    <link href="static/dist/index.css" rel="stylesheet" />
 </head>
 
 <body class="bg-gray-200 dark:bg-zinc-900 h-screen flex flex-col overflow-hidden">
-<!-- theme toggle -->
-<button aria-label="Toggle dark mode"
+    <!-- theme toggle -->
+    <button aria-label="Toggle dark mode"
         class="fixed top-4 right-4 sm:top-6 sm:right-6 p-2 rounded-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors touch-manipulation"
         id="theme-button">
-    <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" fill="none" id="theme-toggle-icon" stroke="currentColor" stroke-width="1.5"
-         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path
-                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
-    </svg>
-</button>
+        <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" fill="none" id="theme-toggle-icon" stroke="currentColor"
+            stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg>
+    </button>
 
-<div class="max-w-3xl mx-auto w-full h-screen p-2 sm:p-4 flex flex-col">
-    <!-- message Container -->
-    <div class="flex-1 min-h-0 mb-2">
-        <div class="relative h-full flex flex-col">
-            <div class="off absolute -inset-1 rounded-3xl blur" id="busy-indicator">
-            </div>
-            <div
+    <div class="max-w-3xl mx-auto w-full h-screen p-2 sm:p-4 flex flex-col">
+        <!-- message container -->
+        <div class="flex-1 min-h-0 mb-2">
+            <div class="relative h-full flex flex-col">
+                <div class="off absolute -inset-1 rounded-3xl blur-xl" id="busy-indicator">
+                </div>
+                <div
                     class="relative h-full flex flex-col bg-white dark:bg-zinc-800 ring-1 ring-gray-900/5 dark:ring-zinc-100/10 rounded-3xl">
-                <!-- scrollable message container -->
-                <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 text-gray-900 dark:text-zinc-100"
-                     id="chat-messages">
-                    <!-- messages -->
+                    <!-- scrollable message container -->
+                    <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 text-gray-900 dark:text-zinc-100"
+                        id="chat-messages">
+                        <!-- messages -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- input - adjusted for better mobile interaction -->
-    <div
+        <!-- user input -->
+        <div
             class="flex-none bg-white dark:bg-zinc-800 ring-1 ring-gray-900/5 dark:ring-zinc-100/10 rounded-3xl p-3 sm:p-4">
-        <div class="flex space-x-3">
-        <textarea
-                class="max-h-72 min-h-12 h-12 flex-1 border dark:border-zinc-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 resize-none overflow-hidden bg-white dark:bg-zinc-700 text-gray-900 dark:text-zinc-100 touch-manipulation"
-                enterkeyhint="send" id="message-input" placeholder="How can Chipper help you today?"
-                rows="1"></textarea>
-            <button
+            <div class="flex space-x-3">
+                <textarea
+                    class="max-h-72 min-h-12 h-12 flex-1 border dark:border-zinc-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 resize-none overflow-hidden bg-white dark:bg-zinc-700 text-gray-900 dark:text-zinc-100 touch-manipulation"
+                    enterkeyhint="send" id="message-input" placeholder="How can Chipper help you today?"
+                    rows="1"></textarea>
+                <button
                     class="max-h-12 px-3 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 touch-manipulation"
                     id="send-button" onclick="sendMessage()">
-                <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5"
-                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path clip-rule="evenodd"
-                          d="M11.47 2.47a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06l-6.22-6.22V21a.75.75 0 0 1-1.5 0V4.81l-6.22 6.22a.75.75 0 1 1-1.06-1.06l7.5-7.5Z"
-                          fill-rule="evenodd"/>
-                </svg>
-            </button>
+                    <svg class="size-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path clip-rule="evenodd"
+                            d="M11.47 2.47a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06l-6.22-6.22V21a.75.75 0 0 1-1.5 0V4.81l-6.22 6.22a.75.75 0 1 1-1.06-1.06l7.5-7.5Z"
+                            fill-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
-</div>
-<script src="static/js/main.js" type="module"></script>
+    <script src="static/js/main.js" type="module"></script>
 </body>
 
 </html>

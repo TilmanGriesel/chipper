@@ -1,3 +1,26 @@
+/* safe area insets */
+
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* improve touch handling */
+
+textarea,
+button {
+  touch-action: manipulation;
+}
+
+/* prevent pull-to-refresh on mobile */
+
+html,
+body {
+  overscroll-behavior-y: contain;
+}
+
 /* Tailwind Imports */
 
 *, ::before, ::after {
@@ -881,6 +904,16 @@ video {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.blur-2xl {
+  --tw-blur: blur(40px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.blur-xl {
+  --tw-blur: blur(24px);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1054,32 +1087,37 @@ pre[class*="language-"] {
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
 }
 
-/* Animations */
+/* Busy Indicator */
 
 @property --rotate {
   syntax: "<angle>";
 
-  initial-value: 0deg;
+  initial-value: 132deg;
 
   inherits: false;
 }
 
 #busy-indicator {
-  background-image: linear-gradient(to right, var(--tw-gradient-stops));
-  --tw-gradient-from: #a855f7 var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(168 85 247 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-  --tw-gradient-to: #ec4899 var(--tw-gradient-to-position);
-  opacity: 0.15;
+  opacity: 0.3;
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 1000ms;
-  animation: spin 3s linear infinite, pulse 2s ease-in-out infinite;
-  transform-origin: center;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    var(--rotate),
+    #5ddcff,
+    #f53ec7 43%,
+    #a162ff
+  );
+  position: absolute;
+  z-index: -1;
+  animation: spin 5.5s linear infinite;
 }
 
 #busy-indicator.off {
   opacity: 0;
+  animation: spin 5.5s linear infinite;
 }
 
 @keyframes spin {
@@ -1089,17 +1127,6 @@ pre[class*="language-"] {
 
   100% {
     --rotate: 360deg;
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.01);
   }
 }
 
