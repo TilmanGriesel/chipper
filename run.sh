@@ -99,7 +99,6 @@ case "$1" in
     "up")
         docker compose -p $PROJECT_NAME down --remove-orphans
         docker_compose_cmd -p $PROJECT_NAME up -d
-        open_browser
         ;;
     "down")
         docker compose -p $PROJECT_NAME down --remove-orphans
@@ -116,7 +115,7 @@ case "$1" in
         docker_compose_cmd up -d --force-recreate
         ;;
     "embed-testdata")
-        run_in_directory "tools/embed" ./run.sh "testdata"
+        run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata"
         ;;
     "embed")
         shift
@@ -139,6 +138,9 @@ case "$1" in
         echo "Running pre-commit hooks for formatting..."
         pre-commit run --all-files
         echo "Formatting completed successfully!"
+        ;;
+    "browser")
+        open_browser
         ;;
     *)
         show_usage
