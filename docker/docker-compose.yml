@@ -1,6 +1,6 @@
 x-healthcheck: &default-healthcheck
   interval: 5s
-  retries: 5
+  retries: 10
 
 x-service-defaults: &service-defaults
   build:
@@ -9,10 +9,10 @@ x-service-defaults: &service-defaults
 
 services:
   ollama:
+    image: ollama/ollama:latest
     pull_policy: always
     tty: true
     restart: unless-stopped
-    image: ollama/ollama:latest
     ports:
       - 21240:11434
     environment:
@@ -39,7 +39,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "http.cors.enabled=true"
-      - "http.cors.allow-origin=http://localhost:8080"
+      - "http.cors.allow-origin=http://localhost:21230"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
@@ -50,16 +50,19 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
     deploy:
       resources:
-        limits:
+         limits:
           memory: 16g
 
   elasticvue:
     image: cars10/elasticvue
     ports:
-      - "20030:8080"
+      - 21230:8080
     environment:
-      ELASTICVUE_CLUSTERS: '[{"name":"es-chipper-cluster","uri":"http://elasticsearch:9200"}]'
+      - ELASTICVUE_CLUSTERS=[{"name":"es-chipper-cluster","uri":"http://localhost:21220"}]
     restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     networks:
       - backend
 
@@ -79,6 +82,10 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    deploy:
+      resources:
+        limits:
+          memory: '2g'
 
   web:
     <<: *service-defaults
@@ -95,10 +102,16 @@ services:
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    deploy:
+      resources:
+        limits:
+          memory: '2g'
 
 networks:
   frontend:
+    name: frontend_network
   backend:
+    name: backend_network
 
 volumes:
   ollama-data:

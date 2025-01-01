@@ -27,6 +27,8 @@ function show_usage() {
     echo "  dev-web             - Start web service in development mode"
     echo "  css                 - Watch and rebuild CSS files"
     echo "  format              - Run pre-commit formatting hooks"
+    echo "  browser             - Open web-interface in local browser"
+    echo "  cli                 - Run cli interface"
 }
 
 function check_dependency() {
@@ -112,7 +114,7 @@ case "$1" in
     "rebuild")
         docker compose -p $PROJECT_NAME down --remove-orphans
         docker_compose_cmd build --no-cache
-        docker_compose_cmd up -d --force-recreate
+        docker_compose_cmd -p $PROJECT_NAME up -d --force-recreate
         ;;
     "embed-testdata")
         run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata"
@@ -141,6 +143,10 @@ case "$1" in
         ;;
     "browser")
         open_browser
+        ;;
+    "cli")
+        shift
+        run_in_directory "tools/cli" ./run.sh "$@"
         ;;
     *)
         show_usage
