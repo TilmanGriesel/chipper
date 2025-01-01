@@ -9,13 +9,14 @@ from functools import wraps
 from pathlib import Path
 
 import elasticsearch
-from core.query import QueryPipelineConfig, RAGQueryPipeline
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+from core.query import QueryPipelineConfig, RAGQueryPipeline
 
 load_dotenv()
 
@@ -149,7 +150,7 @@ def chat():
 
 
 def handle_streaming_response(
-    config: QueryPipelineConfig, query: str, conversation: list
+        config: QueryPipelineConfig, query: str, conversation: list
 ) -> Response:
     q = queue.Queue()
 
@@ -218,7 +219,7 @@ def handle_streaming_response(
 
 
 def handle_standard_response(
-    config: QueryPipelineConfig, query: str, conversation: list, messages: list
+        config: QueryPipelineConfig, query: str, conversation: list, messages: list
 ) -> Response:
     rag = RAGQueryPipeline(config=config)
 

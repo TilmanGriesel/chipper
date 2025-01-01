@@ -1,13 +1,11 @@
 import logging
-import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import elasticsearch
 import requests
 from haystack import Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
-from haystack.dataclasses import StreamingChunk
 from haystack_integrations.components.embedders.ollama import \
     OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
@@ -56,9 +54,9 @@ class RAGQueryPipeline:
     """
 
     def __init__(
-        self,
-        config: QueryPipelineConfig,
-        streaming_callback=None,
+            self,
+            config: QueryPipelineConfig,
+            streaming_callback=None,
     ):
         logging.basicConfig(
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -266,7 +264,7 @@ class RAGQueryPipeline:
         self.logger.info("Pipeline components connected successfully")
 
     def run_query(
-        self, query: str, conversation: List[dict] = None, print_response: bool = False
+            self, query: str, conversation: List[dict] = None, print_response: bool = False
     ) -> Optional[dict]:
         self.logger.info(f"\nProcessing Query: {query}")
         self.logger.info(f"Conversation history present: {bool(conversation)}")
