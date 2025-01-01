@@ -10,8 +10,8 @@ from typing import Any, Dict, List
 
 import requests
 from dotenv import load_dotenv
-from flask import (Flask, Response, jsonify, render_template, request,
-                   session, stream_with_context)
+from flask import (Flask, Response, jsonify, render_template, request, session,
+                   stream_with_context)
 from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()

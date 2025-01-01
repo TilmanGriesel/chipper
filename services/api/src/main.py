@@ -9,14 +9,13 @@ from functools import wraps
 from pathlib import Path
 
 import elasticsearch
+from core.query import QueryPipelineConfig, RAGQueryPipeline
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.middleware.proxy_fix import ProxyFix
-
-from core.query import QueryPipelineConfig, RAGQueryPipeline
 
 load_dotenv()
 
@@ -30,7 +29,7 @@ logger = logging.getLogger(__name__)
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=["1000 per day", "1000 per minute"],
+    default_limits=["10000 per day", "1000 per minute"],
     storage_uri="memory://",
 )
 
@@ -150,13 +149,31 @@ def chat():
 
 
 def handle_streaming_response(
-        config: QueryPipelineConfig, query: str, conversation: list
+    config: QueryPipelineConfig, query: str, conversation: list
 ) -> Response:
     q = queue.Queue()
+
+    def format_model_status(status):
+        model = status.get("model", "unknown")
+        status_type = status.get("status")
+
+        if status_type == "pulling":
+            return f"Starting to download model {model}..."
+        elif status_type == "progress":
+            percentage = int(status.get("percentage", 0))
+            return f"Downloading model {model}: {percentage}% complete"
+        elif status_type == "complete":
+            return f"Successfully downloaded model {model}"
+        elif status_type == "error" and "pull" in status.get("error", "").lower():
+            error_msg = status.get("error", "Unknown error")
+            return f"Error downloading model {model}: {error_msg}"
+
+        return None
 
     def streaming_callback(chunk):
         if chunk.content:
             response_data = {
+                "type": "chat_response",
                 "chunk": chunk.content,
                 "done": False,
                 "full_response": None,
@@ -167,20 +184,41 @@ def handle_streaming_response(
 
     def run_rag():
         try:
+            for status in rag.initialize_and_check_models():
+                message = format_model_status(status)
+                if message:
+                    response_data = {
+                        "type": "chat_response",
+                        "chunk": message + "\n",
+                        "done": False,
+                        "full_response": None,
+                    }
+                    q.put(f"data: {json.dumps(response_data)}\n\n")
+
             rag.create_query_pipeline()
             result = rag.run_query(
                 query=query, conversation=conversation, print_response=False
             )
-            final_data = {"chunk": "", "done": True, "full_response": result}
+            final_data = {
+                "type": "chat_response",
+                "chunk": "",
+                "done": True,
+                "full_response": result,
+            }
             q.put(f"data: {json.dumps(final_data)}\n\n")
         except elasticsearch.BadRequestError as e:
             error_data = {
-                "error": "Embedding retriever error. Index not found.",
+                "type": "chat_response",
+                "chunk": f"Error: Embedding retriever error. Index not found.\n",
                 "done": True,
             }
             q.put(f"data: {json.dumps(error_data)}\n\n")
         except Exception as e:
-            error_data = {"error": str(e), "done": True}
+            error_data = {
+                "type": "chat_response",
+                "chunk": f"Error: {str(e)}\n",
+                "done": True,
+            }
             logger.error(f"Error in RAG pipeline: {e}", exc_info=True)
             q.put(f"data: {json.dumps(error_data)}\n\n")
 
@@ -203,7 +241,11 @@ def handle_streaming_response(
                 logger.warning("Queue timeout. Sending heartbeat.")
             except json.JSONDecodeError as e:
                 logger.error(f"JSON decode error: {e} | Data: {data_item}")
-                error_message = {"error": "Invalid JSON format received.", "done": True}
+                error_message = {
+                    "type": "error",
+                    "error": "Invalid JSON format received.",
+                    "done": True,
+                }
                 yield f"data: {json.dumps(error_message)}\n\n"
                 break
 
@@ -219,7 +261,7 @@ def handle_streaming_response(
 
 
 def handle_standard_response(
-        config: QueryPipelineConfig, query: str, conversation: list, messages: list
+    config: QueryPipelineConfig, query: str, conversation: list, messages: list
 ) -> Response:
     rag = RAGQueryPipeline(config=config)
 
