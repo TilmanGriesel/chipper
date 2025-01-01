@@ -24,10 +24,10 @@ if [ ! -d "$LOCAL_PATH" ]; then
 fi
 
 
-IMAGE_NAME="chipper-embedder"
+IMAGE_NAME="chipper-embed"
 
 docker build -t $IMAGE_NAME .
 
-docker run --env-file .env \
+docker run --rm --name chipper-embed --env-file .env \
     -v "$LOCAL_PATH:/app/data" \
     ${IMAGE_NAME} "$@" 

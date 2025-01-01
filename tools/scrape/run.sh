@@ -10,10 +10,10 @@ fi
 BASE_URL=$1
 shift
 
-IMAGE_NAME="chipper-scraper"
+IMAGE_NAME="chipper-scrape
 
 docker build -t $IMAGE_NAME .
 
-docker run \
+docker run --rm --name chipper-scrape \
     -v "${PWD}/output":/app/data \
     ${IMAGE_NAME} --base-url="${BASE_URL}"

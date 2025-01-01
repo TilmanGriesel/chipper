@@ -10,7 +10,7 @@ x-service-defaults: &service-defaults
 services:
   ollama:
     volumes:
-      - ./ollama/data:/root/.ollama
+      - ./volumes/ollama/data:/root/.ollama
     pull_policy: always
     tty: true
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
     environment:
       - OLLAMA_KEEP_ALIVE=24h
     networks:
-      - backend
+      - chipper-backend
     deploy:
       resources:
         reservations:
@@ -38,9 +38,9 @@ services:
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - ./volumes/elasticsearch/data:/usr/share/elasticsearch/data
     networks:
-      - backend
+      - chipper-backend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
@@ -48,8 +48,18 @@ services:
       resources:
         limits:
           memory: 16g
-          
-  api:
+
+  elasticvue:
+    image: cars10/elasticvue
+    ports:
+      - "8080:8080"
+    environment:
+      ELASTICVUE_CLUSTERS: '[{"name":"chipper","uri":"http://elasticsearch:9200"}]'
+    restart: always
+    networks:
+      - chipper-backend
+
+  chipper-api:
     <<: *service-defaults
     build:
       context: ../services/api
@@ -60,13 +70,13 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - backend
-      - frontend
+      - chipper-backend
+      - chipper-frontend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
 
-  web:
+  chipper-web:
     <<: *service-defaults
     build:
       context: ../services/web
@@ -74,17 +84,14 @@ services:
       - 5000:5000
     env_file: ../services/web/.env
     depends_on:
-      api:
+      chipper-api:
         condition: service_healthy
     networks:
-      - frontend
+      - chipper-frontend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
 
 networks:
-  frontend:
-  backend:
-
-volumes:
-  elasticsearch-data:
+  chipper-frontend:
+  chipper-backend:

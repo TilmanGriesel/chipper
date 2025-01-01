@@ -107,7 +107,7 @@ case "$1" in
         run_in_directory "tools/embed" ./run.sh "$@"
         ;;
     "embed-testdata")
-        run_in_directory "tools/embed" ./run.sh "$(pwd)/testdata"
+        run_in_directory "tools/embed" ./run.sh "testdata"
         ;;
     "scrape")
         shift

@@ -60,7 +60,7 @@ fi
 for FILE in "${FILES[@]}"; do
     echo "Processing file: $FILE"
 
-    docker run --gpus all -it \
+    docker run --rm --name chipper-transcribe --gpus all -it \
         -v ${PWD}/models:/root/.cache/whisper \
         -v ${PWD}/output:/output \
         -v "$(dirname "$FILE"):/app" \

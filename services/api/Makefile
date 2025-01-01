@@ -18,6 +18,8 @@ build-dev:
 
 run-dev:
 	docker run \
+		--rm  \
+		--name chipper-web-dev \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src" \
 		-p 8000:8000 \

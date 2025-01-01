@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Generator
+import json
 
 import elasticsearch
 import requests
@@ -105,11 +106,13 @@ class RAGQueryPipeline:
             )
             raise
 
-    def check_and_pull_models(self):
-        """Check if required models exist and pull them if needed."""
+    def check_and_pull_models(self) -> Generator[dict, None, None]:
+        """Check if required models exist and pull them if needed, yielding status updates."""
         for model_name in [self.config.model_name, self.config.embedding_model]:
             try:
                 self.logger.info(f"Checking availability of model: {model_name}")
+                yield {"status": "checking", "model": model_name}
+
                 show_response = requests.post(
                     f"{self.config.ollama_url}/api/show",
                     json={"model": model_name},
@@ -119,31 +122,50 @@ class RAGQueryPipeline:
                     self.logger.info(
                         f"Model '{model_name}' not found locally, initiating pull..."
                     )
-                    pull_response = requests.post(
-                        f"{self.config.ollama_url}/api/pull",
-                        json={"model": model_name},
-                    )
+                    yield {"status": "pulling", "model": model_name}
 
-                    if pull_response.status_code == 200:
-                        self.logger.info(f"Model '{model_name}' pulled successfully")
-                    else:
-                        self.logger.error(
-                            f"Model pull failed with status code: {pull_response.status_code}"
-                        )
-                        raise Exception(f"Model pull failed: {pull_response.text}")
+                    with requests.post(
+                            f"{self.config.ollama_url}/api/pull",
+                            json={"model": model_name},
+                            stream=True
+                    ) as response:
+                        if response.status_code == 200:
+                            for line in response.iter_lines():
+                                if line:
+                                    progress = json.loads(line)
+                                    if 'total' in progress and 'completed' in progress:
+                                        percentage = round((progress['completed'] / progress['total']) * 100, 1)
+                                        yield {
+                                            "status": "progress",
+                                            "model": model_name,
+                                            "percentage": percentage
+                                        }
+
+                            yield {
+                                "status": "complete",
+                                "model": model_name
+                            }
+                            self.logger.info(f"Model '{model_name}' pulled successfully")
+                        else:
+                            error_msg = f"Model pull failed: {response.text}"
+                            self.logger.error(error_msg)
+                            yield {"status": "error", "model": model_name, "error": error_msg}
+                            raise Exception(error_msg)
                 else:
+                    yield {"status": "available", "model": model_name}
                     self.logger.info(f"Model '{model_name}' is already available locally")
 
             except Exception as e:
-                self.logger.error(
-                    f"Failed to verify or pull model {model_name}: {str(e)}", exc_info=True
-                )
+                error_msg = f"Failed to verify or pull model {model_name}: {str(e)}"
+                self.logger.error(error_msg, exc_info=True)
+                yield {"status": "error", "model": model_name, "error": error_msg}
                 raise
 
     def _initialize_models(self):
         try:
             self._check_server_health()
-            self.check_and_pull_models()
+            for status in self.check_and_pull_models():
+                self.logger.info(f"Model status update: {status}")
         except Exception as e:
             self.logger.error(f"Failed to initialize models: {str(e)}", exc_info=True)
             raise
