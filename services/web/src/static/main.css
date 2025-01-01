@@ -157,7 +157,7 @@ pre[class*="language-"] {
 }
 
 #busy-indicator {
-  @apply transition-opacity opacity-30 duration-1000;
+  @apply transition-opacity opacity-60 dark:opacity-25 duration-1000;
   width: 100%;
   height: 100%;
   background-image: linear-gradient(
