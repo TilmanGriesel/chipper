@@ -1,0 +1,59 @@
+x-healthcheck: &default-healthcheck
+  interval: 5s
+  retries: 10
+
+services:
+  ollama: &ollama-base
+    image: ollama/ollama:latest
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 21240:11434
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - backend
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  elasticsearch: &elasticsearch-base
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    ports:
+      - 21220:9200
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-chipper-cluster
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=http://localhost:21230"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
+    deploy:
+      resources:
+         limits:
+          memory: 16g
+
+networks:
+  frontend:
+    name: frontend_network
+  backend:
+    name: backend_network
+
+volumes:
+  ollama-data:
+  elasticsearch-data:

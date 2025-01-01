@@ -1,0 +1,59 @@
+x-healthcheck: &default-healthcheck
+  interval: 5s
+  retries: 10
+
+x-shared-deploy: &shared-deploy
+  resources:
+    limits:
+      memory: '2g'
+      
+services:
+  elasticvue:
+    image: cars10/elasticvue
+    ports:
+      - 21230:8080
+    environment:
+      - ELASTICVUE_CLUSTERS=[{"name":"es-chipper-cluster","uri":"http://localhost:21220"}]
+    restart: always
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ../services/api
+      args:
+        BUILD_ENV: development
+    ports:
+      - 21210:8000
+    env_file: ../services/api/.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    deploy: *shared-deploy
+
+  web:
+    build:
+      context: ../services/web
+      args:
+        BUILD_ENV: development
+    ports:
+      - 21200:5000
+    env_file: ../services/web/.env
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    deploy: *shared-deploy

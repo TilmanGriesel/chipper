@@ -1,0 +1,62 @@
+x-healthcheck: &default-healthcheck
+  interval: 5s
+  retries: 10
+
+x-shared-deploy: &shared-deploy
+  resources:
+    limits:
+      memory: '2g'
+
+services:
+  api:
+    image: griesel/chipper:api-latest
+    ports:
+      - 127.0.0.1:21210:8000
+    env_file: ../services/api/.env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    deploy: *shared-deploy
+
+  web:
+    image: griesel/chipper:web-latest
+    ports:
+      - 127.0.0.1:21200:5000
+    env_file: ../services/web/.env
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    deploy: *shared-deploy
+
+  nginx-proxy:
+    # ref: https://nginxproxymanager.com/guide/#quick-setup
+    
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - 80:80
+      - 81:81
+      - 443:443
+    volumes:
+      - nginx-proxy-data:/data
+      - nginx-proxy-letsencrypt:/etc/letsencrypt
+    networks:
+      - frontend
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:81"]
+    deploy: *shared-deploy
+
+volumes:
+  nginx-proxy-data:
+  nginx-proxy-letsencrypt:

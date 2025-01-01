@@ -48,7 +48,7 @@ If you like what you see, leaving a star would be sweet and will help more peopl
 1. **Default Docker Setup:**
 
    - In the `docker` directory, you will find a default `docker-compose.yml` file.
-   - For customization, create a `user.docker-compose.yml` file in the same directory. This custom file will automatically be used by the `run.sh` if it exists.
+   - For customization, create a `docker-compose.user.yml` file in the same directory. This custom file will automatically be used by the `run.sh` if it exists.
 
 1. **Environment Configuration:**
 
@@ -81,7 +81,7 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 - [ ] Improve linting and formatting
 - [ ] React based web app
 - [ ] CI test
-- [ ] Docker Hub registry images
+- [x] Docker Hub registry images
 - [ ] Smart document chunking and embedding
 
 ---

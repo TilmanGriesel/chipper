@@ -2,8 +2,10 @@
 
 set -e
 
-DOCKER_COMPOSE_FILE="docker/docker-compose.yml"
-USER_DOCKER_COMPOSE_FILE="docker/user.docker-compose.yml"
+
+DOCKER_COMPOSE_FILE_BASE="docker/docker-compose.base.yml"
+DOCKER_COMPOSE_FILE="docker/docker-compose.dev.yml"
+USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 PROJECT_NAME="chipper"
 LOCAL_URL="http://localhost:21200"
 
@@ -62,12 +64,14 @@ function open_browser() {
     esac
 }
 
-COMPOSE_FILES=(-f "$DOCKER_COMPOSE_FILE")
+COMPOSE_FILES=(-f "$DOCKER_COMPOSE_FILE_BASE")
+COMPOSE_FILES+=(-f "$DOCKER_COMPOSE_FILE")
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         -f|--file)
             if [ -f "$2" ]; then
-                COMPOSE_FILES=(-f "$2")
+                COMPOSE_FILES+=(-f "$2") 
             else
                 echo "Error: Docker compose file '$2' not found"
                 exit 1
