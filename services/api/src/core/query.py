@@ -331,6 +331,7 @@ class RAGQueryPipeline:
             url=self.config.ollama_url,
             generation_kwargs=generation_kwargs,
             streaming_callback=self._streaming_callback,
+            timeout=240,
         )
         self.logger.info("Ollama Generator initialized successfully")
         return generator
