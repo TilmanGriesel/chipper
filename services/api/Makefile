@@ -22,7 +22,7 @@ run-dev:
 		--name chipper-api-dev \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src" \
-		-p 8000:8000 \
+		-p 21210:8000 \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 

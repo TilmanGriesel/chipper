@@ -25,7 +25,7 @@ run-dev:
 		--name chipper-web-dev \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src" \
-		-p 5000:5000 \
+		-p 21200:5000 \
 		--name $(CONTAINER_NAME) \
 		$(IMAGE_NAME)
 
