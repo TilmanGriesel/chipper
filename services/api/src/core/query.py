@@ -6,13 +6,10 @@ import elasticsearch
 import requests
 from haystack import Pipeline
 from haystack.components.builders.prompt_builder import PromptBuilder
-from haystack_integrations.components.embedders.ollama import \
-    OllamaTextEmbedder
+from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
-from haystack_integrations.components.retrievers.elasticsearch import \
-    ElasticsearchEmbeddingRetriever
-from haystack_integrations.document_stores.elasticsearch import \
-    ElasticsearchDocumentStore
+from haystack_integrations.components.retrievers.elasticsearch import ElasticsearchEmbeddingRetriever
+from haystack_integrations.document_stores.elasticsearch import ElasticsearchDocumentStore
 
 
 @dataclass
@@ -71,7 +68,7 @@ class RAGQueryPipeline:
 
         self._log_configuration()
         self.document_store = self._initialize_document_store()
-        self._initialize_query()
+        self._initialize_models()
         self.query_pipeline = None
         self.logger.info("RAGQueryPipeline initialization completed")
 
@@ -108,45 +105,47 @@ class RAGQueryPipeline:
             )
             raise
 
-    def _initialize_query(self):
+    def check_and_pull_models(self):
+        """Check if required models exist and pull them if needed."""
+        for model_name in [self.config.model_name, self.config.embedding_model]:
+            try:
+                self.logger.info(f"Checking availability of model: {model_name}")
+                show_response = requests.post(
+                    f"{self.config.ollama_url}/api/show",
+                    json={"model": model_name},
+                )
+
+                if show_response.status_code != 200:
+                    self.logger.info(
+                        f"Model '{model_name}' not found locally, initiating pull..."
+                    )
+                    pull_response = requests.post(
+                        f"{self.config.ollama_url}/api/pull",
+                        json={"model": model_name},
+                    )
+
+                    if pull_response.status_code == 200:
+                        self.logger.info(f"Model '{model_name}' pulled successfully")
+                    else:
+                        self.logger.error(
+                            f"Model pull failed with status code: {pull_response.status_code}"
+                        )
+                        raise Exception(f"Model pull failed: {pull_response.text}")
+                else:
+                    self.logger.info(f"Model '{model_name}' is already available locally")
+
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to verify or pull model {model_name}: {str(e)}", exc_info=True
+                )
+                raise
+
+    def _initialize_models(self):
         try:
             self._check_server_health()
-
-            self.logger.info(
-                f"Checking availability of model: {self.config.model_name}"
-            )
-            show_response = requests.post(
-                f"{self.config.ollama_url}/api/show",
-                json={"model": self.config.model_name},
-            )
-
-            if show_response.status_code != 200:
-                self.logger.info(
-                    f"Model '{self.config.model_name}' not found locally, initiating pull..."
-                )
-                pull_response = requests.post(
-                    f"{self.config.ollama_url}/api/pull",
-                    json={"model": self.config.model_name},
-                )
-
-                if pull_response.status_code == 200:
-                    self.logger.info(
-                        f"Model '{self.config.model_name}' pulled successfully"
-                    )
-                else:
-                    self.logger.error(
-                        f"Model pull failed with status code: {pull_response.status_code}"
-                    )
-                    raise Exception(f"Model pull failed: {pull_response.text}")
-            else:
-                self.logger.info(
-                    f"Model '{self.config.model_name}' is already available locally"
-                )
-
+            self.check_and_pull_models()
         except Exception as e:
-            self.logger.error(
-                f"Failed to verify or pull model: {str(e)}", exc_info=True
-            )
+            self.logger.error(f"Failed to initialize models: {str(e)}", exc_info=True)
             raise
 
     def _initialize_document_store(self) -> ElasticsearchDocumentStore:
