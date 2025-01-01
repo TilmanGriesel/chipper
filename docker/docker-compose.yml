@@ -30,7 +30,7 @@ services:
               capabilities: [gpu]
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
     ports:
       - 21220:9200
     environment:
