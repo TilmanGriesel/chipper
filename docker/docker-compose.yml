@@ -1,6 +1,6 @@
 x-healthcheck: &default-healthcheck
-  interval: 1s
-  retries: 60
+  interval: 5s
+  retries: 5
 
 x-service-defaults: &service-defaults
   build:
@@ -9,8 +9,6 @@ x-service-defaults: &service-defaults
 
 services:
   ollama:
-    volumes:
-      - ./volumes/ollama/data:/root/.ollama
     pull_policy: always
     tty: true
     restart: unless-stopped
@@ -19,8 +17,10 @@ services:
       - 8434:11434
     environment:
       - OLLAMA_KEEP_ALIVE=24h
+    volumes:
+      - ollama-data:/root/.ollama
     networks:
-      - chipper-backend
+      - backend
     deploy:
       resources:
         reservations:
@@ -38,9 +38,9 @@ services:
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     volumes:
-      - ./volumes/elasticsearch/data:/usr/share/elasticsearch/data
+      - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      - chipper-backend
+      - backend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
@@ -57,9 +57,9 @@ services:
       ELASTICVUE_CLUSTERS: '[{"name":"chipper","uri":"http://elasticsearch:9200"}]'
     restart: always
     networks:
-      - chipper-backend
+      - backend
 
-  chipper-api:
+  api:
     <<: *service-defaults
     build:
       context: ../services/api
@@ -70,13 +70,13 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - chipper-backend
-      - chipper-frontend
+      - backend
+      - frontend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
 
-  chipper-web:
+  web:
     <<: *service-defaults
     build:
       context: ../services/web
@@ -84,14 +84,18 @@ services:
       - 5000:5000
     env_file: ../services/web/.env
     depends_on:
-      chipper-api:
+      api:
         condition: service_healthy
     networks:
-      - chipper-frontend
+      - frontend
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
 
 networks:
-  chipper-frontend:
-  chipper-backend:
+  frontend:
+  backend:
+
+volumes:
+  ollama-data:
+  elasticsearch-data:

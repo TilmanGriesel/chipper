@@ -22,7 +22,7 @@ build-dev:
 run-dev:
 	docker run \
 		--rm  \
-		--name chipper-web-dev \ 
+		--name chipper-web-dev \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src" \
 		-p 5000:5000 \

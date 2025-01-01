@@ -14,6 +14,6 @@ IMAGE_NAME="chipper-scrape
 
 docker build -t $IMAGE_NAME .
 
-docker run --rm --name chipper-scrape \
+docker run --rm --name ${IMAGE_NAME} \
     -v "${PWD}/output":/app/data \
     ${IMAGE_NAME} --base-url="${BASE_URL}"
