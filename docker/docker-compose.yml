@@ -34,9 +34,13 @@ services:
     ports:
       - 9200:9200
     environment:
+      - node.name=elasticsearch
+      - cluster.name=es-chipper-cluster
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=http://localhost:8080"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
@@ -54,7 +58,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      ELASTICVUE_CLUSTERS: '[{"name":"chipper","uri":"http://elasticsearch:9200"}]'
+      ELASTICVUE_CLUSTERS: '[{"name":"es-chipper-cluster","uri":"http://elasticsearch:9200"}]'
     restart: always
     networks:
       - backend
