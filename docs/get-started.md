@@ -35,7 +35,7 @@ Alright, let’s get you set up! There’s one key requirement: [Docker](https:/
 
 Secondly, you’ll need Git, a version control tool that’s also the inspiration behind GitHub’s name. If you don’t already have Git installed, no worries:
 
-- [this guide will help you get started](https://docs.github.com/en/get-started/getting-started-with-git).
+- [This guide will help you get started](https://docs.github.com/en/get-started/getting-started-with-git)
 
 ## Step 2 - Project Setup
 
