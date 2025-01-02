@@ -12,7 +12,7 @@ export default defineConfig({
     ['link', { rel: "icon", type: "image/png", sizes: "192x192", href: "/assets/favicons/favicon-192x192.png"}],
     ['link', { rel: "icon", type: "image/png", sizes: "512x512", href: "/assets/favicons/favicon-512x512.png"}],
     ['link', { rel: "manifest", href: "/assets/favicons/site.webmanifest"}],
-    ['meta', { property: "og:image", content: "/assets/social.png"}],
+    ['meta', { property: "og:image", content: "/assets/social_banner.png"}],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config

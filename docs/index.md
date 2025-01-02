@@ -7,7 +7,7 @@ hero:
   text: ""
   tagline: AI RAG interface for tinkerers
   image:
-    src: /assets/logo_chipper_bg.png
+    src: /assets/logo.png
     alt: chipper-logo
   actions:
     - theme: brand
