@@ -89,6 +89,11 @@ done
     COMPOSE_FILES+=(-f "$USER_DOCKER_COMPOSE_FILE")
 }
 
+if [ $# -eq 0 ]; then
+    show_usage
+    exit 1
+fi
+
 case "$1" in
     up|down|logs|ps|rebuild|clean|embed*|scrape)
         check_dependency docker "Error: Docker is not running. Please start Docker and try again."
