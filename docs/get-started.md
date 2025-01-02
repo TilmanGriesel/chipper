@@ -122,7 +122,7 @@ You can set the index using the `--es-index <name>` parameter, specify the embed
 ./tools/embed/run.sh --help
 ```
 
-### Step 5 - Where to go from here?
+## Step 5 - Where to go from here?
 
 First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to "chip" wood, just like we need to split and chip the data we want to embed. And as for "retriever", - well ...
 
