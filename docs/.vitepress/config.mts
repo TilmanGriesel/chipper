@@ -19,7 +19,8 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Get Started', link: '/get-started' },
-      { text: 'Demo', link: '/demo' }
+      { text: 'Demo', link: '/demo' },
+      { text: 'Docker Hub', link: 'https://hub.docker.com/repository/docker/griesel/chipper' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/TilmanGriesel/chipper' }

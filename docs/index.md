@@ -16,6 +16,9 @@ hero:
     - theme: alt
       text: Demo
       link: /demo
+    - theme: alt
+      text: GitHub
+      link: https://github.com/TilmanGriesel/chipper
 
 features:
   - title: Prepare

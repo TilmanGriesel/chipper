@@ -62,6 +62,7 @@ A huge shoutout and heartfelt thanks to all the incredible projects that make Ch
 - [Ollama](https://ollama.com/) for their amazing models and project.
 - [Elastic](https://www.elastic.com) and [Elasticvue](https://elasticvue.com/) for powering fast and efficient data retrieval.
 - [Docker](https://docker.com) for simplifying deployment and making setup a breeze.
+- [VitePress](https://vitepress.dev/), just the most lovely static site generator.
 
 These projects are the backbone of Chipper, and their contributions inspire endless possibilities.
 
