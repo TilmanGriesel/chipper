@@ -1,21 +1,9 @@
 /* safe area insets */
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
 
 /* improve touch handling */
 textarea,
 button {
   touch-action: manipulation;
-}
-
-/* prevent pull-to-refresh on mobile */
-html,
-body {
-  overscroll-behavior-y: contain;
 }
 
 /* Tailwind Imports */
@@ -34,6 +22,19 @@ body {
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+@font-face {
+  font-family: "JustAnotherHand";
+  src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+#welcome-message h2 {
+  font-family: "JustAnotherHand";
+  letter-spacing: 2px;
 }
 
 /* Prose Typography Styles */
@@ -157,7 +158,7 @@ pre[class*="language-"] {
 }
 
 #busy-indicator {
-  @apply transition-opacity opacity-60 dark:opacity-25 duration-1000;
+  @apply opacity-60 dark:opacity-25 transition-opacity duration-1000;
   width: 100%;
   height: 100%;
   background-image: linear-gradient(
@@ -173,8 +174,8 @@ pre[class*="language-"] {
 }
 
 #busy-indicator.off {
+  @apply transition-opacity duration-1000;
   opacity: 0;
-  animation: spin 5.5s linear infinite;
 }
 
 @keyframes spin {

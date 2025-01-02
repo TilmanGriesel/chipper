@@ -7,6 +7,7 @@ import InputHistoryManager from "./inputHistoryManager.js";
 document.addEventListener("DOMContentLoaded", () => {
   const elements = {
     messageInput: document.getElementById("message-input"),
+    welcomeMessage: document.getElementById("welcome-message"),
     chatMessages: document.getElementById("chat-messages"),
     busyIndicator: document.getElementById("busy-indicator"),
     sendButton: document.getElementById("send-button"),
@@ -68,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = elements.messageInput.value.trim();
     if (!message) return;
 
+    elements.welcomeMessage.classList.add('hidden');
     historyManager.addToHistory(message);
 
     const commandResult = chatCommandHandler.handleCommand(message);

@@ -12,13 +12,13 @@
     <link rel="manifest" href="static/site.webmanifest" />
     <script src="static/vendor/marked.min_9_1_6.js"></script>
     <script src="static/vendor/prism.js"></script>
-    <link as="font" crossorigin href="/static/font/FiraCodeNerdFontMono-Regular.ttf" rel="preload" type="font/ttf" />
+
     <link href="static/vendor/prism.css" rel="stylesheet" />
     <link href="static/vendor/prism-atom-dark.css" rel="stylesheet" />
     <link href="static/dist/index.css" rel="stylesheet" />
 </head>
 
-<body class="bg-gray-200 dark:bg-zinc-900 h-screen flex flex-col overflow-hidden">
+<body class="bg-gray-200 dark:bg-zinc-900 h-screen flex flex-col">
     <!-- theme toggle -->
     <button aria-label="Toggle dark mode"
         class="fixed top-4 right-4 sm:top-6 sm:right-6 p-2 rounded-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors touch-manipulation"
@@ -30,7 +30,7 @@
         </svg>
     </button>
 
-    <div class="max-w-3xl mx-auto w-full h-screen p-2 sm:p-4 flex flex-col">
+    <div class="max-w-3xl mx-auto w-full h-full p-2 sm:p-4 flex flex-col">
         <!-- message container -->
         <div class="flex-1 min-h-0 mb-2">
             <div class="relative h-full flex flex-col">
@@ -42,6 +42,15 @@
                     <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 text-gray-900 dark:text-zinc-100"
                         id="chat-messages">
                         <!-- messages -->
+
+                        <!-- welcome message -->
+                        <div class="absolute inset-0 flex items-center justify-center flex-col p-6 pointer-events-none z-10"
+                            id="welcome-message">
+                            <h2
+                                class="flex items-center text-3xl font-normal tracking-tighter text-gray-700 dark:text-gray-300">
+                                What can I help you with today?
+                            </h2>
+                        </div>
                     </div>
                 </div>
             </div>

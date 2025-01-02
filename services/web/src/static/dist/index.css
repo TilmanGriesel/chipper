@@ -1,24 +1,10 @@
 /* safe area insets */
 
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
 /* improve touch handling */
 
 textarea,
 button {
   touch-action: manipulation;
-}
-
-/* prevent pull-to-refresh on mobile */
-
-html,
-body {
-  overscroll-behavior-y: contain;
 }
 
 /* Tailwind Imports */
@@ -611,6 +597,10 @@ video {
   }
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .fixed {
   position: fixed;
 }
@@ -627,12 +617,20 @@ video {
   inset: -0.25rem;
 }
 
+.inset-0 {
+  inset: 0px;
+}
+
 .right-4 {
   right: 1rem;
 }
 
 .top-4 {
   top: 1rem;
+}
+
+.z-10 {
+  z-index: 10;
 }
 
 .mx-auto {
@@ -741,12 +739,20 @@ video {
   flex-direction: column;
 }
 
+.items-center {
+  align-items: center;
+}
+
 .justify-start {
   justify-content: flex-start;
 }
 
 .justify-end {
   justify-content: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .space-x-3 > :not([hidden]) ~ :not([hidden]) {
@@ -836,6 +842,10 @@ video {
   padding: 1rem;
 }
 
+.p-6 {
+  padding: 1.5rem;
+}
+
 .px-3 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
@@ -856,6 +866,11 @@ video {
   padding-bottom: 0.75rem;
 }
 
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -863,6 +878,19 @@ video {
 
 .font-bold {
   font-weight: 700;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.tracking-tighter {
+  letter-spacing: -0.05em;
+}
+
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
 
 .text-gray-800 {
@@ -937,6 +965,23 @@ body {
   font-style: normal;
 
   font-display: swap;
+}
+
+@font-face {
+  font-family: "JustAnotherHand";
+
+  src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
+
+  font-weight: normal;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
+#welcome-message h2 {
+  font-family: "JustAnotherHand";
+  letter-spacing: 2px;
 }
 
 /* Prose Typography Styles */
@@ -1124,8 +1169,10 @@ pre[class*="language-"] {
 }
 
 #busy-indicator.off {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 1000ms;
   opacity: 0;
-  animation: spin 5.5s linear infinite;
 }
 
 @keyframes spin {
@@ -1202,6 +1249,11 @@ pre[class*="language-"] {
 .dark\:text-gray-200:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(229 231 235 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-gray-300:is(.dark *) {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity, 1));
 }
 
 .dark\:text-zinc-100:is(.dark *) {
