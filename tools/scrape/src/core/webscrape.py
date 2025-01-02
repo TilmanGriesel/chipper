@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Set, Tuple
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse
 
 import aiohttp
 import trafilatura
@@ -27,6 +27,7 @@ class ScraperConfig:
     min_delay: float = 0.5
     max_delay: float = 2.0
     batch_size_variance: float = 0.5
+    retain_query_params: bool = True
 
     def __post_init__(self):
         if self.excluded_extensions is None:
@@ -68,12 +69,39 @@ class WebScraper:
         self.logger.addHandler(console_handler)
 
     def sanitize_filename(self, url: str) -> str:
-        filename = url.replace(self.base_url, "").split("?")[0]
-        filename = re.sub(r'[<>:"/\\|?*]', "_", filename)
-        filename = filename.strip(". ")
-        if not filename:
-            filename = "index"
-        return f"{filename}.txt"
+        parsed_url = urlparse(url)
+        path = parsed_url.path.replace(self.base_url, "")
+        if not path or path == "/":
+            path = "index"
+        path = path.lstrip("/").replace("/", "_")
+
+        if parsed_url.query:
+            query_params = parse_qs(parsed_url.query)
+            param_parts = []
+
+            for key in sorted(query_params.keys()):
+                clean_key = re.sub(r"[^a-zA-Z0-9]+", "_", key).strip("_")
+                values = sorted(query_params[key])
+                for value in values:
+                    clean_value = re.sub(r"[^a-zA-Z0-9]+", "_", value).strip("_")
+                    if clean_value:
+                        param_parts.append(f"{clean_key}_{clean_value}")
+                    else:
+                        param_parts.append(clean_key)
+
+            if param_parts:
+                path = f"{path}__" + "__".join(param_parts)
+
+        while "__" in path:
+            path = path.replace("__", "_")
+
+        path = re.sub(r'[<>:"/\\|?*]', "_", path)
+        path = path.strip("_. ")
+
+        if not path:
+            path = "index"
+
+        return f"{path}.txt"
 
     async def handle_403(self, url: str, attempt: int) -> None:
         if not self._403_encountered:
@@ -135,6 +163,19 @@ class WebScraper:
                     await asyncio.sleep((2**attempt) * (0.5 + random.random()))
         return None, -1
 
+    def normalize_url(self, url: str) -> str:
+        parsed = urlparse(url)
+        if parsed.query:
+            query_params = parse_qs(parsed.query)
+            sorted_params = []
+            for key in sorted(query_params.keys()):
+                values = sorted(query_params[key])
+                for value in values:
+                    sorted_params.append((key, value))
+            new_query = urlencode(sorted_params)
+            return f"{parsed.scheme}://{parsed.netloc}{parsed.path}?{new_query}"
+        return url
+
     def extract_links(self, html: str, current_url: str) -> List[str]:
         if not html:
             return []
@@ -144,24 +185,28 @@ class WebScraper:
             href = link["href"]
             absolute_url = urljoin(current_url, href)
             parsed_url = urlparse(absolute_url)
+
             if (
-                parsed_url.netloc == self.base_domain
-                and absolute_url not in self.visited_urls
-                and "#" not in absolute_url
-                and "javascript:" not in href
-                and not href.startswith("mailto:")
-                and not any(
-                    href.endswith(ext) for ext in self.config.excluded_extensions
-                )
+                parsed_url.netloc != self.base_domain
+                or "javascript:" in href
+                or href.startswith("mailto:")
+                or any(href.endswith(ext) for ext in self.config.excluded_extensions)
             ):
-                cleaned_url = absolute_url.split("#")[0]
-                valid_links.add(cleaned_url)
+                continue
+
+            cleaned_url = absolute_url.split("#")[0]
+            normalized_url = self.normalize_url(cleaned_url)
+
+            if normalized_url not in self.visited_urls:
+                valid_links.add(normalized_url)
+
         return list(valid_links)
 
     async def process_page(self, session: aiohttp.ClientSession, url: str) -> List[str]:
-        if url in self.visited_urls:
+        normalized_url = self.normalize_url(url)
+        if normalized_url in self.visited_urls:
             return []
-        self.visited_urls.add(url)
+        self.visited_urls.add(normalized_url)
         self.logger.info(f"Processing {url}")
 
         html, status = await self.fetch_page(session, url)
