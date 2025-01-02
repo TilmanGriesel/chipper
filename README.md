@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/bannerr.png" width="480" alt="Logo Chipper RAG Util"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/banner.png" width="480" alt="Logo Chipper RAG Util"/></p>
 
 <p align="center">
 	<a href="https://github.com/TilmanGriesel/chipper/actions"><img src="https://img.shields.io/github/actions/workflow/status/TilmanGriesel/chipper/.github%2Fworkflows%2Fpublish-docker.yml?colorA=1F2229&colorB=5c5e70&style=for-the-badge&label=DockerHub"></a>
