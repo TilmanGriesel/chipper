@@ -2,7 +2,6 @@ import argparse
 import asyncio
 import logging
 import os
-import platform
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum

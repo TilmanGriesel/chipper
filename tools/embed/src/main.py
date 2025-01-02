@@ -100,7 +100,7 @@ def main():
             embedder_stats = embedder.metrics_tracker.metrics
             logger.info(f"Embedder Metrics: {embedder_stats}")
 
-    except Exception as e:
+    except Exception:
         logger.error("Error in pipeline execution", exc_info=True)
         raise
 

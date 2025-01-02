@@ -11,8 +11,15 @@ from typing import Any, Dict, List
 
 import requests
 from dotenv import load_dotenv
-from flask import (Flask, Response, jsonify, render_template, request, session,
-                   stream_with_context)
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    render_template,
+    request,
+    session,
+    stream_with_context,
+)
 from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
@@ -28,7 +35,7 @@ class SessionManager:
         self.app = app
         self.abort_flags = {}
         app.secret_key = secrets.token_hex(32)
-        logger.info(f"Initialized SessionManager with new secret key")
+        logger.info("Initialized SessionManager with new secret key")
         app.config.update(
             SESSION_COOKIE_SECURE=False,
             SESSION_COOKIE_HTTPONLY=True,

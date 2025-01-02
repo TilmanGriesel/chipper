@@ -2,15 +2,14 @@ import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List
+from typing import List
 
 import requests
 from core.document_embedder import DocumentEmbedder
 from haystack import Document
-from haystack_integrations.components.embedders.ollama import \
-    OllamaTextEmbedder
-from haystack_integrations.document_stores.elasticsearch import \
-    ElasticsearchDocumentStore
+from haystack_integrations.document_stores.elasticsearch import (
+    ElasticsearchDocumentStore,
+)
 
 
 @dataclass
@@ -168,7 +167,7 @@ class RAGEmbedder:
         start_time = datetime.now()
         total_chars = sum(len(doc.content) for doc in documents)
 
-        self.logger.info(f"Starting document embedding process:")
+        self.logger.info("Starting document embedding process:")
         self.logger.info(f"- Total documents: {len(documents)}")
         self.logger.info(f"- Total characters: {total_chars}")
 
@@ -181,7 +180,7 @@ class RAGEmbedder:
             embedder.embed_documents(documents)
 
             execution_time = (datetime.now() - start_time).total_seconds()
-            self.logger.info(f"Document embedding completed:")
+            self.logger.info("Document embedding completed:")
             self.logger.info(f"- Execution time: {execution_time:.2f} seconds")
             self.logger.info(
                 f"- Average time per document: {execution_time / len(documents):.2f} seconds"

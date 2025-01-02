@@ -7,9 +7,12 @@ from haystack import Document, Pipeline
 from haystack.components.writers import DocumentWriter
 from haystack.document_stores.types import DuplicatePolicy
 from haystack_integrations.components.embedders.ollama import (
-    OllamaDocumentEmbedder, OllamaTextEmbedder)
-from haystack_integrations.document_stores.elasticsearch import \
-    ElasticsearchDocumentStore
+    OllamaDocumentEmbedder,
+    OllamaTextEmbedder,
+)
+from haystack_integrations.document_stores.elasticsearch import (
+    ElasticsearchDocumentStore,
+)
 
 
 def generate_document_id(file_path: str, content: str) -> str:

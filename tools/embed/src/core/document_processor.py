@@ -98,7 +98,6 @@ class DocumentProcessor:
 
         for i, (name, subtree) in enumerate(items):
             is_last_item = i == len(items) - 1
-            current_prefix = prefix + ("└── " if is_last_item else "├── ")
             tree_lines.append(f"{prefix}{'└── ' if is_last else '├── '}{name}")
 
             if subtree is not None:

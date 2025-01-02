@@ -60,7 +60,6 @@ class WebScraper:
         self._setup_logging()
 
     def _setup_logging(self):
-        log_file = self.output_dir / f"{self.base_domain}_scraper.log"
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)

@@ -206,10 +206,10 @@ def handle_streaming_response(
                 "full_response": result,
             }
             q.put(f"data: {json.dumps(final_data)}\n\n")
-        except elasticsearch.BadRequestError as e:
+        except elasticsearch.BadRequestError:
             error_data = {
                 "type": "chat_response",
-                "chunk": f"Error: Embedding retriever error. Index not found.\n",
+                "chunk": "Error: Embedding retriever error. Index not found.\n",
                 "done": True,
             }
             q.put(f"data: {json.dumps(error_data)}\n\n")
