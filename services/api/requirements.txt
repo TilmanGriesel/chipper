@@ -3,6 +3,5 @@ ollama-haystack
 elasticsearch-haystack
 flask
 flask_limiter
-flask_cors
 python-dotenv
 gunicorn

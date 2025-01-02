@@ -12,7 +12,6 @@ import elasticsearch
 from core.query import QueryPipelineConfig, RAGQueryPipeline
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
-from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -20,7 +19,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
 logging.basicConfig(level=logging.INFO)
