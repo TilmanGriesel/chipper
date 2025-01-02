@@ -1,0 +1,24 @@
+name: Lint and Format
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+      - name: Install dependencies
+        run: |
+          pip install black isort flake8
+      - name: Run Black
+        run: black --check .
+      - name: Run isort
+        run: isort --check-only .
+      - name: Run Flake8
+        run: flake8 .
