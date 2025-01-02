@@ -174,9 +174,10 @@ case "$1" in
         run_in_directory "tools/cli" ./run.sh "$@"
         ;;
     "docs-dev")
+        shift
         echo "Starting vitepress..."
         yarn add -D vitepress
-        yarn docs:dev
+        yarn docs:dev "$@"
         ;;
     *)
         show_usage
