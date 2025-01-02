@@ -80,7 +80,7 @@ def parse_args():
         choices=["word", "sentence", "passage", "page", "line"],
         help="Method to split text documents",
     )
-    
+
     parser.add_argument(
         "--split-length",
         type=int,

@@ -53,8 +53,8 @@ class DocumentProcessor:
             "blacklist": sorted(self.blacklist),
             "split_by": split_by,
             "split_length": split_length,
-            "split_overlap": split_overlap, 
-            "split_threshold": split_threshold
+            "split_overlap": split_overlap,
+            "split_threshold": split_threshold,
         }
         self.logger.info(f"Initialized with config: {json.dumps(config, indent=2)}")
 
