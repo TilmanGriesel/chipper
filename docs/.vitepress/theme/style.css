@@ -119,7 +119,7 @@
 
 h1.name {
   font-family: var(--vp-font-family-brand);
-  letter-spacing: 3px !important;
+  letter-spacing: 2px !important;
 }
 
 @media (min-width: 960px) {
@@ -130,6 +130,12 @@ h1.name {
 
 .home .title {
   visibility: hidden;
+}
+
+@media (min-width: 960px) {
+  .name {
+    font-size: 82px !important;
+  }
 }
 
 /**
