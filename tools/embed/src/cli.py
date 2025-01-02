@@ -12,7 +12,6 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
-    # Document Processing Arguments
     parser.add_argument(
         "--path",
         type=str,
@@ -71,6 +70,36 @@ def parse_args():
         type=str,
         default=os.getenv("EMBEDDING_MODEL", "nomic-embed-text"),
         help="Model to use for embeddings",
+    )
+
+    # Text Splitting Configuration
+    parser.add_argument(
+        "--split-by",
+        type=str,
+        default="word",
+        choices=["word", "sentence", "passage", "page", "line"],
+        help="Method to split text documents",
+    )
+    
+    parser.add_argument(
+        "--split-length",
+        type=int,
+        default=200,
+        help="Number of units per split",
+    )
+
+    parser.add_argument(
+        "--split-overlap",
+        type=int,
+        default=20,
+        help="Number of units to overlap between splits",
+    )
+
+    parser.add_argument(
+        "--split-threshold",
+        type=int,
+        default=5,
+        help="Minimum length of split to keep",
     )
 
     # Misc

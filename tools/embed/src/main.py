@@ -56,7 +56,13 @@ def process_documents(args) -> List[Document]:
     logger.info("Starting document processing")
     blacklist = load_blacklist("./")
     processor = DocumentProcessor(
-        base_path=args.path, file_extensions=args.extensions, blacklist=blacklist
+        base_path=args.path,
+        file_extensions=args.extensions,
+        blacklist=blacklist,
+        split_by=args.split_by,
+        split_length=args.split_length,
+        split_overlap=args.split_overlap,
+        split_threshold=args.split_threshold,
     )
     documents = processor.process_files()
     logger.info(f"Processed {len(documents)} documents")

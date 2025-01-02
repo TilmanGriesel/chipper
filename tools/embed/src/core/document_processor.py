@@ -1,3 +1,4 @@
+import json
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
@@ -46,7 +47,16 @@ class DocumentProcessor:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.setLevel(log_level)
 
-        self.logger.info(f"Initialized with blacklist: {sorted(self.blacklist)}")
+        config = {
+            "base_path": str(self.base_path),
+            "file_extensions": self.file_extensions,
+            "blacklist": sorted(self.blacklist),
+            "split_by": split_by,
+            "split_length": split_length,
+            "split_overlap": split_overlap, 
+            "split_threshold": split_threshold
+        }
+        self.logger.info(f"Initialized with config: {json.dumps(config, indent=2)}")
 
         self.document_store = InMemoryDocumentStore()
         self.converter = TextFileToDocument(
