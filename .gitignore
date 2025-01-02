@@ -23,3 +23,5 @@ output
 .DS_Store
 /docker/ollama
 /docker/volumes
+/node_modules
+/docs/.vitepress/cache
