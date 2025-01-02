@@ -411,6 +411,13 @@ h1.name {
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
 
+@media (min-width: 960px) {
+  .image-src {
+    max-width: 280px !important;
+    max-height: 280px !important;
+  }
+}
+
 /**
  * Glow
  * -------------------------------------------------------------------------- */
@@ -421,9 +428,21 @@ h1.name {
   inherits: false;
 }
 
+@-webkit-property --rotate {
+  syntax: "<angle>";
+  initial-value: 132deg;
+  inherits: false;
+}
+
 .image-bg {
   width: 100%;
   height: 100%;
+  background-image: -webkit-linear-gradient(
+    var(--rotate),
+    #5ddcff,
+    #f53ec7 43%,
+    #a162ff
+  ) !important;
   background-image: linear-gradient(
     var(--rotate),
     #5ddcff,
@@ -431,9 +450,17 @@ h1.name {
     #a162ff
   ) !important;
   position: absolute;
-  z-index: -1;
-
+  -webkit-animation: spin 5.5s linear infinite;
   animation: spin 5.5s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
+  }
 }
 
 @keyframes spin {
