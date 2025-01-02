@@ -16,7 +16,7 @@ export class UIManager {
     input.style.height = input.scrollHeight + "px";
   }
 
-  scrollToBottom(immediate = false) {
+  scrollToBottom(immediate = true) {
     const scroll = () => {
       const container = this.elements.chatMessages;
       if (container) {
