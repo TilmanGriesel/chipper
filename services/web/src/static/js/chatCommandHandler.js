@@ -53,12 +53,9 @@ export class ChatCommandHandler {
   
   \`/model [name]\` - Change AI model
   \`/index [name]\` - Change knowledge base index
-  \`/stream [name]\` - Enable or disable response streaming
+  \`/stream [0/1]\` - Enable or disable response streaming
   \`/clear\` - Clear chat history
   \`/theme\` - Toggle theme
-  \`/help\` - Show this help message
-  
-  ### Chat Controls
-  - Press Enter to send message`;
+  \`/help\` - Show this help message`;
   }
 }
