@@ -32,11 +32,6 @@ body {
   font-display: swap;
 }
 
-#welcome-message h2 {
-  font-family: "JustAnotherHand";
-  letter-spacing: 2px;
-}
-
 /* Prose Typography Styles */
 /* Headings */
 .prose h1 {
