@@ -422,52 +422,37 @@ h1.name {
  * Glow
  * -------------------------------------------------------------------------- */
 
-@property --rotate {
-  syntax: "<angle>";
-  initial-value: 132deg;
-  inherits: false;
-}
-
-@-webkit-property --rotate {
-  syntax: "<angle>";
-  initial-value: 132deg;
-  inherits: false;
+:root {
+  --vp-home-hero-image-filter: blur(80px);
 }
 
 .image-bg {
-  width: 100%;
-  height: 100%;
-  background-image: -webkit-linear-gradient(
-    var(--rotate),
-    #5ddcff,
-    #f53ec7 43%,
-    #a162ff
-  ) !important;
-  background-image: linear-gradient(
-    var(--rotate),
-    #5ddcff,
-    #f53ec7 43%,
-    #a162ff
-  ) !important;
-  position: absolute;
-  -webkit-animation: spin 5.5s linear infinite;
-  animation: spin 5.5s linear infinite;
+  position: relative;
+  overflow: hidden;
 }
 
-@-webkit-keyframes spin {
-  0% {
-    --rotate: 0deg;
-  }
-  100% {
-    --rotate: 360deg;
-  }
+.image-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(132deg, #5ddcff, #f53ec7 80%);
+
+  animation: spin 5.5s linear infinite;
 }
 
 @keyframes spin {
   0% {
-    --rotate: 0deg;
+    transform: rotate(0deg);
   }
   100% {
-    --rotate: 360deg;
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 640px) {
+  .image-bg {
+    width: 256px;
+    height: 256px;
   }
 }
