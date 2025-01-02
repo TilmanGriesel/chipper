@@ -45,6 +45,8 @@ class Config:
         verify_ssl,
         log_level,
         max_context_size,
+        max_retries=3,
+        retry_delay=1.0,
         model=None,
         index=None,
     ):
@@ -54,6 +56,8 @@ class Config:
         self.verify_ssl = verify_ssl
         self.log_level = log_level
         self.max_context_size = max_context_size
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
         self.model = model
         self.index = index
         if not self.api_key:
@@ -65,8 +69,16 @@ class AsyncAPIClient:
         self.config = config
         self.session: Optional[aiohttp.ClientSession] = None
         self.logger = logging.getLogger(__name__)
+        self.max_retries = self.config.max_retries
+        self.retry_delay = self.config.retry_delay
 
     async def __aenter__(self):
+        connector = aiohttp.TCPConnector(
+            limit=10,
+            keepalive_timeout=30,
+            enable_cleanup_closed=True,
+            force_close=False,
+        )
         self.session = aiohttp.ClientSession(
             headers={
                 "X-API-Key": self.config.api_key,
@@ -78,49 +90,80 @@ class AsyncAPIClient:
                 sock_read=90.0,
                 sock_connect=30.0,
             ),
+            connector=connector,
         )
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.session:
+        if self.session and not self.session.closed:
             await self.session.close()
 
     async def _make_request(
-        self, method: str, endpoint: str, **kwargs
+        self, method: str, endpoint: str, attempt: int = 1, **kwargs
     ) -> Dict[str, Any]:
         url = urljoin(self.config.base_url, endpoint)
         kwargs.setdefault("ssl", self.config.verify_ssl)
+
         try:
             async with self.session.request(method, url, **kwargs) as response:
                 response.raise_for_status()
                 return await response.json()
+
+        except asyncio.TimeoutError:
+            self.logger.warning(
+                f"Request timed out (attempt {attempt}/{self.max_retries})"
+            )
+            if attempt < self.max_retries:
+                await asyncio.sleep(self.retry_delay * attempt)
+                return await self._make_request(method, endpoint, attempt + 1, **kwargs)
+            raise APIError("Request timed out after all retries")
+
+        except aiohttp.ClientResponseError as e:
+            if e.status == 429 and attempt < self.max_retries:
+                retry_after = int(e.headers.get("Retry-After", self.retry_delay * 2))
+                await asyncio.sleep(retry_after)
+                return await self._make_request(method, endpoint, attempt + 1, **kwargs)
+            raise APIError(f"API request failed: {str(e)}")
+
         except aiohttp.ClientError as e:
-            self.logger.error(f"Request failed: {str(e)}")
+            if attempt < self.max_retries and isinstance(
+                e, (aiohttp.ClientConnectorError, aiohttp.ServerDisconnectedError)
+            ):
+                await asyncio.sleep(self.retry_delay * attempt)
+                return await self._make_request(method, endpoint, attempt + 1, **kwargs)
             raise APIError(f"API request failed: {str(e)}")
 
     async def query(
         self, query_text: str, conversation_context: List[Dict[str, str]]
     ) -> Dict[str, Any]:
-        messages = []
-        for ctx in conversation_context:
-            messages.append({"role": ctx["role"], "content": ctx["content"]})
+        messages = [
+            {"role": ctx["role"], "content": ctx["content"]}
+            for ctx in conversation_context
+        ]
         messages.append({"role": "user", "content": query_text})
 
-        options = {}
-        if self.config.model:
-            options["model"] = self.config.model
-        if self.config.index:
-            options["index"] = self.config.index
+        options = {
+            k: v
+            for k, v in {"model": self.config.model, "index": self.config.index}.items()
+            if v is not None
+        }
 
-        return await self._make_request(
-            "POST",
-            "/api/chat",
-            json={"messages": messages, "stream": False, "options": options},
-        )
+        try:
+            return await self._make_request(
+                "POST",
+                "/api/chat",
+                json={"messages": messages, "stream": False, "options": options},
+            )
+        except APIError as e:
+            self.logger.error(f"Query failed: {str(e)}")
+            raise
 
     async def health_check(self) -> Dict[str, Any]:
-        self.logger.info(f"Executing health check... {self.config.base_url}")
-        return await self._make_request("GET", "/health")
+        try:
+            return await self._make_request("GET", "/health")
+        except APIError as e:
+            self.logger.error(f"Health check failed: {str(e)}")
+            raise
 
 
 class ChatInterface:
@@ -148,7 +191,10 @@ class ChatInterface:
             "/model": self._cmd_model,
             "/index": self._cmd_index,
             "/settings": self._cmd_settings,
+            "/retry": self._cmd_retry,
         }
+        self.last_query = None
+        self.last_context = None
 
     def display_welcome(self):
         welcome_text = """
@@ -161,6 +207,7 @@ Available commands:
 * /model    - Set the model name
 * /index    - Set the index name
 * /settings - Show current settings
+* /retry    - Retry last query
 
 Type your message and press Enter to chat.
 """
@@ -247,11 +294,22 @@ Type your message and press Enter to chat.
 - Index: {self.config.index or 'default'}
 - Context Size: {self.config.max_context_size}
 - Base URL: {self.config.base_url}
+- Max Retries: {self.config.max_retries}
+- Retry Delay: {self.config.retry_delay}s
             """,
                 title="Settings",
                 border_style="blue",
             )
         )
+        return True
+
+    async def _cmd_retry(self) -> bool:
+        if not self.last_query:
+            self.console.print("[red]No previous query to retry[/red]")
+            return True
+
+        self.console.print("[blue]Retrying last query...[/blue]")
+        await self._handle_query(self.last_query, self.last_context)
         return True
 
     async def process_command(self, command: str) -> bool:
@@ -261,47 +319,64 @@ Type your message and press Enter to chat.
         self.console.print(f"[blue]Unknown command: {command}[/blue]")
         return True
 
+    async def _handle_query(self, user_input: str, context: list = None):
+        if context is None:
+            context = list(self.conversation_context)
+
+        try:
+            with self.console.status("[bold blue]Thinking...", spinner="dots"):
+                response = await self.client.query(user_input, context)
+                result = response.get("result", {}) if response.get("success") else {}
+                replies = result.get("llm", {}).get("replies") or [
+                    "No response received"
+                ]
+
+                for reply in replies:
+                    self.display_message(Message(reply, MessageType.ASSISTANT))
+
+        except APIError as e:
+            self.display_message(
+                Message(f"Error: {str(e)}\nUse /retry to try again.", MessageType.ERROR)
+            )
+
     async def run(self):
         try:
             async with AsyncAPIClient(self.config) as client:
+                self.client = client
                 health_status = await client.health_check()
                 if health_status.get("status") != "healthy":
                     raise APIError("API is not healthy")
+
                 self.display_welcome()
+
                 while True:
-                    user_input = self.get_user_input()
-                    if user_input.startswith("/"):
-                        should_continue = await self.process_command(user_input)
-                        if not should_continue:
-                            break
-                        continue
-                    user_message = Message(user_input, MessageType.USER)
-                    self.display_message(user_message)
                     try:
-                        with self.console.status(
-                            "[bold blue]Thinking...", spinner="dots"
-                        ):
-                            response = await client.query(
-                                user_input, list(self.conversation_context)
-                            )
-                            if response.get("success"):
-                                result = response.get("result", {})
-                                replies = result.get("llm", {}).get(
-                                    "replies", ["No response received"]
-                                )
-                                for reply in replies:
-                                    chipper_message = Message(
-                                        reply, MessageType.ASSISTANT
-                                    )
-                                    self.display_message(chipper_message)
-                            else:
-                                error_message = Message(
-                                    "Failed to get response from API", MessageType.ERROR
-                                )
-                                self.display_message(error_message)
-                    except APIError as e:
-                        error_message = Message(f"Error: {str(e)}", MessageType.ERROR)
+                        user_input = self.get_user_input()
+
+                        if user_input.startswith("/"):
+                            should_continue = await self.process_command(user_input)
+                            if not should_continue:
+                                break
+                            continue
+
+                        user_message = Message(user_input, MessageType.USER)
+                        self.display_message(user_message)
+
+                        self.last_query = user_input
+                        self.last_context = list(self.conversation_context)
+
+                        await self._handle_query(user_input)
+
+                    except asyncio.CancelledError:
+                        self.console.print("[red]Operation cancelled[/red]")
+                    except Exception as e:
+                        self.console.print(f"Error processing message: {e}")
+                        error_message = Message(
+                            f"Internal error: {str(e)}", MessageType.ERROR
+                        )
                         self.display_message(error_message)
+                        raise e
+
         except Exception as e:
             self.console.print(f"[red]Fatal error: {str(e)}[/red]")
 
@@ -358,14 +433,16 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
     config = Config(
-        base_url,
-        args.api_key,
-        args.timeout,
-        args.verify_ssl,
-        args.log_level,
-        args.max_context_size,
-        args.model,
-        args.index,
+        base_url=base_url,
+        api_key=args.api_key,
+        timeout=args.timeout,
+        verify_ssl=args.verify_ssl,
+        log_level=args.log_level,
+        max_context_size=args.max_context_size,
+        max_retries=3,
+        retry_delay=1.0,
+        model=args.model,
+        index=args.index,
     )
 
     setup_logging(config.log_level)
