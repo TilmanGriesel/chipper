@@ -25,7 +25,7 @@ This section is still under construction.
       - `./run.sh embed-testdata`
 
    1. Test Embeddings
-      1 `./run.sh browser` or visit: http://localhost:21200
+      1 `./run.sh browser` or visit: `http://localhost:21200`
       1. Ask Chipper: `Tell me a story about Chipper, the brilliant golden retriever.`
 
 1. **Default Docker Setup:**
