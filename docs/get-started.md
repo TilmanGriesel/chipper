@@ -22,7 +22,10 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 ---
 
 <p align="center">
-<iframe width="640" height="360" src="https://www.youtube.com/embed/WFAGn9BjN9M" title="Chipper AI -  AI interface for tinkerers (Ollama, Haystack RAG, Python)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div style="position: relative; padding-top: 56.25%;">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"  src="https://www.youtube.com/embed/WFAGn9BjN9M" title="Chipper AI -  AI interface for tinkerers (Ollama, Haystack RAG, Python)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 </p>
 
 ## Step 1: Setting Up Chipper 🛠️
