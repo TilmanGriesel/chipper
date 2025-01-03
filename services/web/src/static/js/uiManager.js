@@ -76,4 +76,21 @@ export class UIManager {
   isInProcessingState() {
     return this.isProcessing;
   }
+
+  updateGreeting() {
+    const hour = new Date().getHours();
+    let greeting;
+
+    if (hour >= 5 && hour < 12) {
+      greeting = 'Good morning! What can I help you with today?';
+    } else if (hour >= 12 && hour < 17) {
+      greeting = 'Good afternoon! What can I help you with today?';
+    } else if (hour >= 17 && hour < 22) {
+      greeting = 'Good evening! What can I help you with today?';
+    } else {
+      greeting = 'Hello! What can I help you with today?';
+    }
+
+    this.elements.welcomeText.textContent = greeting;
+  }
 }

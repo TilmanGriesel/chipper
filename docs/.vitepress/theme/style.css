@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Just Another Hand";
+  src: url("/assets/fonts/JustAnotherHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /**
  * Customize default theme styling by overriding CSS variables:
  * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
@@ -30,8 +38,6 @@
  *    to create a accent, such as when having inline code block inside
  *    custom containers.
  * -------------------------------------------------------------------------- */
-
-@import url("https://fonts.googleapis.com/css2?family=Just+Another+Hand&display=swap");
 
 :root {
   --vp-c-gray-1: #e8e9ec;

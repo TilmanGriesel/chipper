@@ -31,7 +31,7 @@ function show_usage() {
     echo "  format              - Run pre-commit formatting hooks"
     echo "  browser             - Open web-interface in local browser"
     echo "  cli                 - Run cli interface"
-    echo "  docs-dev            - Run local vitepress server"
+    echo "  dev-docs            - Run local vitepress server"
 }
 
 function check_dependency() {
@@ -173,7 +173,7 @@ case "$1" in
         shift
         run_in_directory "tools/cli" ./run.sh "$@"
         ;;
-    "docs-dev")
+    "dev-docs")
         shift
         echo "Starting vitepress..."
         yarn add -D vitepress

@@ -2,6 +2,7 @@
 *.jpg binary
 *.png binary
 *.gif binary
+*.ttf binary
 
 # Git config
 # git config core.eol lf

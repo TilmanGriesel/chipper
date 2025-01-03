@@ -1,9 +1,21 @@
 /* safe area insets */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
 
 /* improve touch handling */
 textarea,
 button {
   touch-action: manipulation;
+}
+
+/* prevent pull-to-refresh on mobile */
+html,
+body {
+  overscroll-behavior-y: contain;
 }
 
 /* Tailwind Imports */
@@ -25,11 +37,16 @@ body {
 }
 
 @font-face {
-  font-family: "JustAnotherHand";
+  font-family: "Just Another Hand";
   src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+.brand-name {
+  font-family: "Just Another Hand", serif;
+  letter-spacing: 2px;
 }
 
 /* Prose Typography Styles */

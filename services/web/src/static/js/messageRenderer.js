@@ -31,7 +31,7 @@ export class MessageRenderer {
       } mb-4`;
 
     const messageDiv = document.createElement("div");
-    messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-lg";
+    messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-3xl";
 
     const typeClasses = {
       user: "bg-zinc-900 text-white user-message",

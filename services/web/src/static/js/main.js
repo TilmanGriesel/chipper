@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const elements = {
     messageInput: document.getElementById("message-input"),
     welcomeMessage: document.getElementById("welcome-message"),
+    welcomeText: document.getElementById("welcome-text"),
     chatMessages: document.getElementById("chat-messages"),
     busyIndicator: document.getElementById("busy-indicator"),
     sendButton: document.getElementById("send-button"),
@@ -63,6 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  uiManager.updateGreeting()
 
   // message send handling
   async function sendMessage() {

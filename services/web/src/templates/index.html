@@ -19,22 +19,42 @@
 </head>
 
 <body class="bg-gray-200 dark:bg-zinc-900 h-screen flex flex-col">
-    <!-- theme toggle -->
-    <button aria-label="Toggle dark mode"
-        class="fixed top-4 right-4 sm:top-6 sm:right-6 p-2 rounded-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors touch-manipulation"
-        id="theme-button">
-        <svg class="w-5 h-5 text-gray-800 dark:text-gray-200" fill="none" id="theme-toggle-icon" stroke="currentColor"
-            stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-        </svg>
-    </button>
-
     <div class="max-w-3xl mx-auto w-full h-full p-2 sm:p-4 flex flex-col">
+        <header class="w-full">
+            <div class="flex h-14 items-center px-4 md:px-6">
+                <!-- project name -->
+                <div class="flex flex-1 items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl font-normal text-gray-900 dark:text-gray-100">
+                            <a class="brand-name" href="https://chipper.tilmangriesel.com/" target="_blank">Chipper</a>
+                        </span>
+                    </div>
+
+                    <!-- theme toggle button -->
+                    <button aria-label="Toggle dark mode"
+                        class="inline-flex items-center justify-center rounded-full p-2.5 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-800"
+                        id="theme-button">
+                        <svg class="w-5 h-5" fill="none" id="theme-toggle-icon" stroke="currentColor" stroke-width="1.5"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
         <!-- message container -->
         <div class="flex-1 min-h-0 mb-2">
             <div class="relative h-full flex flex-col">
                 <div class="off absolute -inset-1 rounded-3xl blur-xl" id="busy-indicator">
+                </div>
+                <!-- welcome message -->
+                <div class="absolute inset-0 flex items-center justify-center flex-col p-6 pointer-events-none z-10"
+                    id="welcome-message">
+                    <h2 id="welcome-text"
+                        class="text-center flex items-center text-xl font-normal opacity-50 text-gray-700 dark:text-gray-300">
+                    </h2>
                 </div>
                 <div
                     class="relative h-full flex flex-col bg-white dark:bg-zinc-800 ring-1 ring-gray-900/5 dark:ring-zinc-100/10 rounded-3xl">
@@ -42,15 +62,6 @@
                     <div class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 text-gray-900 dark:text-zinc-100"
                         id="chat-messages">
                         <!-- messages -->
-
-                        <!-- welcome message -->
-                        <div class="absolute inset-0 flex items-center justify-center flex-col p-6 pointer-events-none z-10"
-                            id="welcome-message">
-                            <h2
-                                class="flex items-center text-xl font-medium opacity-50 text-gray-700 dark:text-gray-300">
-                                What can I help you with today?
-                            </h2>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -61,11 +72,11 @@
             class="flex-none bg-white dark:bg-zinc-800 ring-1 ring-gray-900/5 dark:ring-zinc-100/10 rounded-3xl p-3 sm:p-4">
             <div class="flex space-x-3">
                 <textarea
-                    class="max-h-72 min-h-12 h-12 flex-1 border dark:border-zinc-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 resize-none overflow-hidden bg-white dark:bg-zinc-700 text-gray-900 dark:text-zinc-100 touch-manipulation"
+                    class="max-h-72 min-h-12 h-12 flex-1 border dark:border-zinc-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 resize-none overflow-hidden bg-white dark:bg-zinc-700 text-gray-900 dark:text-zinc-100 touch-manipulation"
                     enterkeyhint="send" id="message-input" placeholder="How can Chipper help you today?"
                     rows="1"></textarea>
                 <button
-                    class="max-h-12 px-3 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 touch-manipulation transition-all duration-200"
+                    class="max-h-12 px-3 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full hover:bg-zinc-800 dark:hover:bg-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 touch-manipulation transition-all duration-200"
                     data-state="send" id="send-button">
                     <!-- send -->
                     <svg class="size-6" fill="none" id="send-icon" stroke="currentColor" stroke-width="1.5"
@@ -81,6 +92,7 @@
                     </svg>
                 </button>
             </div>
+
         </div>
     </div>
     <script src="static/js/main.js" type="module"></script>
