@@ -19,7 +19,7 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 
 </details>
 
-## Step 1: Setting Up Chipper
+## Step 1: Setting Up Chipper 🛠️
 
 ::: info
 Everything mentioned here assumes some familiarity with the command line on your system. If you’re using Windows, consider using [MSYS](https://www.msys2.org/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/about) to make things easier.
@@ -37,7 +37,7 @@ Secondly, you’ll need Git, a version control tool that’s also the inspiratio
 
 - [This guide will help you get started](https://docs.github.com/en/get-started/getting-started-with-git)
 
-## Step 2: Getting Started
+## Step 2: Getting Started 🚀
 
 ### 2.1 Clone the Repository
 
@@ -65,7 +65,7 @@ cd chipper
 
 > This step may take some time as [Docker](https://www.docker.com/) downloads all the required resources and compiles Chipper on your system.
 
-## Step 3: Testing Your Setup
+## Step 3: Testing Your Setup ✅
 
 Let’s verify that everything is working as expected by importing some test data included with Chipper. During this process, we’ll also pull the embedding model from Ollama if it hasn’t been downloaded yet.
 
@@ -75,7 +75,7 @@ Let’s verify that everything is working as expected by importing some test dat
 ./run.sh embed-testdata
 ```
 
-### 3.2 Access the Web Interface 🌐
+### 3.2 Access the Web Interface
 
 ```bash
 ./run.sh browser
@@ -95,7 +95,7 @@ Chipper will now respond using the test data embeddings we set up in the previou
 You’ll likely see a message like `Starting to download model xy.z...`. Don’t worry, this only happens once for the default model. In the future, I plan to enhance this process with a progress bar or something similar. Once the download is complete, you can reload the page for a smoother experience.
 :::
 
-## Step 4: Embedding Your Own Data
+## Step 4: Embedding Your Own Data 📊
 
 Congratulations! Now we’re diving into the details. Embeddings are organized into what’s called an `index`, which is essentially a label for a "drawer" where data or embeddings are stored. By default, Chipper uses an index named `default`. While embeddings and the web UI will automatically use this default, you can specify a different one if needed. Just remember, if you switch to another index, you’ll also need to select it in the web UI using the `/index myindex` command.
 
@@ -122,7 +122,7 @@ You can set the index using the `--es-index <name>` parameter, specify the embed
 ./tools/embed/run.sh --help
 ```
 
-## Step 5: Next Steps and Exploration
+## Step 5: Next Steps and Exploration 🔍
 
 First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to "chip" wood, just like we need to split and chip the data we want to embed. And as for "retriever", - well ...
 
