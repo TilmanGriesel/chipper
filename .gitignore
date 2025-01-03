@@ -1,3 +1,6 @@
+# env
+.env
+
 # docker
 /docker/user.docker-compose.yml
 /docker/user_files
