@@ -34,10 +34,10 @@ export class MessageRenderer {
     messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-3xl";
 
     const typeClasses = {
-      user: "bg-zinc-900 text-white user-message",
-      assistant: "bg-zinc-200 dark:bg-zinc-700 assistant-message",
-      error: "bg-red-600 dark:bg-red-500 text-white error-message",
-      system: "bg-purple-600 dark:bg-purple-500 text-white system-message",
+      user: "bg-zinc-900 selection:bg-zinc-700 text-white user-message",
+      assistant: "bg-zinc-200 dark:bg-zinc-700 selection:bg-zinc-400 selection:dark:bg-zinc-800 assistant-message",
+      error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
+      system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
     messageDiv.classList.add(
       ...(typeClasses[type]?.split(" ") || ["bg-gray-600"])
