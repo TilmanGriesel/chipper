@@ -1,0 +1,8 @@
+* text=auto
+*.jpg binary
+*.png binary
+*.gif binary
+
+# Git config
+# git config core.eol lf
+# git config core.autocrlf input
