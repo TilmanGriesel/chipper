@@ -20,6 +20,7 @@ function show_usage() {
     echo "  down                - Stop containers"
     echo "  rebuild             - Clean, rebuild and recreate images and containers"
     echo "  clean-volumes       - Delete all volumes"
+    echo "  clean-env           - Delete all dotfiles like .env and .systemprompt"
     echo "  logs                - Show container logs"
     echo "  ps                  - Show container status"
     echo "  embed [args]        - Run embed tool with optional arguments"
@@ -109,6 +110,7 @@ esac
 
 case "$1" in
     "up")
+        python env_setup.py
         docker compose -p $PROJECT_NAME down --remove-orphans
         docker_compose_cmd -p $PROJECT_NAME up -d
         ;;
@@ -140,6 +142,10 @@ case "$1" in
         echo "Volume directories cleaned"
         
         echo "Clean complete!"
+        ;;
+    "clean-env")
+        echo "Cleaning environment files..."
+        python env_setup.py --clean
         ;;
     "embed-testdata")
         run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata"

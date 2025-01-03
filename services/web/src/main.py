@@ -153,7 +153,7 @@ def make_api_request(endpoint: str, data: Dict, stream: bool = False) -> Any:
     api_url = os.getenv("API_URL", "http://localhost:8000")
     headers = {
         "Content-Type": "application/json",
-        "X-API-Key": os.getenv("API_KEY", "DEV-API-KEY-12345678-ABCDEFGHIJKLMNOP"),
+        "X-API-Key": os.getenv("API_KEY", "EXAMPLE_API_KEY"),
     }
 
     try:

@@ -1,0 +1,16 @@
+# Development
+build
+node_modules
+dist
+out
+venv
+license
+
+# Misc
+temp
+cache
+logs
+
+# QT Specific
+moc_
+_autogen
