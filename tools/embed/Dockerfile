@@ -8,7 +8,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-COPY .ragignore .
+
+# First copy example, and then use user ragignore if it can be found
+COPY .ragignore.example .ragignore
+COPY .ragignor[e] .ragignore
 
 RUN mkdir -p /app/data
 
