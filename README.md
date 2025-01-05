@@ -66,6 +66,16 @@ A huge shoutout and heartfelt thanks to all the incredible projects that make Ch
 
 These projects are the backbone of Chipper, and their contributions inspire endless possibilities.
 
+## Star History
+
+<a href="https://star-history.com/#TilmanGriesel/chipper&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date" />
+ </picture>
+</a>
+
 ---
 
 Be sure to visit the [Chipper project website](https://chipper.tilmangriesel.com/) for detailed setup instructions and more information.
