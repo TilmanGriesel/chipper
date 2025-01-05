@@ -6,7 +6,7 @@
     <a href="https://github.com/tilmangriesel/chipper/issues"><img src="https://img.shields.io/github/issues/tilmangriesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a><a href="https://hub.docker.com/repository/docker/griesel/chipper"><img src="https://img.shields.io/docker/pulls/griesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a>
 </p>
 
-**Chipper** gives you a web interface, CLI, and a hackable, simple architecture for embedding pipelines, document chunking, web scraping, and query workflows. Built with **Haystack**, **Ollama**, **Docker**, **Tailwind**, and **ElasticSearch**, it runs locally or scales as a Dockerized service.
+**Chipper** gives you a web interface, CLI, and a hackable, simple architecture for embedding pipelines, document chunking, web scraping, and query workflows. Built with **Haystack**, **Ollama**, **Hugging Face**, **Docker**, **Tailwind**, and **ElasticSearch**, it runs locally or scales as a Dockerized service.
 
 This project started as a way to help my girlfriend with her new book. The idea was to use local RAG and LLMs to ask questions about characters and explore creative possibilities, all without sharing proprietary details or your own book with cloud services like ChatGPT. What began as a bunch of scripts is now growing into a fully dockerized service architecture.
 
@@ -14,6 +14,7 @@ If you **like what you see, leaving a star would be sweet** and will help more p
 
 ## Features
 
+- Local [Ollama](https://ollama.com/) and [hosted Hugging Face API](https://huggingface.co/)
 - Build a powerful knowledge base using ElasticSearch embeddings.
 - Automatically split documents via Haystack.
 - Scrape content from web sources.
@@ -60,6 +61,7 @@ A huge shoutout and heartfelt thanks to all the incredible projects that make Ch
 
 - [Haystack](https://haystack.deepset.ai/) for providing the foundation for embedding and retrieval.
 - [Ollama](https://ollama.com/) for their amazing models and project.
+- [Hugging Face](https://huggingface.co/) for the ease of use.
 - [Elastic](https://www.elastic.co) and [Elasticvue](https://elasticvue.com/) for powering fast and efficient data retrieval.
 - [Docker](https://docker.com) for simplifying deployment and making setup a breeze.
 - [VitePress](https://vitepress.dev/), just the most lovely static site generator.
