@@ -69,7 +69,6 @@ function detect_docker_compose() {
         echo "docker-compose"
     else
         echo "Error: Neither 'docker compose' nor 'docker-compose' is available" >&2
-        exit 1
     fi
 }
 
