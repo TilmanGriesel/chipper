@@ -78,6 +78,7 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         temperature=float(os.getenv("TEMPERATURE", 0.7)),
         seed=int(os.getenv("SEED", 0)),
         top_k=int(os.getenv("TOP_K", 5)),
+        allow_model_pull=os.getenv("ALLOW_MODEL_PULL", "True").lower() == "true",
     )
 
 
@@ -154,6 +155,10 @@ def handle_streaming_response(
     def format_model_status(status):
         model = status.get("model", "unknown")
         status_type = status.get("status")
+
+        allow_model_pull = os.getenv("ALLOW_MODEL_PULL", "True").lower() == "true"
+        if not allow_model_pull:
+            return None
 
         if status_type == "pulling":
             return f"Starting to download model {model}..."

@@ -23,6 +23,7 @@ class PipelineConfig:
     es_index: str
     ollama_url: str
     embedding_model: str
+    allow_model_pull: bool
 
 
 @dataclass
@@ -33,6 +34,13 @@ class QueryPipelineConfig(PipelineConfig):
     temperature: float
     seed: int
     top_k: int
+    allow_model_pull: bool
+
+
+class ModelNotFoundError(Exception):
+    """Raised when a required model is not available and auto-pull is disabled."""
+
+    pass
 
 
 class RAGQueryPipeline:
@@ -127,6 +135,17 @@ class RAGQueryPipeline:
                 )
 
                 if show_response.status_code != 200:
+                    if not self.config.allow_model_pull:
+                        error_msg = f"Model '{model_name}' not found locally and auto-pull is disabled"
+                        self.logger.error(error_msg)
+                        yield {
+                            "type": "model_status",
+                            "status": "error",
+                            "model": model_name,
+                            "error": error_msg,
+                        }
+                        raise ModelNotFoundError(error_msg)
+
                     self.logger.info(
                         f"Model '{model_name}' not found locally, initiating pull..."
                     )
@@ -209,6 +228,8 @@ class RAGQueryPipeline:
                         f"Model '{model_name}' is already available locally"
                     )
 
+            except ModelNotFoundError:
+                raise
             except Exception as e:
                 error_msg = f"Failed to verify or pull model {model_name}: {str(e)}"
                 self.logger.error(error_msg, exc_info=True)
