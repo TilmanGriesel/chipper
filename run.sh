@@ -244,11 +244,7 @@ case "$1" in
         ;;
     "clean-volumes")
         echo "Stopping containers and removing volumes..."
-        if [ "$DOCKER_COMPOSE_CMD" = "docker compose" ]; then
-            docker compose -p "$PROJECT_NAME" down -v --remove-orphans
-        else
-            docker-compose -p "$PROJECT_NAME" down -v --remove-orphans
-        fi
+        docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
         
         echo "Cleaning up volume directories..."
         rm -rfv docker/volumes
