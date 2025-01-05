@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ ! -x ./run.sh ]]; then
+  echo "Error: ./run.sh not found or not executable." >&2
+  exit 1
+fi
+
+./run.sh "$@"
+
+exit $?
