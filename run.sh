@@ -8,6 +8,7 @@ readonly DOCKER_COMPOSE_FILE="docker/docker-compose.dev.yml"
 readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
+readonly ELASTICVUE_URL="http://localhost:21230"
 readonly SCRIPT_VERSION="1.0.0"
 
 function show_usage() {
@@ -35,12 +36,9 @@ Commands:
   css                 - Watch and rebuild CSS files
   format              - Run pre-commit formatting hooks
   browser             - Open web-interface in local browser
+  evue                - Open elasticvue web-interface in local browser
   cli                 - Run cli interface
   dev-docs            - Run local vitepress server
-
-Environment Variables:
-  PROJECT_NAME        - Docker project name (default: ${PROJECT_NAME})
-  LOCAL_URL          - Local development URL (default: ${LOCAL_URL})
 EOF
 }
 
@@ -91,6 +89,29 @@ function run_in_directory() {
 
 function open_browser() {
     local url="$LOCAL_URL"
+    case "$(uname -s)" in
+        Darwin)
+            open "$url"
+            ;;
+        Linux)
+            if command -v xdg-open >/dev/null; then
+                xdg-open "$url"
+            else
+                echo "Please install xdg-utils or manually open: $url"
+            fi
+            ;;
+        MINGW*|MSYS*|CYGWIN*)
+            start "$url"
+            ;;
+        *)
+            echo "Unsupported operating system for automatic browser opening"
+            echo "Please manually open: $url"
+            ;;
+    esac
+}
+
+function open_elasticvue() {
+    local url="$ELASTICVUE_URL"
     case "$(uname -s)" in
         Darwin)
             open "$url"
@@ -263,6 +284,9 @@ case "$1" in
         ;;
     "browser")
         open_browser
+        ;;
+    "evue")
+        open_elasticvue
         ;;
     "cli")
         shift
