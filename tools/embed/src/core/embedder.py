@@ -127,7 +127,7 @@ class RAGEmbedder:
             health_response = requests.get(self.config.ollama_url)
 
             if health_response.status_code == 200:
-                self.logger.info(f"Successfully connected to the Ollama server")
+                self.logger.info("Successfully connected to the Ollama server")
             else:
                 self.logger.error(
                     f"Failed to connect to the Ollama server. "
