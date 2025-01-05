@@ -101,12 +101,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let responseContent = "";
 
     try {
+      messageItem = messageRenderer.createMessageElement("", "assistant", true);
+      elements.chatMessages.appendChild(messageItem.container);
+      outputDiv = messageItem.message;
+      uiManager.scrollToBottom();
+
       await chatService.sendMessage(
         (chunk) => {
-          if (!messageItem) {
-            messageItem = messageRenderer.createMessageElement("", "assistant");
-            elements.chatMessages.appendChild(messageItem.container);
-            outputDiv = messageItem.message;
+          if (outputDiv.classList.contains('dots-animation')) {
+            // replace the thinking animation with a new content div on first chunk
+            const newContentDiv = document.createElement("div");
+            newContentDiv.className = "prose prose-sm max-w-none break-words";
+            outputDiv.parentNode.replaceChild(newContentDiv, outputDiv);
+            outputDiv = newContentDiv;
           }
 
           responseContent += chunk;
