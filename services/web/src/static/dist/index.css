@@ -725,6 +725,10 @@ video {
   max-width: none;
 }
 
+.max-w-4xl {
+  max-width: 56rem;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -905,6 +909,11 @@ video {
   line-height: 1.75rem;
 }
 
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
 .font-bold {
   font-weight: 700;
 }
@@ -997,8 +1006,8 @@ body {
   font-display: swap;
 }
 
-.brand-name {
-  font-family: "Just Another Hand", serif;
+.chipper-font {
+  font-family: "Just Another Hand", serif !important;
   letter-spacing: 2px;
 }
 
@@ -1203,14 +1212,14 @@ pre[class*="language-"] {
   }
 }
 
-.selection\:bg-zinc-500 *::-moz-selection {
+.selection\:bg-purple-900 *::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-zinc-500 *::selection {
+.selection\:bg-purple-900 *::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-red-200 *::-moz-selection {
@@ -1223,56 +1232,6 @@ pre[class*="language-"] {
   background-color: rgb(254 202 202 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-purple-200 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(233 213 255 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-200 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(233 213 255 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-900 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-900 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-600 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-600 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-900 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-900 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-200 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-200 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
-}
-
 .selection\:bg-zinc-400 *::-moz-selection {
   --tw-bg-opacity: 1;
   background-color: rgb(161 161 170 / var(--tw-bg-opacity, 1));
@@ -1281,16 +1240,6 @@ pre[class*="language-"] {
 .selection\:bg-zinc-400 *::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(161 161 170 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-800 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-800 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-zinc-700 *::-moz-selection {
@@ -1303,14 +1252,14 @@ pre[class*="language-"] {
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-zinc-500::-moz-selection {
+.selection\:bg-purple-900::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-zinc-500::selection {
+.selection\:bg-purple-900::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-red-200::-moz-selection {
@@ -1323,56 +1272,6 @@ pre[class*="language-"] {
   background-color: rgb(254 202 202 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-purple-200::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(233 213 255 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-200::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(233 213 255 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-900::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-purple-900::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-600::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-600::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-900::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-900::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-200::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-200::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
-}
-
 .selection\:bg-zinc-400::-moz-selection {
   --tw-bg-opacity: 1;
   background-color: rgb(161 161 170 / var(--tw-bg-opacity, 1));
@@ -1381,16 +1280,6 @@ pre[class*="language-"] {
 .selection\:bg-zinc-400::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(161 161 170 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-800::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-zinc-800::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-zinc-700::-moz-selection {
@@ -1498,14 +1387,14 @@ pre[class*="language-"] {
   --tw-ring-color: rgb(244 244 245 / 0.1);
 }
 
-.selection\:dark\:bg-zinc-500:is(.dark *) *::-moz-selection {
+.selection\:dark\:bg-zinc-600:is(.dark *) *::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:dark\:bg-zinc-500:is(.dark *) *::selection {
+.selection\:dark\:bg-zinc-600:is(.dark *) *::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
+  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:dark\:bg-zinc-800:is(.dark *) *::-moz-selection {
@@ -1518,34 +1407,14 @@ pre[class*="language-"] {
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:dark\:bg-zinc-700:is(.dark *) *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-700:is(.dark *) *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-600:is(.dark *) *::-moz-selection {
+.selection\:dark\:bg-zinc-600:is(.dark *)::-moz-selection {
   --tw-bg-opacity: 1;
   background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:dark\:bg-zinc-600:is(.dark *) *::selection {
+.selection\:dark\:bg-zinc-600:is(.dark *)::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-500:is(.dark *)::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-500:is(.dark *)::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:dark\:bg-zinc-800:is(.dark *)::-moz-selection {
@@ -1556,26 +1425,6 @@ pre[class*="language-"] {
 .selection\:dark\:bg-zinc-800:is(.dark *)::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-700:is(.dark *)::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-700:is(.dark *)::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-600:is(.dark *)::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:dark\:bg-zinc-600:is(.dark *)::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
 .dark\:hover\:bg-zinc-200:hover:is(.dark *) {

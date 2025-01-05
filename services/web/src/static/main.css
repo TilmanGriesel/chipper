@@ -44,8 +44,8 @@ body {
   font-display: swap;
 }
 
-.brand-name {
-  font-family: "Just Another Hand", serif;
+.chipper-font {
+  font-family: "Just Another Hand", serif !important;
   letter-spacing: 2px;
 }
 
