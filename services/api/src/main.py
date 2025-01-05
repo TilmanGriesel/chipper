@@ -74,10 +74,10 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         provider = ModelProvider.HUGGINGFACE
 
     model_name = model or os.getenv("MODEL_NAME")
-    embedding_model = os.getenv("EMBEDDING_MODEL")
+    embedding_model = os.getenv("EMBEDDING_MODEL_NAME")
     if provider == ModelProvider.HUGGINGFACE:
         model_name = model or os.getenv("HF_MODEL_NAME")
-        embedding_model = os.getenv("HF_EMBEDDING_MODEL")
+        embedding_model = os.getenv("HF_EMBEDDING_MODEL_NAME")
 
     return QueryPipelineConfig(
         provider=provider,
