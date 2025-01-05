@@ -1,6 +1,7 @@
 haystack-ai
 ollama-haystack
 elasticsearch-haystack
+huggingface_hub
 flask
 flask_limiter
 python-dotenv

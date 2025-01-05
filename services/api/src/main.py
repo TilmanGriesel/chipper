@@ -9,8 +9,8 @@ from functools import wraps
 from pathlib import Path
 
 import elasticsearch
+from core.pipeline_config import ModelProvider, QueryPipelineConfig
 from core.rag_pipeline import RAGQueryPipeline
-from core.pipeline_config import QueryPipelineConfig
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_limiter import Limiter
@@ -68,12 +68,25 @@ system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcw
 
 
 def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelineConfig:
+    provider_selection = os.getenv("PROVIDER")
+    provider = ModelProvider.OLLAMA
+    if provider_selection.lower() == "hf":
+        provider = ModelProvider.HUGGINGFACE
+
+    model_name = model or os.getenv("MODEL_NAME")
+    embedding_model = os.getenv("EMBEDDING_MODEL")
+    if provider == ModelProvider.HUGGINGFACE:
+        model_name = model or os.getenv("HF_MODEL_NAME")
+        embedding_model = os.getenv("HF_EMBEDDING_MODEL")
+
     return QueryPipelineConfig(
+        provider=provider,
+        hf_api_key=os.getenv("HF_API_KEY"),
+        ollama_url=os.getenv("OLLAMA_URL"),
         es_url=os.getenv("ES_URL"),
         es_index=index or os.getenv("ES_INDEX"),
-        ollama_url=os.getenv("OLLAMA_URL"),
-        model_name=model or os.getenv("MODEL_NAME"),
-        embedding_model=os.getenv("EMBEDDING_MODEL"),
+        model_name=model_name,
+        embedding_model=embedding_model,
         system_prompt=system_prompt_value,
         context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
         temperature=float(os.getenv("TEMPERATURE", 0.7)),
