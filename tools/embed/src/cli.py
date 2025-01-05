@@ -41,6 +41,14 @@ def parse_args():
         "--debug", action="store_true", default=False, help="Enable debug logging"
     )
 
+    parser.add_argument(
+        "--provider",
+        type=str,
+        default=None,
+        choices=["ollama", "hf"],
+        help="Embedding provider",
+    )
+
     # Service Configuration
     parser.add_argument(
         "--es-url",
@@ -68,7 +76,7 @@ def parse_args():
     parser.add_argument(
         "--embedding-model",
         type=str,
-        default=os.getenv("EMBEDDING_MODEL", "nomic-embed-text"),
+        default=None,
         help="Model to use for embeddings",
     )
 

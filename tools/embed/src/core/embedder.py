@@ -2,10 +2,10 @@ import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 import requests
-from core.document_embedder import DocumentEmbedder
+from core.document_embedder import DocumentEmbedder, ModelProvider
 from haystack import Document
 from haystack_integrations.document_stores.elasticsearch import (
     ElasticsearchDocumentStore,
@@ -16,8 +16,22 @@ from haystack_integrations.document_stores.elasticsearch import (
 class PipelineConfig:
     es_url: str
     es_index: str
-    ollama_url: str
+    provider: str
     embedding_model: str
+    ollama_url: Optional[str] = None
+    hf_api_key: Optional[str] = None
+
+    def __post_init__(self):
+        if self.provider not in [ModelProvider.OLLAMA, ModelProvider.HUGGINGFACE]:
+            raise ValueError(f"Unsupported provider: {self.provider}")
+
+        if self.provider == ModelProvider.OLLAMA and not self.ollama_url:
+            raise ValueError("Ollama URL is required when using Ollama provider")
+
+        if self.provider == ModelProvider.HUGGINGFACE and not self.hf_api_key:
+            raise ValueError(
+                "HuggingFace API key is required when using HuggingFace provider"
+            )
 
 
 class MetricsTracker:
@@ -55,8 +69,10 @@ class RAGEmbedder:
         self,
         es_url: str = None,
         es_index: str = None,
-        ollama_url: str = None,
+        provider_name: str = None,
         embedding_model: str = None,
+        ollama_url: str = None,
+        hf_api_key: str = None,
     ):
         logging.basicConfig(
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -64,24 +80,46 @@ class RAGEmbedder:
         )
         self.logger = logging.getLogger(__name__)
 
+        provider_name = provider_name or os.getenv("PROVIDER", "ollama")
+
+        provider = ModelProvider.OLLAMA
+        if provider_name.lower() == "hf":
+            provider = ModelProvider.HUGGINGFACE
+
+        if not embedding_model:
+            if provider == ModelProvider.HUGGINGFACE:
+                embedding_model = os.getenv("HF_EMBEDDING_MODEL_NAME")
+            else:
+                embedding_model = os.getenv("EMBEDDING_MODEL_NAME")
+
+        self.logger.info(f"EMBEDDING MODEL:{embedding_model}")
+
         self.config = PipelineConfig(
             es_url=es_url or os.getenv("ES_URL"),
             es_index=es_index or os.getenv("ES_INDEX"),
+            provider=provider,
+            embedding_model=embedding_model,
             ollama_url=ollama_url or os.getenv("OLLAMA_URL"),
-            embedding_model=embedding_model or os.getenv("EMBEDDING_MODEL"),
+            hf_api_key=hf_api_key or os.getenv("HF_API_KEY"),
         )
 
         self._log_configuration()
         self.document_store = self._initialize_document_store()
-        self._initialize_embedder()
+
+        if self.config.provider == ModelProvider.OLLAMA:
+            self._initialize_ollama()
+
         self.metrics_tracker = MetricsTracker()
 
     def _log_configuration(self):
         self.logger.info("\nEmbedding Pipeline Configuration:")
-        for field_name, field_value in self.config.__dict__.items():
+        config_dict = self.config.__dict__.copy()
+        if config_dict.get("hf_api_key"):
+            config_dict["hf_api_key"] = "****"
+        for field_name, field_value in config_dict.items():
             self.logger.info(f"- {field_name}: {field_value}")
 
-    def _check_server_health(self):
+    def _check_ollama_health(self):
         try:
             self.logger.info(
                 f"Checking connectivity to Ollama server at {self.config.ollama_url}"
@@ -89,13 +127,11 @@ class RAGEmbedder:
             health_response = requests.get(self.config.ollama_url)
 
             if health_response.status_code == 200:
-                self.logger.info(
-                    f"Successfully connected to the Ollama server, Response: {health_response.text}"
-                )
+                self.logger.info(f"Successfully connected to the Ollama server")
             else:
                 self.logger.error(
                     f"Failed to connect to the Ollama server. "
-                    f"Status code: {health_response.status_code}, Response: {health_response.text}"
+                    f"Status code: {health_response.status_code}"
                 )
                 raise Exception("Ollama server connectivity check failed.")
 
@@ -106,9 +142,9 @@ class RAGEmbedder:
             )
             raise
 
-    def _initialize_embedder(self):
+    def _initialize_ollama(self):
         try:
-            self._check_server_health()
+            self._check_ollama_health()
 
             self.logger.info(f"Checking embedding model: {self.config.embedding_model}")
             show_response = requests.post(
@@ -174,8 +210,10 @@ class RAGEmbedder:
         try:
             embedder = DocumentEmbedder(
                 document_store=self.document_store,
-                ollama_url=self.config.ollama_url,
+                model_url=self.config.ollama_url,
                 embedding_model=self.config.embedding_model,
+                provider=self.config.provider,
+                hf_api_key=self.config.hf_api_key,
             )
             embedder.embed_documents(documents)
 

@@ -80,6 +80,7 @@ def main():
     try:
         logger.info("Initializing RAG Embedder")
         embedder = RAGEmbedder(
+            provider_name=args.provider,
             es_url=args.es_url,
             es_index=args.es_index,
             ollama_url=args.ollama_url,

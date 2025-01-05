@@ -2,3 +2,4 @@ haystack-ai
 ollama-haystack
 elasticsearch-haystack
 python-dotenv
+huggingface_hub

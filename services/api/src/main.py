@@ -68,9 +68,9 @@ system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcw
 
 
 def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelineConfig:
-    provider_selection = os.getenv("PROVIDER")
+    provider_name = os.getenv("PROVIDER")
     provider = ModelProvider.OLLAMA
-    if provider_selection.lower() == "hf":
+    if provider_name.lower() == "hf":
         provider = ModelProvider.HUGGINGFACE
 
     model_name = model or os.getenv("MODEL_NAME")
@@ -223,10 +223,10 @@ def handle_streaming_response(
                 "full_response": result,
             }
             q.put(f"data: {json.dumps(final_data)}\n\n")
-        except elasticsearch.BadRequestError:
+        except elasticsearch.BadRequestError as e:
             error_data = {
                 "type": "chat_response",
-                "chunk": "Error: Embedding retriever error. Index not found.\n",
+                "chunk": f"Error: Embedding retriever error. {str(e)}.\n",
                 "done": True,
             }
             q.put(f"data: {json.dumps(error_data)}\n\n")

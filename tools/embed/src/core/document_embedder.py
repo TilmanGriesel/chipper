@@ -4,8 +4,13 @@ import os
 from typing import Any, Dict, List, Optional
 
 from haystack import Document, Pipeline
+from haystack.components.embedders import (
+    HuggingFaceAPIDocumentEmbedder,
+    HuggingFaceAPITextEmbedder,
+)
 from haystack.components.writers import DocumentWriter
 from haystack.document_stores.types import DuplicatePolicy
+from haystack.utils import Secret
 from haystack_integrations.components.embedders.ollama import (
     OllamaDocumentEmbedder,
     OllamaTextEmbedder,
@@ -13,6 +18,11 @@ from haystack_integrations.components.embedders.ollama import (
 from haystack_integrations.document_stores.elasticsearch import (
     ElasticsearchDocumentStore,
 )
+
+
+class ModelProvider:
+    OLLAMA = "ollama"
+    HUGGINGFACE = "huggingface"
 
 
 def generate_document_id(file_path: str, content: str) -> str:
@@ -24,15 +34,26 @@ class DocumentEmbedder:
     def __init__(
         self,
         document_store: ElasticsearchDocumentStore,
-        ollama_url: str,
+        model_url: str,
         embedding_model: str,
+        provider: str = ModelProvider.OLLAMA,
+        hf_api_key: Optional[str] = None,
     ):
         self.logger = logging.getLogger(__name__)
         self.document_store = document_store
-        self.ollama_url = ollama_url
+        self.model_url = model_url
         self.embedding_model = embedding_model
+        self.provider = provider
+        self.hf_api_key = hf_api_key
         self.embedding_pipeline = None
         self.embedding_dimension = None
+
+        # Validate HuggingFace configuration if selected
+        if self.provider == ModelProvider.HUGGINGFACE and not self.hf_api_key:
+            raise ValueError(
+                "HuggingFace API key is required when using HuggingFace provider"
+            )
+
         try:
             self._validate_or_set_embedding_dimension()
         except Exception as e:
@@ -42,9 +63,20 @@ class DocumentEmbedder:
         try:
             self.logger.debug("Setting up embedding pipeline")
             embedding_pipeline = Pipeline()
-            document_embedder = OllamaDocumentEmbedder(
-                model=self.embedding_model, url=self.ollama_url
-            )
+
+            if self.provider == ModelProvider.OLLAMA:
+                document_embedder = OllamaDocumentEmbedder(
+                    model=self.embedding_model, url=self.model_url
+                )
+            elif self.provider == ModelProvider.HUGGINGFACE:
+                document_embedder = HuggingFaceAPIDocumentEmbedder(
+                    api_type="serverless_inference_api",
+                    api_params={"model": self.embedding_model},
+                    token=Secret.from_token(self.hf_api_key),
+                )
+            else:
+                raise ValueError(f"Unsupported provider: {self.provider}")
+
             embedding_pipeline.add_component("embedder", document_embedder)
             writer = DocumentWriter(
                 document_store=self.document_store, policy=DuplicatePolicy.OVERWRITE
@@ -53,6 +85,29 @@ class DocumentEmbedder:
             embedding_pipeline.connect("embedder", "writer")
             self.embedding_pipeline = embedding_pipeline
             return embedding_pipeline
+        except Exception as e:
+            self.logger.debug(str(e))
+            return None
+
+    def get_embedding_dimension(self, text: str = "test query") -> Optional[int]:
+        if self.embedding_dimension is not None:
+            return self.embedding_dimension
+        try:
+            if self.provider == ModelProvider.OLLAMA:
+                text_embedder = OllamaTextEmbedder(
+                    model=self.embedding_model, url=self.model_url
+                )
+            else:
+                text_embedder = HuggingFaceAPITextEmbedder(
+                    api_type="serverless_inference_api",
+                    api_params={"model": self.embedding_model},
+                    token=Secret.from_token(self.hf_api_key),
+                )
+
+            embedding = text_embedder.run(text=text)["embedding"]
+            self.embedding_dimension = len(embedding)
+            self.logger.debug(str(self.embedding_dimension))
+            return self.embedding_dimension
         except Exception as e:
             self.logger.debug(str(e))
             return None
@@ -70,21 +125,6 @@ class DocumentEmbedder:
                 self.logger.debug(str(self.embedding_dimension))
         except Exception as e:
             self.logger.debug(str(e))
-
-    def get_embedding_dimension(self, text: str = "test query") -> Optional[int]:
-        if self.embedding_dimension is not None:
-            return self.embedding_dimension
-        try:
-            text_embedder = OllamaTextEmbedder(
-                model=self.embedding_model, url=self.ollama_url
-            )
-            embedding = text_embedder.run(text=text)["embedding"]
-            self.embedding_dimension = len(embedding)
-            self.logger.debug(str(self.embedding_dimension))
-            return self.embedding_dimension
-        except Exception as e:
-            self.logger.debug(str(e))
-            return None
 
     def _validate_documents(self, documents: List[Document]) -> List[Document]:
         valid_documents = []
@@ -167,21 +207,3 @@ class DocumentEmbedder:
             except Exception as e:
                 self.logger.debug(str(e))
         return self.embed_documents(documents, clear_index=clear_index)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    document_store = ElasticsearchDocumentStore(
-        host="localhost",
-        port=9200,
-        username="",
-        password="",
-        index="my-haystack-index",
-        embedding_field="embedding",
-    )
-    embedder = DocumentEmbedder(
-        document_store, "http://localhost:11434", "nomic-embed-text"
-    )
-    files_to_embed = ["/path/to/first_file.txt", "/path/to/some_other_file.txt"]
-    result = embedder.embed_files(files_to_embed, clear_index=True)
-    print(result)
