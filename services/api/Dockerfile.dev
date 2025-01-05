@@ -9,7 +9,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN pip install --no-cache-dir watchdog[watchmedo] pytest pytest-watch ipython
 
-COPY .systemprompt /app
+COPY src/ ./src/
+
+# First copy example, and then use user system prompt if it can be found
+COPY .systemprompt.example /app/.systemprompt
+COPY .systempromp[t] /app/.systemprompt
 
 ENV FLASK_DEBUG=1
 ENV FLASK_APP=src/main.py

@@ -8,7 +8,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-COPY .systemprompt /app
+
+# First copy example, and then use user system prompt if it can be found
+COPY .systemprompt.example /app/.systemprompt
+COPY .systempromp[t] /app/.systemprompt
 
 ENV PYTHONPATH=/app/src
 
