@@ -9,12 +9,29 @@ readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
-readonly SCRIPT_VERSION="1.0.0"
+readonly SCRIPT_VERSION="1.1.0"
+
+
+function show_welcome() {
+    echo ""
+    # purple
+    echo -e "\e[35m"
+    echo "        __    _                      "
+    echo "  _____/ /_  (_)___  ____  ___  _____"
+    echo " / ___/ __ \/ / __ \/ __ \/ _ \/ ___/"
+    echo "/ /__/ / / / / /_/ / /_/ /  __/ /    "
+    echo "\___/_/ /_/_/ .___/ .___/\___/_/     "
+    echo "           /_/   /_/                 "
+    echo -e "\e[0m"
+    # blue
+    echo -e "\e[34m        Chipper run v${SCRIPT_VERSION}\e[0m"
+    echo ""
+}
+
+show_welcome
 
 function show_usage() {
     cat << EOF
-Development Environment Manager v${SCRIPT_VERSION}
-
 Usage: $0 <command> [args]
 
 Options:
