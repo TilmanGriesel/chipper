@@ -9,7 +9,8 @@ from functools import wraps
 from pathlib import Path
 
 import elasticsearch
-from core.query import QueryPipelineConfig, RAGQueryPipeline
+from core.rag_pipeline import RAGQueryPipeline
+from core.pipeline_config import QueryPipelineConfig
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_limiter import Limiter
@@ -163,7 +164,7 @@ def handle_streaming_response(
         if status_type == "pulling":
             return f"Starting to download model {model}..."
         elif status_type == "progress":
-            percentage = int(status.get("percentage", 0))
+            percentage = status.get("percentage", 0)
             return f"Downloading model {model}: {percentage}% complete"
         elif status_type == "complete":
             return f"Successfully downloaded model {model}"
