@@ -24,7 +24,7 @@ function show_welcome() {
     echo "           /_/   /_/                 "
     echo -e "\e[0m"
     # blue
-    echo -e "\e[34m        Chipper run v${SCRIPT_VERSION}\e[0m"
+    echo -e "\e[34m        Chipper Run v${SCRIPT_VERSION}\e[0m"
     echo ""
 }
 
