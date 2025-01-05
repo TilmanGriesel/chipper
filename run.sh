@@ -237,12 +237,16 @@ case "$1" in
         echo "Rebuilding containers..."
         docker_compose_cmd build --no-cache
         
+        python env_setup.py
+
         echo "Starting containers..."
         docker_compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
         
         echo "Clean and rebuild complete!"
         ;;
     "clean-volumes")
+        python env_setup.py
+
         echo "Stopping containers and removing volumes..."
         docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
         
