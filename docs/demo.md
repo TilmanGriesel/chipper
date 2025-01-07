@@ -11,11 +11,13 @@ Tell me a story about Chipper, the brilliant golden retriever.
  <iframe
    title="Chipper AI Demo"
    width="100%" 
-   height="600"
+   height="900"
    style="border: none;"
    src="https://demo.chipper.tilmangriesel.com/">
  </iframe>
 </div>
+
+or visit the demo at: https://demo.chipper.tilmangriesel.com/
 
 This demo **is limited by the free resources** available from Hugging Face and myself. The quality of the results depends on the specific model and its size, with larger models typically producing more accurate outcomes. Please note that model and index selection options are disabled in this demo.
 

@@ -37,7 +37,6 @@ jobs:
         with:
           path: ./docs/.vitepress/dist
   # Deployment job
-
   deploy:
     environment:
       name: docs

@@ -435,7 +435,7 @@ h1.name {
  * -------------------------------------------------------------------------- */
 
 :root {
-  --vp-home-hero-image-filter: blur(80px);
+  --vp-home-hero-image-filter: blur(40px);
 }
 
 .image-bg {
@@ -450,7 +450,6 @@ h1.name {
   z-index: -1;
   background: linear-gradient(132deg, #5ddcff, #f53ec7 80%);
   opacity: 60%;
-
   animation: spin 5.5s linear infinite;
 }
 
