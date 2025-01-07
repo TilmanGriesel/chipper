@@ -20,7 +20,7 @@ def log_info(message):
 
 
 def log_warning(message):
-    print(f"{Colors.YELLOW}[WARNING]{Colors.NC} {message}")
+    print(f"{Colors.YELLOW}[WARN]{Colors.NC} {message}")
 
 
 def log_error(message):
@@ -94,11 +94,20 @@ def detect_gpu_profile():
     return "cpu"
 
 
-def needs_api_key_update(env_file):
+def has_example_api_key_set(env_file):
     try:
         with open(env_file, "r") as file:
             content = file.read()
         return "API_KEY=EXAMPLE_API_KEY" in content
+    except Exception as e:
+        log_error(f"Failed to read {env_file}: {str(e)}")
+        return False
+
+def has_ollama_key(env_file):
+    try:
+        with open(env_file, "r") as file:
+            content = file.read()
+        return "OLLAMA_URL=" in content
     except Exception as e:
         log_error(f"Failed to read {env_file}: {str(e)}")
         return False
@@ -210,7 +219,7 @@ def copy_example_files():
                 shutil.copy(example_file, actual_file)
                 log_info(f"Created {actual_file} from {example_file}")
 
-            if example_pattern == ".env.example" or needs_api_key_update(
+            if example_pattern == ".env.example" or has_example_api_key_set(
                 str(actual_file)
             ):
                 files_needing_update.append(actual_file)
@@ -271,9 +280,9 @@ def main():
     for env_file in files_needing_update:
         if str(env_file).endswith(".env"):
             updates = {}
-            if needs_api_key_update(str(env_file)):
+            if has_example_api_key_set(str(env_file)):
                 updates["API_KEY"] = SHARED_API_KEY
-            if use_external_ollama:
+            if has_ollama_key(str(env_file)) and use_external_ollama:
                 updates["OLLAMA_URL"] = EXTERNAL_OLLAMA_URL
             if updates:
                 update_env_file(str(env_file), updates)
