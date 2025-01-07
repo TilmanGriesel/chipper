@@ -1,0 +1,133 @@
+x-healthcheck: &a1
+  interval: 30s
+  retries: 10
+
+x-shared-deploy: &a2
+  resources:
+    limits:
+      memory: 2g
+
+x-logging: &default-logging
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "100m"
+      max-file: "5"
+      compress: "true"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-chipper-cluster
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:21230
+      - ES_JAVA_OPTS=-Xms128m -Xmx128m
+      - bootstrap.memory_lock=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9200/_cluster/health
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+    restart: unless-stopped
+    <<: *default-logging
+
+  api:
+    pull_policy: always
+    image: griesel/chipper:api-latest
+    env_file: .env.api
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/health
+    deploy: *a2
+    restart: unless-stopped
+    <<: *default-logging
+
+  web:
+    pull_policy: always
+    image: griesel/chipper:web-latest
+    env_file: .env.web
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - frontend
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:5000/health
+    deploy: *a2
+    restart: unless-stopped
+    <<: *default-logging
+
+  nginx-proxy:
+    pull_policy: always
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - "80:80"
+      - "127.0.0.1:81:81"  # Admin panel
+      - "443:443"
+    volumes:
+      - nginx-proxy-data:/data
+      - nginx-proxy-letsencrypt:/etc/letsencrypt
+    networks:
+      - frontend
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:81
+    deploy: *a2
+    restart: unless-stopped
+    <<: *default-logging
+
+networks:
+  frontend:
+    name: frontend_network
+    driver: bridge
+  backend:
+    name: backend_network
+    driver: bridge
+    internal: true
+
+volumes:
+  ollama-data:
+    external: true
+  elasticsearch-data:
+    external: true
+  nginx-proxy-data:
+    external: true
+  nginx-proxy-letsencrypt:
+    external: true
