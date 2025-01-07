@@ -225,10 +225,12 @@ case "$1" in
         docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f
         echo "Project images cleaned"
         
+        echo "Cleaning environment..."
+        python setup.py --clean
+        python setup.py
+
         echo "Rebuilding containers..."
         docker_compose_cmd build --no-cache
-        
-        python setup.py
 
         echo "Starting containers..."
         docker_compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
