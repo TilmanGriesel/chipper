@@ -25,11 +25,15 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+DAILY_LIMIT = int(os.getenv("DAILY_RATE_LIMIT", "86400"))
+MINUTE_LIMIT = int(os.getenv("MINUTE_RATE_LIMIT", "60"))
+STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE", "memory://")
+
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=["10000 per day", "1000 per minute"],
-    storage_uri="memory://",
+    default_limits=[f"{DAILY_LIMIT} per day", f"{MINUTE_LIMIT} per minute"],
+    storage_uri=STORAGE_URI,
 )
 
 API_KEY = os.getenv("API_KEY")

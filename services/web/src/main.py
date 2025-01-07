@@ -241,7 +241,12 @@ def create_app():
         except (ConnectionError, Timeout):
             return jsonify({"error": "Connection error"}), 503
         except RequestException as e:
-            return jsonify({"error": str(e)}), 500
+            status_code = (
+                e.response.status_code
+                if hasattr(e, "response") and e.response is not None
+                else 500
+            )
+            return jsonify({"error": str(e)}), status_code
 
     @app.route("/api/chat/abort", methods=["POST"])
     def abort_chat():
