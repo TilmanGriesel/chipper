@@ -210,7 +210,7 @@ def copy_example_files():
                 shutil.copy(example_file, actual_file)
                 log_info(f"Created {actual_file} from {example_file}")
 
-            if example_pattern == ".env.example" and needs_api_key_update(
+            if example_pattern == ".env.example" or needs_api_key_update(
                 str(actual_file)
             ):
                 files_needing_update.append(actual_file)

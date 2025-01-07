@@ -40,6 +40,7 @@ Commands:
   down                - Stop containers
   rebuild             - Clean, rebuild and recreate images and containers
   clean-volumes       - Delete all volumes
+  env                 - Create or update all dotfiles like .env and .systemprompt
   clean-env           - Delete all dotfiles like .env and .systemprompt
   logs                - Show container logs
   ps                  - Show container status
@@ -245,6 +246,10 @@ case "$1" in
         echo "Volume directories cleaned"
         
         echo "Clean complete!"
+        ;;
+    "env")
+        echo "Creating environment files..."
+        python setup.py
         ;;
     "clean-env")
         echo "Cleaning environment files..."
