@@ -5,12 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Process documents with text embeddings and query capability",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
+    parser = argparse.ArgumentParser(description=f"Chipper Embed CLI {APP_VERSION}")
 
     parser.add_argument(
         "--path",

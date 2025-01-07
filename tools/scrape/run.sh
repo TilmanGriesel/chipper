@@ -2,22 +2,6 @@
 
 set -euo pipefail
 
-readonly SCRIPT_VERSION="0.1.0"
-function show_welcome() {
-    printf "\n"
-    printf "\033[32m"
-    printf "        __    _                      \n"
-    printf "  _____/ /_  (_)___  ____  ___  _____\n"
-    printf " / ___/ __ \/ / __ \/ __ \/ _ \/ ___/\n"
-    printf "/ /__/ / / / / /_/ / /_/ /  __/ /    \n"
-    printf "\___/_/ /_/_/ .___/ .___/\___/_/     \n"
-    printf "           /_/   /_/                 \n"
-    printf "\033[0m\n"
-    printf "\033[36m        Chipper Scrape v%s\033[0m\n" "${SCRIPT_VERSION}"
-    printf "\n"
-}
-show_welcome
-
 OS_TYPE=$(uname -s)
 
 if [[ "$OS_TYPE" == *"MINGW"* || "$OS_TYPE" == *"MSYS"* ]]; then

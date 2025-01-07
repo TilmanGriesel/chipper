@@ -24,10 +24,31 @@ from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
 
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+
+
+def show_welcome():
+    PURPLE = "\033[34m"
+    CYAN = "\033[36m"
+    RESET = "\033[0m"
+
+    print("\n", flush=True)
+    print(f"{PURPLE}", flush=True)
+    print("        __    _                      ", flush=True)
+    print("  _____/ /_  (_)___  ____  ___  _____", flush=True)
+    print(" / ___/ __ \\/ / __ \\/ __ \\/ _ \\/ ___/", flush=True)
+    print("/ /__/ / / / / /_/ / /_/ /  __/ /    ", flush=True)
+    print("\\___/_/ /_/_/ .___/ .___/\\___/_/     ", flush=True)
+    print("           /_/   /_/                 ", flush=True)
+    print(f"{RESET}", flush=True)
+    print(f"{CYAN}       Chipper Web {APP_VERSION}", flush=True)
+    print(f"{RESET}\n", flush=True)
+
+
+show_welcome()
 
 
 class SessionManager:
@@ -279,7 +300,12 @@ def create_app():
     @app.route("/health", methods=["GET"])
     def health_check():
         return jsonify(
-            {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+            {
+                "service": "chipper-web",
+                "version": APP_VERSION,
+                "status": "healthy",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
         )
 
     @app.errorhandler(404)

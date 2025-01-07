@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+ARG VERSION=latest
+ENV APP_VERSION=$VERSION
+
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     sudo \
     python3.9 \

@@ -103,6 +103,7 @@ def has_example_api_key_set(env_file):
         log_error(f"Failed to read {env_file}: {str(e)}")
         return False
 
+
 def has_ollama_key(env_file):
     try:
         with open(env_file, "r") as file:

@@ -16,6 +16,8 @@ from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
 from rich.theme import Theme
 
+APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+
 
 class MessageType(Enum):
     USER = "user"
@@ -389,26 +391,32 @@ def setup_logging(log_level):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Chat Interface")
+    parser = argparse.ArgumentParser(description=f"Chipper Chat CLI {APP_VERSION}")
+
     parser.add_argument(
         "--host", default=os.getenv("API_HOST", "0.0.0.0"), help="API Host"
     )
+
     parser.add_argument(
         "--port", default=os.getenv("API_PORT", "8000"), help="API Port"
     )
+
     parser.add_argument("--api_key", default=os.getenv("API_KEY"), help="API Key")
+
     parser.add_argument(
         "--timeout",
         type=int,
         default=int(os.getenv("API_TIMEOUT", "120")),
         help="API Timeout",
     )
+
     parser.add_argument(
         "--verify_ssl",
         action="store_true",
         default=os.getenv("REQUIRE_SECURE", "False").lower() == "true",
         help="Verify SSL",
     )
+
     parser.add_argument(
         "--log_level", default=os.getenv("LOG_LEVEL", "INFO"), help="Log Level"
     )
@@ -418,16 +426,19 @@ def main():
         default=int(os.getenv("MAX_CONTEXT_SIZE", "10")),
         help="Maximum Context Size",
     )
+
     parser.add_argument(
         "--model",
         default=os.getenv("MODEL_NAME"),
         help="Model name to use",
     )
+
     parser.add_argument(
         "--index",
         default=os.getenv("ES_INDEX"),
         help="Elasticsearch index to use",
     )
+
     args = parser.parse_args()
 
     base_url = f"http://{args.host}:{args.port}"

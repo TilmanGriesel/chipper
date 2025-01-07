@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import List, Set
 
@@ -7,10 +8,10 @@ from core.document_processor import DocumentProcessor
 from core.embedder import RAGEmbedder
 from haystack import Document
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
 
 
 def load_blacklist(base_path: str) -> Set[str]:
@@ -112,6 +113,25 @@ def main():
         raise
 
 
+def show_welcome():
+    RED = "\033[31m"
+    YELLOW = "\033[33m"
+    RESET = "\033[0m"
+
+    print("\n", flush=True)
+    print(f"{RED}", flush=True)
+    print("        __    _                      ", flush=True)
+    print("  _____/ /_  (_)___  ____  ___  _____", flush=True)
+    print(" / ___/ __ \\/ / __ \\/ __ \\/ _ \\/ ___/", flush=True)
+    print("/ /__/ / / / / /_/ / /_/ /  __/ /    ", flush=True)
+    print("\\___/_/ /_/_/ .___/ .___/\\___/_/     ", flush=True)
+    print("           /_/   /_/                 ", flush=True)
+    print(f"{RESET}", flush=True)
+    print(f"{YELLOW}       Chipper Embed {APP_VERSION}", flush=True)
+    print(f"{RESET}\n", flush=True)
+
+
 if __name__ == "__main__":
+    show_welcome()
     logger.info("Starting RAG Embedding...")
     main()
