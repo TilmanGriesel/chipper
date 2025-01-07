@@ -125,7 +125,7 @@
 
 h1.name {
   font-family: var(--vp-font-family-brand);
-  letter-spacing: 2px !important;
+  letter-spacing: 2.2px !important;
 }
 
 @media (min-width: 960px) {
@@ -449,6 +449,7 @@ h1.name {
   inset: 0;
   z-index: -1;
   background: linear-gradient(132deg, #5ddcff, #f53ec7 80%);
+  opacity: 60%;
 
   animation: spin 5.5s linear infinite;
 }

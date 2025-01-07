@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "Chipper"
   text: ""
-  tagline: Your AI RAG Toolbox
+  tagline: Your LLM RAG Playground
   image:
     src: /assets/logo.png
     alt: chipper-logo
