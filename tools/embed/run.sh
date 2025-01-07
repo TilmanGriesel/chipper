@@ -6,19 +6,17 @@ OS_TYPE=$(uname -s)
 
 readonly SCRIPT_VERSION="0.1.0"
 function show_welcome() {
-    echo ""
-    # red
-    echo -e "\e[31m"
-    echo "        __    _                      "
-    echo "  _____/ /_  (_)___  ____  ___  _____"
-    echo " / ___/ __ \/ / __ \/ __ \/ _ \/ ___/"
-    echo "/ /__/ / / / / /_/ / /_/ /  __/ /    "
-    echo "\___/_/ /_/_/ .___/ .___/\___/_/     "
-    echo "           /_/   /_/                 "
-    echo -e "\e[0m"
-    # yellow
-    echo -e "\e[33m        Chipper Embed v${SCRIPT_VERSION}\e[0m"
-    echo ""
+    printf "\n"
+    printf "\033[31m"
+    printf "        __    _                      \n"
+    printf "  _____/ /_  (_)___  ____  ___  _____\n"
+    printf " / ___/ __ \/ / __ \/ __ \/ _ \/ ___/\n"
+    printf "/ /__/ / / / / /_/ / /_/ /  __/ /    \n"
+    printf "\___/_/ /_/_/ .___/ .___/\___/_/     \n"
+    printf "           /_/   /_/                 \n"
+    printf "\033[0m\n"
+    printf "\033[33m        Chipper Embed v%s\033[0m\n" "${SCRIPT_VERSION}"
+    printf "\n"
 }
 show_welcome
 
