@@ -1,20 +1,17 @@
 x-healthcheck: &a1
   interval: 30s
   retries: 10
-
-x-shared-deploy: &a2
+x-shared-deploy: &a3
   resources:
     limits:
       memory: 2g
-
-x-logging: &default-logging
+x-logging: &a2
   logging:
-    driver: "json-file"
+    driver: json-file
     options:
-      max-size: "100m"
+      max-size: 100m
       max-file: "5"
       compress: "true"
-
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
@@ -50,8 +47,7 @@ services:
         limits:
           memory: 4g
     restart: unless-stopped
-    <<: *default-logging
-
+    <<: *a2
   api:
     pull_policy: always
     image: griesel/chipper:api-latest
@@ -66,10 +62,9 @@ services:
         - curl
         - -f
         - http://localhost:8000/health
-    deploy: *a2
+    deploy: *a3
     restart: unless-stopped
-    <<: *default-logging
-
+    <<: *a2
   web:
     pull_policy: always
     image: griesel/chipper:web-latest
@@ -86,17 +81,16 @@ services:
         - curl
         - -f
         - http://localhost:5000/health
-    deploy: *a2
+    deploy: *a3
     restart: unless-stopped
-    <<: *default-logging
-
+    <<: *a2
   nginx-proxy:
     pull_policy: always
     image: jc21/nginx-proxy-manager:latest
     ports:
-      - "80:80"
-      - "127.0.0.1:81:81"  # Admin panel
-      - "443:443"
+      - 80:80
+      - 127.0.0.1:81:81 # Admin panel
+      - 443:443
     volumes:
       - nginx-proxy-data:/data
       - nginx-proxy-letsencrypt:/etc/letsencrypt
@@ -109,10 +103,9 @@ services:
         - curl
         - -f
         - http://localhost:81
-    deploy: *a2
+    deploy: *a3
     restart: unless-stopped
-    <<: *default-logging
-
+    <<: *a2
 networks:
   frontend:
     name: frontend_network
@@ -121,13 +114,12 @@ networks:
     name: backend_network
     driver: bridge
     internal: true
-
 volumes:
   ollama-data:
-    external: true
+    driver: local
   elasticsearch-data:
-    external: true
+    driver: local
   nginx-proxy-data:
-    external: true
+    driver: local
   nginx-proxy-letsencrypt:
-    external: true
+    driver: local
