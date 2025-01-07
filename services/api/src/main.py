@@ -25,6 +25,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+ALLOW_MODEL_CHANGE = os.getenv("ALLOW_MODEL_CHANGE", "true").lower() == "true"
+ALLOW_INDEX_CHANGE = os.getenv("ALLOW_INDEX_CHANGE", "true").lower() == "true"
+
 DAILY_LIMIT = int(os.getenv("DAILY_RATE_LIMIT", "86400"))
 MINUTE_LIMIT = int(os.getenv("MINUTE_RATE_LIMIT", "60"))
 STORAGE_URI = os.getenv("RATE_LIMIT_STORAGE", "memory://")
@@ -140,25 +143,30 @@ def chat():
             logger.error("No JSON payload received.")
             abort(400, description="Invalid JSON payload.")
 
-        model = data.get("model")
         messages = data.get("messages", [])
-        stream = data.get("stream", True)
-        options = data.get("options", {})
-        index = options.get("index")
-
         if not messages:
             abort(400, description="No messages provided")
+
         query = messages[-1].get("content")
         if not query:
             abort(400, description="Invalid message format")
 
-        conversation = messages[:-1] if len(messages) > 1 else []
-        config = create_pipeline_config(model, index)
+        model = data.get("model")
+        if model and not ALLOW_MODEL_CHANGE:
+            abort(403, description="Model changes are not allowed")
 
+        options = data.get("options", {})
+        index = options.get("index")
+        if index and not ALLOW_INDEX_CHANGE:
+            abort(403, description="Index changes are not allowed")
+
+        config = create_pipeline_config(model, index)
+        stream = data.get("stream", True)
+        conversation = messages[:-1] if len(messages) > 1 else []
         if stream:
             return handle_streaming_response(config, query, conversation)
         else:
-            return handle_standard_response(config, query, conversation, messages)
+            return handle_standard_response(config, query, conversation)
 
     except Exception as e:
         logger.error(f"Error processing chat request: {str(e)}", exc_info=True)
@@ -282,7 +290,7 @@ def handle_streaming_response(
 
 
 def handle_standard_response(
-    config: QueryPipelineConfig, query: str, conversation: list, messages: list
+    config: QueryPipelineConfig, query: str, conversation: list
 ) -> Response:
     rag = RAGQueryPipeline(config=config)
 
@@ -302,14 +310,14 @@ def handle_standard_response(
             "content": result["llm"]["replies"][0],
             "timestamp": datetime.now().isoformat(),
         }
-        messages.append(latest_message)
+        conversation.append(latest_message)
 
     return jsonify(
         {
             "success": success,
             "timestamp": datetime.now().isoformat(),
             "result": result,
-            "messages": messages,
+            "messages": conversation,
         }
     )
 
