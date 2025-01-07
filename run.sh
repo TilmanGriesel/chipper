@@ -209,16 +209,8 @@ esac
 # Main command handling
 case "$1" in
     "up")
-        python env_setup.py
-        if [ "$DOCKER_COMPOSE_CMD" = "docker compose" ]; then
-            docker compose -p "$PROJECT_NAME" down --remove-orphans
-        else
-            if [ "$DOCKER_COMPOSE_CMD" = "docker compose" ]; then
-            docker compose -p "$PROJECT_NAME" down --remove-orphans
-        else
-            docker-compose -p "$PROJECT_NAME" down --remove-orphans
-        fi
-        fi
+        python setup.py
+        docker_compose_cmd -p "$PROJECT_NAME" down --remove-orphans
         docker_compose_cmd -p "$PROJECT_NAME" up -d
         ;;
     "down")
@@ -235,7 +227,7 @@ case "$1" in
         echo "Rebuilding containers..."
         docker_compose_cmd build --no-cache
         
-        python env_setup.py
+        python setup.py
 
         echo "Starting containers..."
         docker_compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
@@ -243,7 +235,7 @@ case "$1" in
         echo "Clean and rebuild complete!"
         ;;
     "clean-volumes")
-        python env_setup.py
+        python setup.py
 
         echo "Stopping containers and removing volumes..."
         docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
@@ -256,7 +248,7 @@ case "$1" in
         ;;
     "clean-env")
         echo "Cleaning environment files..."
-        python env_setup.py --clean
+        python setup.py --clean
         ;;
     "logs")
         docker_compose_cmd -p "$PROJECT_NAME" logs -f

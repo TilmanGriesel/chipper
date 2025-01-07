@@ -3,6 +3,7 @@ x-healthcheck: &default-healthcheck
   retries: 10
 
 services:
+  # Base service configuration
   ollama: &ollama-base
     image: ollama/ollama:latest
     pull_policy: always
@@ -16,6 +17,12 @@ services:
       - ollama-data:/root/.ollama
     networks:
       - backend
+    profiles:
+      - cpu
+
+  # NVIDIA GPU configuration
+  ollama-nvidia:
+    <<: *ollama-base
     deploy:
       resources:
         reservations:
@@ -23,6 +30,27 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    profiles:
+      - nvidia
+
+  # AMD GPU configuration (with ROCm)
+  ollama-amd:
+    <<: *ollama-base
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - video
+      - render
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
+    profiles:
+      - amd
 
   elasticsearch: &elasticsearch-base
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
