@@ -12,6 +12,8 @@ This project started as a way to help my girlfriend with her new book. The idea 
 
 If you **like what you see, leaving a star would be sweet** and will help more people discover Chipper!
 
+Check out the **live demo**: https://demo.chipper.tilmangriesel.com/
+
 ## Features
 
 - Local [Ollama](https://ollama.com/) and [hosted Hugging Face API](https://huggingface.co/)
