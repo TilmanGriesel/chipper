@@ -795,10 +795,6 @@ video {
   overflow-y: auto;
 }
 
-.whitespace-pre-wrap {
-  white-space: pre-wrap;
-}
-
 .break-words {
   overflow-wrap: break-word;
 }
@@ -1165,7 +1161,7 @@ pre[class*="language-"] {
 }
 
 #busy-indicator {
-  opacity: 0.6;
+  opacity: 0.4;
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 1000ms;
