@@ -1086,7 +1086,7 @@ body {
 
 .prose code:not([class*="language-"]) {
   --tw-bg-opacity: 1;
-  background-color: rgb(212 212 216 / var(--tw-bg-opacity, 1));
+  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
 }
 
 .prose code:not([class*="language-"]):is(.dark *) {

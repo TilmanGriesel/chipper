@@ -110,7 +110,7 @@ body {
 
 /* Code Blocks */
 .prose code:not([class*="language-"]) {
-  @apply bg-brand-b-300 dark:bg-brand-b-800;
+  @apply bg-brand-a-300 dark:bg-brand-b-800;
   padding: 0.2em 0.4em;
   border-radius: 0.25em;
   font-family: ui-monospace, monospace;
