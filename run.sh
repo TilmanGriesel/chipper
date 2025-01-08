@@ -263,7 +263,8 @@ case "$1" in
         docker_compose_cmd -p "$PROJECT_NAME" ps
         ;;
     "embed-testdata")
-        run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata"
+        shift
+        run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata" "$@"
         ;;
     "embed")
         shift

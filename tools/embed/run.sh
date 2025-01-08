@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+
+IMAGE_NAME="chipper-embed"
+
+docker build -t $IMAGE_NAME .
+
+if [ $# -eq 1 ] && [ "$1" == "--help" ]; then
+    docker run --rm --name ${IMAGE_NAME} ${IMAGE_NAME} --help
+    exit 0
+fi
+
 OS_TYPE=$(uname -s)
 
 if [[ "$OS_TYPE" == *"MINGW"* || "$OS_TYPE" == *"MSYS"* ]]; then
@@ -26,10 +36,6 @@ if [ ! -d "$LOCAL_PATH" ]; then
 fi
 
 
-IMAGE_NAME="chipper-embed"
-
-docker build -t $IMAGE_NAME .
-
 docker run --rm --name ${IMAGE_NAME} --env-file .env \
     -v "$LOCAL_PATH:/app/data" \
-    ${IMAGE_NAME} "$@" 
+    ${IMAGE_NAME} "$@"
