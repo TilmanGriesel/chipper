@@ -38,18 +38,18 @@ def check_external_ollama_requirement() -> bool:
     log_info(f"Platform: {system}/{release}")
 
     if system in ["Darwin", "Linux"]:
-        is_wsl = 'microsoft' in release.lower()
+        is_wsl = "microsoft" in release.lower()
         if is_wsl:
             return False
-        
+
         log_info(f"Using external Ollama server at {EXTERNAL_OLLAMA_URL}")
         log_warning("--------------------")
-        
+
         if not is_wsl:
             log_warning(
                 "Note: Currently GPU support in Docker Desktop is only available on Windows with the WSL2 backend."
             )
-        
+
         log_warning(
             "Please ensure you have Ollama installed and running at the specified URL."
         )
