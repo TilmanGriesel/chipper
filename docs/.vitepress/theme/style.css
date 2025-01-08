@@ -7,18 +7,18 @@
 }
 
 :root {
-  --champagne-50: #F6F1ED;
-  --champagne-100: #EFE7E2;
-  --champagne-200: #E9DDD5;
+  --champagne-50: #f6f1ed;
+  --champagne-100: #efe7e2;
+  --champagne-200: #e9ddd5;
   --champagne-250: hsl(24, 28%, 84%);
-  --champagne-300: #C3B0A4;
-  --champagne-400: #C79273;
-  --champagne-500: #A06340;
-  --champagne-600: #804F33;
-  --champagne-700: #603C26;
-  --champagne-800: #40281A;
-  --champagne-900: #20140D;
-  --champagne-950: #120B07;
+  --champagne-300: #c3b0a4;
+  --champagne-400: #c79273;
+  --champagne-500: #a06340;
+  --champagne-600: #804f33;
+  --champagne-700: #603c26;
+  --champagne-800: #40281a;
+  --champagne-900: #20140d;
+  --champagne-950: #120b07;
 
   --vp-c-chipper-accent-1: var(--champagne-800);
   --vp-c-chipper-accent-2: var(--champagne-900);
@@ -32,7 +32,6 @@
   --vp-c-chipper-accent-3: #fff;
   --vp-c-chipper-accent-soft: #fff;
 }
-
 
 :root {
   --vp-c-gray-1: #e8e9ec;
@@ -109,7 +108,8 @@
   --vp-font-family-hand: "Kalam", serif;
 }
 
-h1.name, .title span {
+h1.name,
+.title span {
   font-family: var(--vp-font-family-brand);
   letter-spacing: 2.2px !important;
 }
@@ -214,7 +214,7 @@ h1.name, .title span {
   --vp-c-caution-soft: var(--vp-c-red-soft);
 }
 
- :root {
+:root {
   --vp-c-bg: var(--champagne-100);
   --vp-c-bg-alt: var(--champagne-50);
   --vp-c-bg-elv: var(--champagne-300);
@@ -342,10 +342,18 @@ h1.name, .title span {
   border: none;
 }
 
-
 /**
  * Glow
  * -------------------------------------------------------------------------- */
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 :root {
   --vp-home-hero-image-filter: blur(40px);
@@ -354,7 +362,6 @@ h1.name, .title span {
 .image-bg {
   position: relative;
   overflow: hidden;
-  pointer-events: all;
 }
 
 .image-bg::before {
@@ -367,22 +374,6 @@ h1.name, .title span {
   animation: spin 5.5s linear infinite;
 }
 
-@keyframes spinFast {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @media (min-width: 640px) {
   .image-bg {
     width: 256px !important;
@@ -392,7 +383,7 @@ h1.name, .title span {
 
 @media (min-width: 640px) {
   .image-src {
-      max-width: 256px !important;
-      max-height: 256px !important;
+    max-width: 256px !important;
+    max-height: 256px !important;
   }
 }
