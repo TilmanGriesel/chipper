@@ -12,13 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Determine Version
+      - name: Determine Version and Build Number
         id: version
         run: |
+          BUILD_NUM=$(git rev-list --count HEAD)
           if [ "${{ github.ref_type }}" == "tag" ]; then
-            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "VERSION=${{ github.ref_name }}.${BUILD_NUM}" >> $GITHUB_ENV
           else
-            echo "VERSION=latest" >> $GITHUB_ENV
+            echo "VERSION=latest.${BUILD_NUM}" >> $GITHUB_ENV
           fi
 
       - name: Log in to Docker Hub
