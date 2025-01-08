@@ -913,11 +913,6 @@ video {
   font-weight: 400;
 }
 
-.text-brand-a-500 {
-  --tw-text-opacity: 1;
-  color: rgb(160 99 64 / var(--tw-text-opacity, 1));
-}
-
 .text-brand-a-700 {
   --tw-text-opacity: 1;
   color: rgb(96 60 38 / var(--tw-text-opacity, 1));
@@ -936,6 +931,10 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.opacity-70 {
+  opacity: 0.7;
 }
 
 .ring-1 {
@@ -1029,7 +1028,7 @@ body {
   }
 
   to {
-    opacity: 1;
+    opacity: 0.85;
   }
 }
 
