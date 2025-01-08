@@ -225,8 +225,7 @@ case "$1" in
         docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f
         echo "Project images cleaned"
         
-        echo "Cleaning environment..."
-        python setup.py --clean
+        echo "Ensure valid environment..."
         python setup.py
 
         echo "Rebuilding containers..."
