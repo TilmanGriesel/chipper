@@ -395,6 +395,9 @@ h1.name {
 .dark {
   --vp-button-brand-text: var(--vp-c-black);
   --vp-button-brand-hover-text: var(--vp-c-black);
+
+  --vp-button-alt-bg: var(--vp-c-gray-3);
+  --vp-button-alt-hover-bg: var(--vp-c-gray-2);
 }
 
 /**
