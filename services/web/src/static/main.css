@@ -110,7 +110,7 @@ body {
 
 /* Code Blocks */
 .prose code:not([class*="language-"]) {
-  @apply bg-zinc-300 dark:bg-zinc-800;
+  @apply bg-brand-b-300 dark:bg-brand-b-800;
   padding: 0.2em 0.4em;
   border-radius: 0.25em;
   font-family: ui-monospace, monospace;
@@ -174,12 +174,12 @@ pre[class*="language-"] {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-zinc-300 dark:bg-zinc-900;
+  @apply bg-brand-b-300 dark:bg-brand-b-900;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-zinc-600 dark:bg-zinc-700;
+  @apply bg-brand-b-600 dark:bg-brand-b-700;
 }
 
 /* Busy Indicator */

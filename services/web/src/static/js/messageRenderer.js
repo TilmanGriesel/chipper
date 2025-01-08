@@ -33,15 +33,15 @@ export class MessageRenderer {
     messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-3xl";
 
     const typeClasses = {
-      user: "bg-zinc-900 selection:bg-zinc-700 text-white user-message",
-      assistant: "bg-champagne-200 dark:bg-zinc-700 selection:bg-champagne-500 selection:dark:bg-zinc-800 assistant-message",
+      user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
+      assistant: "bg-brand-a-100 dark:bg-brand-b-700 selection:bg-brand-a-300 selection:dark:bg-brand-b-800 assistant-message",
       error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
       system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
-    messageDiv.classList.add(...(typeClasses[type]?.split(" ") || ["bg-champagne-600"]));
+    messageDiv.classList.add(...(typeClasses[type]?.split(" ") || ["bg-brand-a-600"]));
 
     const header = document.createElement("div");
-    header.className = `font-bold text-sm ${type === "assistant" ? "text-zinc-800 dark:text-zinc-300" : "text-white"} mb-2`;
+    header.className = `font-bold text-sm ${type === "assistant" ? "text-brand-b-800 dark:text-brand-b-300" : "text-white"} mb-2`;
     header.textContent = {
       user: "You",
       assistant: "Chipper",

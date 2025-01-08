@@ -7,12 +7,11 @@ Experience Chipper live right here! Please note that the demo's functionality is
 Tell me a story about Chipper, the brilliant golden retriever.
 ```
 
-<div style="border-radius: 24px; overflow: hidden;">
+<div class="demo">
  <iframe
    title="Chipper AI Demo"
    width="100%" 
    height="900"
-   class="demo-frame"
    src="https://demo.chipper.tilmangriesel.com/">
  </iframe>
 </div>
