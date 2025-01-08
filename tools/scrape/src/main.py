@@ -5,11 +5,12 @@ import os
 from core.webscrape import ScraperConfig, WebScraper
 
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description=f"Chipper Web Scrape CLI {APP_VERSION}"
+        description=f"Chipper Web Scrape CLI {APP_VERSION}.{BUILD_NUMBER}"
     )
     parser.add_argument(
         "--base-url", default="https://localhost/", help="Base URL to scrape"
@@ -59,7 +60,7 @@ def show_welcome():
     print("\\___/_/ /_/_/ .___/ .___/\\___/_/     ", flush=True)
     print("           /_/   /_/                 ", flush=True)
     print(f"{RESET}", flush=True)
-    print(f"{CYAN}       Chipper Scrape {APP_VERSION}", flush=True)
+    print(f"{CYAN}       Chipper Scrape {APP_VERSION}.{BUILD_NUMBER}", flush=True)
     print(f"{RESET}\n", flush=True)
 
 

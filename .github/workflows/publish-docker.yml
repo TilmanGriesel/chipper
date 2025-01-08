@@ -15,11 +15,11 @@ jobs:
       - name: Determine Version and Build Number
         id: version
         run: |
-          BUILD_NUM=$(git rev-list --count HEAD)
+          echo "BUILD_NUM=${{ github.run_number }}" >> $GITHUB_ENV
           if [ "${{ github.ref_type }}" == "tag" ]; then
-            echo "VERSION=${{ github.ref_name }}.${BUILD_NUM}" >> $GITHUB_ENV
+            echo "VERSION=${{ github.ref_name }}.${{ github.run_number }}" >> $GITHUB_ENV
           else
-            echo "VERSION=latest.${BUILD_NUM}" >> $GITHUB_ENV
+            echo "VERSION=latest" >> $GITHUB_ENV
           fi
 
       - name: Log in to Docker Hub
@@ -32,6 +32,7 @@ jobs:
         run: |
           docker build \
             --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
             -t ${{ secrets.DOCKER_USERNAME }}/chipper:web-${{ env.VERSION }} \
             services/web
           docker push ${{ secrets.DOCKER_USERNAME }}/chipper:web-${{ env.VERSION }}
@@ -40,6 +41,7 @@ jobs:
         run: |
           docker build \
             --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
             -t ${{ secrets.DOCKER_USERNAME }}/chipper:api-${{ env.VERSION }} \
             services/api
           docker push ${{ secrets.DOCKER_USERNAME }}/chipper:api-${{ env.VERSION }}
@@ -48,6 +50,7 @@ jobs:
         run: |
           docker build \
             --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
             -t ${{ secrets.DOCKER_USERNAME }}/chipper:cli-${{ env.VERSION }} \
             tools/cli
           docker push ${{ secrets.DOCKER_USERNAME }}/chipper:cli-${{ env.VERSION }}
@@ -56,6 +59,7 @@ jobs:
         run: |
           docker build \
             --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
             -t ${{ secrets.DOCKER_USERNAME }}/chipper:embed-${{ env.VERSION }} \
             tools/embed
           docker push ${{ secrets.DOCKER_USERNAME }}/chipper:embed-${{ env.VERSION }}
@@ -64,6 +68,7 @@ jobs:
         run: |
           docker build \
             --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
             -t ${{ secrets.DOCKER_USERNAME }}/chipper:scrape-${{ env.VERSION }} \
             tools/scrape
           docker push ${{ secrets.DOCKER_USERNAME }}/chipper:scrape-${{ env.VERSION }}
@@ -74,6 +79,7 @@ jobs:
       #   run: |
       #     docker build \
       #       --build-arg VERSION=${{ env.VERSION }} \
+      #       --build-arg BUILD_NUM=${{ env.BUILD_NUM }} \
       #       -t ${{ secrets.DOCKER_USERNAME }}/chipper:transcribe-${{ env.VERSION }} \
       #       tools/transcribe
       #     docker push ${{ secrets.DOCKER_USERNAME }}/chipper:transcribe-${{ env.VERSION }}

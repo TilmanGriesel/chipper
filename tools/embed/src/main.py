@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
 def load_blacklist(base_path: str) -> Set[str]:
@@ -127,7 +128,7 @@ def show_welcome():
     print("\\___/_/ /_/_/ .___/ .___/\\___/_/     ", flush=True)
     print("           /_/   /_/                 ", flush=True)
     print(f"{RESET}", flush=True)
-    print(f"{YELLOW}       Chipper Embed {APP_VERSION}", flush=True)
+    print(f"{YELLOW}       Chipper Embed {APP_VERSION}.{BUILD_NUMBER}", flush=True)
     print(f"{RESET}\n", flush=True)
 
 

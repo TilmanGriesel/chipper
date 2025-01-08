@@ -17,6 +17,7 @@ from rich.prompt import IntPrompt, Prompt
 from rich.theme import Theme
 
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
 class MessageType(Enum):
@@ -391,7 +392,9 @@ def setup_logging(log_level):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=f"Chipper Chat CLI {APP_VERSION}")
+    parser = argparse.ArgumentParser(
+        description=f"Chipper Chat CLI {APP_VERSION}.{BUILD_NUMBER}"
+    )
 
     parser.add_argument(
         "--host", default=os.getenv("API_HOST", "0.0.0.0"), help="API Host"

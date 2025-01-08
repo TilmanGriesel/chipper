@@ -6,10 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description=f"Chipper Embed CLI {APP_VERSION}")
+    parser = argparse.ArgumentParser(
+        description=f"Chipper Embed CLI {APP_VERSION}.{BUILD_NUMBER}"
+    )
 
     parser.add_argument(
         "--path",

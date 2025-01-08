@@ -28,6 +28,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
+BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
 def show_welcome():
@@ -44,7 +45,7 @@ def show_welcome():
     print("\\___/_/ /_/_/ .___/ .___/\\___/_/     ", flush=True)
     print("           /_/   /_/                 ", flush=True)
     print(f"{RESET}", flush=True)
-    print(f"{CYAN}       Chipper Web {APP_VERSION}", flush=True)
+    print(f"{CYAN}       Chipper Web {APP_VERSION}.{BUILD_NUMBER}", flush=True)
     print(f"{RESET}\n", flush=True)
 
 
@@ -301,8 +302,9 @@ def create_app():
     def health_check():
         return jsonify(
             {
-                "service": "chipper-web",
+                "service": "chipper-api",
                 "version": APP_VERSION,
+                "build": BUILD_NUMBER,
                 "status": "healthy",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
