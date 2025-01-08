@@ -1022,6 +1022,10 @@ body {
   letter-spacing: 2.2px;
 }
 
+a.chipper-font:hover {
+  text-decoration: underline !important;
+}
+
 .hand-font {
   font-family: "Kalam", serif !important;
 }
@@ -1086,7 +1090,7 @@ body {
 
 .prose code:not([class*="language-"]) {
   --tw-bg-opacity: 1;
-  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
+  background-color: rgb(246 241 237 / var(--tw-bg-opacity, 1));
 }
 
 .prose code:not([class*="language-"]):is(.dark *) {
