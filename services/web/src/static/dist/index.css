@@ -913,6 +913,11 @@ video {
   font-weight: 400;
 }
 
+.text-brand-a-500 {
+  --tw-text-opacity: 1;
+  color: rgb(160 99 64 / var(--tw-text-opacity, 1));
+}
+
 .text-brand-a-700 {
   --tw-text-opacity: 1;
   color: rgb(96 60 38 / var(--tw-text-opacity, 1));
@@ -931,10 +936,6 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.opacity-70 {
-  opacity: 0.7;
 }
 
 .ring-1 {
@@ -976,7 +977,7 @@ body {
 @font-face {
   font-family: "Fira Code NF";
 
-  src: url("/static/font/FiraCodeNerdFontMono-Regular.ttf") format("truetype");
+  src: url("/static/font/FiraCodeNerdFont-Regular.ttf") format("truetype");
 
   font-weight: normal;
 
@@ -1262,14 +1263,14 @@ pre[class*="language-"] {
   }
 }
 
-.selection\:bg-brand-a-500 *::-moz-selection {
+.selection\:bg-brand-a-300 *::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(160 99 64 / var(--tw-bg-opacity, 1));
+  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-brand-a-500 *::selection {
+.selection\:bg-brand-a-300 *::selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(160 99 64 / var(--tw-bg-opacity, 1));
+  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-brand-b-400 *::-moz-selection {
@@ -1312,34 +1313,14 @@ pre[class*="language-"] {
   background-color: rgb(254 202 202 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-brand-a-300 *::-moz-selection {
+.selection\:bg-brand-a-300::-moz-selection {
   --tw-bg-opacity: 1;
   background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
 }
 
-.selection\:bg-brand-a-300 *::selection {
+.selection\:bg-brand-a-300::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-200 *::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(235 221 211 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-200 *::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(235 221 211 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-500::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(160 99 64 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-500::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(160 99 64 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-brand-b-400::-moz-selection {
@@ -1380,26 +1361,6 @@ pre[class*="language-"] {
 .selection\:bg-red-200::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(254 202 202 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-300::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-300::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(212 171 147 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-200::-moz-selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(235 221 211 / var(--tw-bg-opacity, 1));
-}
-
-.selection\:bg-brand-a-200::selection {
-  --tw-bg-opacity: 1;
-  background-color: rgb(235 221 211 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-brand-a-100:hover {

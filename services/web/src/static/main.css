@@ -30,7 +30,7 @@ body {
 /* Typography Styles */
 @font-face {
   font-family: "Fira Code NF";
-  src: url("/static/font/FiraCodeNerdFontMono-Regular.ttf") format("truetype");
+  src: url("/static/font/FiraCodeNerdFont-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
