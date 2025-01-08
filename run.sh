@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# Configuration
+# configuration
 readonly DOCKER_COMPOSE_FILE_BASE="docker/docker-compose.base.yml"
 readonly DOCKER_COMPOSE_FILE="docker/docker-compose.dev.yml"
 readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
@@ -11,6 +11,12 @@ readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
 readonly SCRIPT_VERSION="1.1.0"
 
+# common messages
+readonly WARN_CLEAN_PROMPT="⚠️  WARNING: This will delete all %s. Are you sure? [y/N] "
+readonly ERR_DIR_NOT_FOUND="Error: Directory '%s' not found"
+readonly ERR_CMD_NOT_FOUND="Error: '%s' is not available. Please install it and try again."
+readonly ERR_DOCKER_NOT_RUNNING="Error: Docker is not running. Please start Docker and try again."
+readonly ERR_COMPOSE_FILE_NOT_FOUND="Error: Docker compose file '%s' not found"
 
 function show_welcome() {
     printf "\n"
@@ -39,41 +45,55 @@ Commands:
   up                  - Start containers in detached mode
   down                - Stop containers
   rebuild             - Clean, rebuild and recreate images and containers
-  clean-volumes       - Delete all volumes
-  env                 - Create or update all dotfiles like .env and .systemprompt
-  clean-env           - Delete all dotfiles like .env and .systemprompt
   logs                - Show container logs
   ps                  - Show container status
+  env                 - Create or update all dotfiles like .env and .systemprompt
+  clean-full          - Cleans all project related files, including images, volumes and env files
+  clean-volumes       - Delete all volumes
+  clean-env           - Delete all dotfiles like .env and .systemprompt
   embed [args]        - Run embed tool with optional arguments
   embed-testdata      - Run embed tool with internal testdata
   scrape [args]       - Run scrape tool with optional arguments
   dev-api             - Start API in development mode
   dev-web             - Start web service in development mode
+  dev-docs            - Run local vitepress server
   css                 - Watch and rebuild CSS files
   format              - Run pre-commit formatting hooks
   browser             - Open web-interface in local browser
   evue                - Open elasticvue web-interface in local browser
   cli                 - Run cli interface
-  dev-docs            - Run local vitepress server
 EOF
+}
+
+function error_exit() {
+    echo "$1" >&2
+    exit 1
+}
+
+function confirm_clean() {
+    local target="$1"
+    printf "$WARN_CLEAN_PROMPT" "$target"
+    read -r response
+    case "$response" in
+        [yY]|[yY][eE][sS])
+            return 0
+            ;;
+        *)
+            echo "Operation cancelled."
+            exit 0
+            ;;
+    esac
 }
 
 function check_dependency() {
     local cmd="$1"
-    local message="${2:-Error: '$cmd' is not available. Please install it and try again.}"
-    
-    if ! command -v "$cmd" &> /dev/null; then
-        echo "$message" >&2
-        exit 1
-    fi
+    local message="${2:-$(printf "$ERR_CMD_NOT_FOUND" "$cmd")}"
+    command -v "$cmd" &> /dev/null || error_exit "$message"
 }
 
 function check_directory() {
     local dir="$1"
-    if [ ! -d "$dir" ]; then
-        echo "Error: Directory '$dir' not found" >&2
-        exit 1
-    fi
+    [ -d "$dir" ] || error_exit "$(printf "$ERR_DIR_NOT_FOUND" "$dir")"
 }
 
 function detect_docker_compose() {
@@ -82,7 +102,7 @@ function detect_docker_compose() {
     elif docker-compose version >/dev/null 2>&1; then
         echo "docker-compose"
     else
-        echo "Error: Neither 'docker compose' nor 'docker-compose' is available" >&2
+        error_exit "Neither 'docker compose' nor 'docker-compose' is available"
     fi
 }
 
@@ -103,8 +123,8 @@ function run_in_directory() {
     (cd "$dir" && "$@")
 }
 
-function open_browser() {
-    local url="$LOCAL_URL"
+function open_url() {
+    local url="$1"
     case "$(uname -s)" in
         Darwin)
             open "$url"
@@ -124,49 +144,64 @@ function open_browser() {
             echo "Please manually open: $url"
             ;;
     esac
+}
+
+function open_browser() {
+    open_url "$LOCAL_URL"
 }
 
 function open_elasticvue() {
-    local url="$ELASTICVUE_URL"
-    case "$(uname -s)" in
-        Darwin)
-            open "$url"
-            ;;
-        Linux)
-            if command -v xdg-open >/dev/null; then
-                xdg-open "$url"
-            else
-                echo "Please install xdg-utils or manually open: $url"
-            fi
-            ;;
-        MINGW*|MSYS*|CYGWIN*)
-            start "$url"
-            ;;
-        *)
-            echo "Unsupported operating system for automatic browser opening"
-            echo "Please manually open: $url"
-            ;;
-    esac
+    open_url "$ELASTICVUE_URL"
 }
 
 function check_docker_running() {
-    if ! docker info >/dev/null 2>&1; then
-        echo "Error: Docker is not running. Please start Docker and try again." >&2
-        exit 1
-    fi
+    docker info >/dev/null 2>&1 || error_exit "$ERR_DOCKER_NOT_RUNNING"
+}
+
+function docker_compose_down() {
+    echo "Stopping containers..."
+    docker-compose -p "$PROJECT_NAME" down --remove-orphans
+}
+
+function docker_compose_down_clean() {
+    echo "Stopping containers and removing volumes..."
+    docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
+}
+
+function clean_environment() {
+    echo "Cleaning environment files..."
+    python setup.py --clean
+}
+
+function ensure_environment() {
+    python setup.py
+}
+
+function clean_project_images() {
+    echo "Removing project-related images..."
+    docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f
+    echo "Project images cleaned"
+}
+
+function print_local_url() {
+    local green="\033[0;32m"
+    local reset="\033[0m"
+    local bold="\033[1m"
+    
+    echo
+    echo -e "Open the Chipper web interface at:"
+    echo -e "${bold}${green}➜${reset} ${bold}$LOCAL_URL${reset}"
+    echo
 }
 
 COMPOSE_FILES=(-f "$DOCKER_COMPOSE_FILE_BASE")
 COMPOSE_FILES+=(-f "$DOCKER_COMPOSE_FILE")
 
-# Parse command line arguments
+# parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         -f|--file)
-            if [ ! -f "$2" ]; then
-                echo "Error: Docker compose file '$2' not found" >&2
-                exit 1
-            fi
+            [ -f "$2" ] || error_exit "$(printf "$ERR_COMPOSE_FILE_NOT_FOUND" "$2")"
             COMPOSE_FILES+=(-f "$2")
             shift 2
             ;;
@@ -176,19 +211,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Check for user compose file
+# check for user compose file
 if [ -f "$USER_DOCKER_COMPOSE_FILE" ]; then
     echo "Found user compose file"
     COMPOSE_FILES+=(-f "$USER_DOCKER_COMPOSE_FILE")
 fi
 
-# Show usage if no command provided
-if [ $# -eq 0 ]; then
-    show_usage
-    exit 1
-fi
+# show usage if no command provided
+[ $# -eq 0 ] && { show_usage; exit 1; }
 
-# Pre-command dependency checks
+# pre-command dependency checks
 case "$1" in
     up|down|logs|ps|rebuild|clean-volumes|embed*|scrape)
         check_docker_running
@@ -207,26 +239,25 @@ case "$1" in
         ;;
 esac
 
-# Main command handling
+# main command handling
 case "$1" in
     "up")
-        python setup.py
-        docker_compose_cmd -p "$PROJECT_NAME" down --remove-orphans
+        ensure_environment
+        docker_compose_down
         docker_compose_cmd -p "$PROJECT_NAME" up -d
+        print_local_url
         ;;
     "down")
-        docker-compose -p "$PROJECT_NAME" down --remove-orphans
+        docker_compose_down
         ;;
     "rebuild")
-        echo "Stopping containers..."
-        docker-compose -p "$PROJECT_NAME" down --remove-orphans
+        confirm_clean "containers and rebuild all images"
+        docker_compose_down
     
-        echo "Removing project-related images..."
-        docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f
-        echo "Project images cleaned"
+        clean_project_images
         
         echo "Ensure valid environment..."
-        python setup.py
+        ensure_environment
 
         echo "Rebuilding containers..."
         docker_compose_cmd build --no-cache
@@ -235,26 +266,7 @@ case "$1" in
         docker_compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
         
         echo "Clean and rebuild complete!"
-        ;;
-    "clean-volumes")
-        python setup.py
-
-        echo "Stopping containers and removing volumes..."
-        docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
-        
-        echo "Cleaning up volume directories..."
-        rm -rfv docker/volumes
-        echo "Volume directories cleaned"
-        
-        echo "Clean complete!"
-        ;;
-    "env")
-        echo "Creating environment files..."
-        python setup.py
-        ;;
-    "clean-env")
-        echo "Cleaning environment files..."
-        python setup.py --clean
+        print_local_url
         ;;
     "logs")
         docker_compose_cmd -p "$PROJECT_NAME" logs -f
@@ -262,31 +274,49 @@ case "$1" in
     "ps")
         docker_compose_cmd -p "$PROJECT_NAME" ps
         ;;
+    "env")
+        echo "Creating environment files..."
+        ensure_environment
+        ;;
+    "clean-full")
+        confirm_clean "containers, volumes, environment files"
+        docker_compose_down_clean
+        clean_project_images
+        clean_environment
+        ;;
+    "clean-volumes")
+        confirm_clean "Docker volumes and volume directories"
+        ensure_environment
+
+        docker_compose_down_clean
+        
+        echo "Cleaning up volume directories..."
+        rm -rfv docker/volumes
+        echo "Volume directories cleaned"
+        
+        echo "Clean complete!"
+        ;;
+    "clean-env")
+        confirm_clean "environment files (.env, .systemprompt, .ragignore)"
+        clean_environment
+        ;;
     "embed-testdata")
         shift
         run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata" "$@"
         ;;
-    "embed")
+    "embed"|"scrape")
         shift
-        if [ $# -eq 0 ]; then
-            echo "Error: embed command requires arguments" >&2
-            exit 1
-        fi
-        run_in_directory "tools/embed" ./run.sh "$@"
+        [ $# -eq 0 ] && error_exit "Error: ${1} command requires arguments"
+        run_in_directory "tools/${1}" ./run.sh "$@"
         ;;
-    "scrape")
+    "dev-api"|"dev-web")
+        run_in_directory "services/${1#dev-}" make dev
+        ;;
+    "dev-docs")
         shift
-        if [ $# -eq 0 ]; then
-            echo "Error: scrape command requires arguments" >&2
-            exit 1
-        fi
-        run_in_directory "tools/scrape" ./run.sh "$@"
-        ;;
-    "dev-api")
-        run_in_directory "services/api" make dev
-        ;;
-    "dev-web")
-        run_in_directory "services/web" make dev
+        echo "Starting vitepress..."
+        yarn add -D vitepress
+        yarn docs:dev "$@"
         ;;
     "css")
         run_in_directory "services/web" make build-watch-css
@@ -305,12 +335,6 @@ case "$1" in
     "cli")
         shift
         run_in_directory "tools/cli" ./run.sh "$@"
-        ;;
-    "dev-docs")
-        shift
-        echo "Starting vitepress..."
-        yarn add -D vitepress
-        yarn docs:dev "$@"
         ;;
     *)
         show_usage
