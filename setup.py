@@ -108,7 +108,7 @@ def has_ollama_key(env_file):
     try:
         with open(env_file, "r") as file:
             content = file.read()
-        return "OLLAMA_URL=" in content
+        return "OLLAMA_URL=http://host.docker.internal:21240" in content
     except Exception as e:
         log_error(f"Failed to read {env_file}: {str(e)}")
         return False
