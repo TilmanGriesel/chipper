@@ -737,6 +737,43 @@ video {
   flex: none;
 }
 
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 .touch-manipulation {
   touch-action: manipulation;
 }
@@ -904,6 +941,11 @@ video {
   line-height: 1.25rem;
 }
 
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
 .font-bold {
   font-weight: 700;
 }
@@ -932,8 +974,8 @@ video {
   color: rgb(39 39 42 / var(--tw-text-opacity, 1));
 }
 
-.opacity-50 {
-  opacity: 0.5;
+.opacity-70 {
+  opacity: 0.7;
 }
 
 .ring-1 {
@@ -996,9 +1038,39 @@ body {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Kalam";
+
+  src: url("/static/font/Kalam-Light.ttf") format("truetype");
+
+  font-weight: normal;
+
+  font-style: normal;
+
+  font-display: swap;
+}
+
 .chipper-font {
   font-family: "Just Another Hand", serif !important;
   letter-spacing: 2.2px;
+}
+
+.hand-font {
+  font-family: "Kalam", serif !important;
+}
+
+.empty-state-fade-in {
+  animation: es-fadeIn 2.2s forwards;
+}
+
+@keyframes es-fadeIn {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 0.75;
+  }
 }
 
 /* Prose Typography Styles */

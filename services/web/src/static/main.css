@@ -44,9 +44,30 @@ body {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Kalam";
+  src: url("/static/font/Kalam-Light.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .chipper-font {
   font-family: "Just Another Hand", serif !important;
   letter-spacing: 2.2px;
+}
+
+.hand-font {
+  font-family: "Kalam", serif !important;
+}
+
+.empty-state-fade-in {
+  animation: es-fadeIn 2.2s forwards;
+}
+
+@keyframes es-fadeIn {
+  from { opacity: 0.4; }
+  to { opacity: 0.75; }
 }
 
 /* Prose Typography Styles */
