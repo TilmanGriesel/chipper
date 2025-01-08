@@ -1,5 +1,6 @@
 import { MessageRenderer } from "./messageRenderer.js";
 import { ChatCommandHandler } from "./chatCommandHandler.js";
+import { URLParamsHandler } from "./urlParamsHandler.js";
 import { UIManager } from "./uiManager.js";
 import { ChatService } from "./chatService.js";
 import InputHistoryManager from "./inputHistoryManager.js";
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatService = new ChatService();
   const uiManager = new UIManager(elements);
 
+  let urlParamsHandler;
   const chatCommandHandler = new ChatCommandHandler(
     (model) => chatService.setModel(model),
     (index) => chatService.setIndex(index),
@@ -33,7 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.chatMessages.innerHTML = "";
     },
     () => uiManager.toggleTheme(),
+    null
   );
+
+  urlParamsHandler = new URLParamsHandler(chatCommandHandler);
+  chatCommandHandler.urlParamsHandler = urlParamsHandler;
+
+  urlParamsHandler.handleURLParams();
 
   elements.messageInput.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") {

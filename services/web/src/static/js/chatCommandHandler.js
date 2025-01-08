@@ -1,10 +1,11 @@
 export class ChatCommandHandler {
-  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme) {
+  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme, urlParamsHandler) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
     this.onStreamChange = onStreamChange;
     this.onClear = onClear;
     this.onToggleTheme = onToggleTheme;
+    this.urlParamsHandler = urlParamsHandler;
   }
 
   handleCommand(message) {
@@ -18,17 +19,26 @@ export class ChatCommandHandler {
       "/model": () => {
         const model = parts[1] || null;
         this.onModelChange(model);
+        if (this.urlParamsHandler) {
+          this.urlParamsHandler.updateURL('model', model);
+        }
         return { type: "system", content: `Model set to: \`${model}\`` };
       },
       "/index": () => {
         const index = parts[1] || null;
         this.onIndexChange(index);
+        if (this.urlParamsHandler) {
+          this.urlParamsHandler.updateURL('index', index);
+        }
         return { type: "system", content: `Index set to: \`${index}\`` };
       },
       "/stream": () => {
         const value = parts[1] || "true";
         const enabled = value === "true" || value === "1";
         this.onStreamChange(enabled);
+        if (this.urlParamsHandler) {
+          this.urlParamsHandler.updateURL('stream', enabled ? "1" : "0");
+        }
         return {
           type: "system",
           content: `Streaming is \`${enabled ? "enabled" : "disabled"}\``,
@@ -40,6 +50,10 @@ export class ChatCommandHandler {
       },
       "/theme": () => {
         this.onToggleTheme();
+        if (this.urlParamsHandler) {
+          const isDark = document.documentElement.classList.contains('dark');
+          this.urlParamsHandler.updateURL('theme', isDark ? 'dark' : 'light');
+        }
         return { type: "system", content: "Theme toggled" };
       },
     };
@@ -56,6 +70,9 @@ export class ChatCommandHandler {
   \`/stream [0/1]\` - Enable or disable response streaming
   \`/clear\` - Clear chat history
   \`/theme\` - Toggle theme
-  \`/help\` - Show this help message`;
+  \`/help\` - Show this help message
+  
+  You can also set initial values using URL parameters:
+  \`?model=name&index=name&stream=1&theme=dark\``;
   }
 }
