@@ -108,7 +108,7 @@ class OllamaModelManager:
                     progress = json.loads(line)
                     if "total" in progress and "completed" in progress:
                         progress_raw = progress["completed"] / progress["total"]
-                        current_percentage = round(progress_raw * 100, 2)
+                        current_percentage = int(progress_raw * 100)
                         if current_percentage > last_percentage:
                             yield {
                                 "type": "model_status",
