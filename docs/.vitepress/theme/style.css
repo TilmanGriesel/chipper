@@ -6,6 +6,32 @@
   font-display: swap;
 }
 
+:root {
+  --champagne-50: #FDFCFB;
+  --champagne-100: #F9F6F4;
+  --champagne-200: #F5EEE9;
+  --champagne-300: #F1E6DE;
+  --champagne-400: #F0E2D8;
+  --champagne-500: #EEDDD3;
+  --champagne-600: #d3c5be;
+  --champagne-700: #b3a6a1;
+  --champagne-800: #6E635E;
+  --champagne-900: #433C38;
+  --champagne-950: #20140D;
+
+  --vp-c-chipper-accent-1: var(--champagne-800);
+  --vp-c-chipper-accent-2: var(--champagne-900);
+  --vp-c-chipper-accent-3: #000;
+  --vp-c-chipper-accent-soft: var(--champagne-600);
+}
+
+.dark {
+  --vp-c-chipper-accent-1: #a1a1a1;
+  --vp-c-chipper-accent-2: #dddddd;
+  --vp-c-chipper-accent-3: #fff;
+  --vp-c-chipper-accent-soft: #fff;
+}
+
 /**
  * Customize default theme styling by overriding CSS variables:
  * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
@@ -71,19 +97,9 @@
   --vp-c-red-soft: rgba(244, 63, 94, 0.14);
 
   --vp-c-sponsor: #db2777;
-
-  --vp-c-chipper-accent-1: #383838;
-  --vp-c-chipper-accent-2: #272727;
-  --vp-c-chipper-accent-3: #000;
-  --vp-c-chipper-accent-soft: var(--vp-c-gray-soft);
 }
 
 .dark {
-  --vp-c-chipper-accent-1: #a1a1a1;
-  --vp-c-chipper-accent-2: #dddddd;
-  --vp-c-chipper-accent-3: #fff;
-  --vp-c-chipper-accent-soft: #fff;
-
   --vp-c-gray-1: #515c67;
   --vp-c-gray-2: #414853;
   --vp-c-gray-3: #32363f;
@@ -296,11 +312,11 @@ h1.name {
  *   the page. Used for things like "carbon ads" or "table".
  * -------------------------------------------------------------------------- */
 
-:root {
-  --vp-c-bg: #fff;
-  --vp-c-bg-alt: #f6f6f7;
-  --vp-c-bg-elv: #ffffff;
-  --vp-c-bg-soft: #eff0f3;
+ :root {
+  --vp-c-bg: var(--champagne-200);
+  --vp-c-bg-alt: var(--champagne-100);
+  --vp-c-bg-elv: var(--champagne-100);
+  --vp-c-bg-soft: #fff;
 }
 
 .dark {
@@ -346,9 +362,9 @@ h1.name {
  * -------------------------------------------------------------------------- */
 
 :root {
-  --vp-c-text-1: rgba(0, 0, 0, 1);
-  --vp-c-text-2: rgba(60, 60, 60, 0.85);
-  --vp-c-text-3: rgba(60, 60, 60, 0.56);
+  --vp-c-text-1: var(--champagne-950);
+  --vp-c-text-2: var(--champagne-900);
+  --vp-c-text-3: var(--champagne-800);
 }
 
 .dark {
@@ -371,6 +387,9 @@ h1.name {
   --vp-button-brand-active-border: transparent;
   --vp-button-brand-active-text: var(--vp-c-white);
   --vp-button-brand-active-bg: var(--vp-c-brand-1);
+
+  --vp-button-alt-bg: var(--champagne-600);
+  --vp-button-alt-hover-bg: var(--champagne-700);
 }
 
 .dark {
@@ -388,7 +407,7 @@ h1.name {
 
 @media (min-width: 640px) {
   :root {
-    --vp-home-hero-image-filter: blur(56px);
+    --vp-home-hero-image-filter: blur(68px);
   }
 }
 
@@ -399,36 +418,29 @@ h1.name {
 }
 
 /**
- * Component: Custom Block
+ * Blocks
  * -------------------------------------------------------------------------- */
 
 :root {
+  --vp-custom-block-info-bg: #fff;
+  --vp-code-block-bg: white;
   --vp-custom-block-tip-border: transparent;
   --vp-custom-block-tip-text: var(--vp-c-text-1);
   --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
   --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
 }
 
-/**
- * Component: Algolia
- * -------------------------------------------------------------------------- */
-
-.DocSearch {
-  --docsearch-primary-color: var(--vp-c-brand-1) !important;
+.dark {
+  --vp-custom-block-info-bg: var(--vp-c-gray-3);
+  --vp-code-block-bg: var(--vp-c-gray-3);
 }
 
-@media (min-width: 960px) {
-  .image-src {
-    max-width: 280px !important;
-    max-height: 280px !important;
-  }
+.demo-frame {
+  border: solid 2px;
+  border-color: white;
+  border-radius: 32px;
 }
 
-@media (min-width: 640px) {
-  .tagline {
-    padding-top: 18px !important;
-  }
-}
 
 /**
  * Glow
@@ -464,7 +476,14 @@ h1.name {
 
 @media (min-width: 640px) {
   .image-bg {
-    width: 256px;
-    height: 256px;
+    width: 256px !important;
+    height: 256px !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .image-src {
+      max-width: 256px !important;
+      max-height: 256px !important;
   }
 }

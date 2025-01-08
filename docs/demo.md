@@ -12,7 +12,7 @@ Tell me a story about Chipper, the brilliant golden retriever.
    title="Chipper AI Demo"
    width="100%" 
    height="900"
-   style="border: none;"
+   class="demo-frame"
    src="https://demo.chipper.tilmangriesel.com/">
  </iframe>
 </div>

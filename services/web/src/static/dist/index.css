@@ -737,43 +737,6 @@ video {
   flex: none;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8,0,1,1);
-  }
-
-  50% {
-    transform: none;
-    animation-timing-function: cubic-bezier(0,0,0.2,1);
-  }
-}
-
-.animate-bounce {
-  animation: bounce 1s infinite;
-}
-
-@keyframes pulse {
-  50% {
-    opacity: .5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-.animate-ping {
-  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
 .touch-manipulation {
   touch-action: manipulation;
 }
@@ -852,14 +815,19 @@ video {
   border-width: 1px;
 }
 
-.bg-gray-200 {
+.bg-champagne-200 {
   --tw-bg-opacity: 1;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
+  background-color: rgb(245 238 233 / var(--tw-bg-opacity, 1));
 }
 
-.bg-gray-600 {
+.bg-champagne-300 {
   --tw-bg-opacity: 1;
-  background-color: rgb(75 85 99 / var(--tw-bg-opacity, 1));
+  background-color: rgb(241 230 222 / var(--tw-bg-opacity, 1));
+}
+
+.bg-champagne-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(196 180 172 / var(--tw-bg-opacity, 1));
 }
 
 .bg-purple-600 {
@@ -877,18 +845,9 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 
-.bg-zinc-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(228 228 231 / var(--tw-bg-opacity, 1));
-}
-
 .bg-zinc-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-.p-2 {
-  padding: 0.5rem;
 }
 
 .p-2\.5 {
@@ -954,14 +913,14 @@ video {
   font-weight: 400;
 }
 
-.text-gray-700 {
+.text-champagne-700 {
   --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+  color: rgb(153 139 133 / var(--tw-text-opacity, 1));
 }
 
-.text-gray-900 {
+.text-champagne-900 {
   --tw-text-opacity: 1;
-  color: rgb(17 24 39 / var(--tw-text-opacity, 1));
+  color: rgb(67 60 56 / var(--tw-text-opacity, 1));
 }
 
 .text-white {
@@ -974,6 +933,16 @@ video {
   color: rgb(39 39 42 / var(--tw-text-opacity, 1));
 }
 
+.text-champagne-500 {
+  --tw-text-opacity: 1;
+  color: rgb(238 221 211 / var(--tw-text-opacity, 1));
+}
+
+.text-champagne-600 {
+  --tw-text-opacity: 1;
+  color: rgb(196 180 172 / var(--tw-text-opacity, 1));
+}
+
 .opacity-70 {
   opacity: 0.7;
 }
@@ -984,8 +953,8 @@ video {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
-.ring-gray-900\/5 {
-  --tw-ring-color: rgb(17 24 39 / 0.05);
+.ring-champagne-900\/5 {
+  --tw-ring-color: rgb(67 60 56 / 0.05);
 }
 
 .blur {
@@ -1065,11 +1034,11 @@ body {
 
 @keyframes es-fadeIn {
   from {
-    opacity: 0.4;
+    opacity: 0;
   }
 
   to {
-    opacity: 0.75;
+    opacity: 1;
   }
 }
 
@@ -1303,6 +1272,16 @@ pre[class*="language-"] {
   }
 }
 
+.selection\:bg-champagne-600 *::-moz-selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(196 180 172 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-600 *::selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(196 180 172 / var(--tw-bg-opacity, 1));
+}
+
 .selection\:bg-purple-900 *::-moz-selection {
   --tw-bg-opacity: 1;
   background-color: rgb(88 28 135 / var(--tw-bg-opacity, 1));
@@ -1341,6 +1320,26 @@ pre[class*="language-"] {
 .selection\:bg-zinc-700 *::selection {
   --tw-bg-opacity: 1;
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-500 *::-moz-selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 221 211 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-500 *::selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 221 211 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-600::-moz-selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(196 180 172 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-600::selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(196 180 172 / var(--tw-bg-opacity, 1));
 }
 
 .selection\:bg-purple-900::-moz-selection {
@@ -1383,9 +1382,19 @@ pre[class*="language-"] {
   background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:bg-gray-100:hover {
+.selection\:bg-champagne-500::-moz-selection {
   --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+  background-color: rgb(238 221 211 / var(--tw-bg-opacity, 1));
+}
+
+.selection\:bg-champagne-500::selection {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 221 211 / var(--tw-bg-opacity, 1));
+}
+
+.hover\:bg-champagne-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 246 244 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-zinc-800:hover {
@@ -1401,6 +1410,12 @@ pre[class*="language-"] {
 .focus\:ring-1:focus {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
@@ -1444,24 +1459,14 @@ pre[class*="language-"] {
   background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
 }
 
-.dark\:text-gray-100:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(243 244 246 / var(--tw-text-opacity, 1));
-}
-
-.dark\:text-gray-200:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity, 1));
-}
-
-.dark\:text-gray-300:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(209 213 219 / var(--tw-text-opacity, 1));
-}
-
 .dark\:text-zinc-100:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(244 244 245 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-zinc-200:is(.dark *) {
+  --tw-text-opacity: 1;
+  color: rgb(228 228 231 / var(--tw-text-opacity, 1));
 }
 
 .dark\:text-zinc-300:is(.dark *) {

@@ -34,11 +34,11 @@ export class MessageRenderer {
 
     const typeClasses = {
       user: "bg-zinc-900 selection:bg-zinc-700 text-white user-message",
-      assistant: "bg-zinc-200 dark:bg-zinc-700 selection:bg-zinc-400 selection:dark:bg-zinc-800 assistant-message",
+      assistant: "bg-champagne-200 dark:bg-zinc-700 selection:bg-champagne-500 selection:dark:bg-zinc-800 assistant-message",
       error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
       system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
-    messageDiv.classList.add(...(typeClasses[type]?.split(" ") || ["bg-gray-600"]));
+    messageDiv.classList.add(...(typeClasses[type]?.split(" ") || ["bg-champagne-600"]));
 
     const header = document.createElement("div");
     header.className = `font-bold text-sm ${type === "assistant" ? "text-zinc-800 dark:text-zinc-300" : "text-white"} mb-2`;
