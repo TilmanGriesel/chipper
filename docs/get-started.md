@@ -1,13 +1,19 @@
-# Welcome to Chipper! :wave:
+# Welcome to Chipper :wave:
 
-**Awesome to have you here!** You might be wondering, "Who or what is Chipper?" Let me give you a quick introduction.
+**Awesome to have you here!** You might be wondering, **Who or what is Chipper?** Let me give you a quick introduction.
 Chipper started as a set of Python scripts designed to experiment with local RAGs (Retrieval-Augmented Generation). Essentially, we process local text files and enhance an AI model with that data.
 
-The big advantage? By using RAG or embedding our knowledge base, we can achieve impressive results with much smaller models and keep everything private on your computer.
+<p align="center">
+<div style="position: relative; padding-top: 56.25%">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 24px;"  src="https://www.youtube.com/embed/WFAGn9BjN9M" title="Chipper AI -  AI interface for tinkerers (Ollama, Haystack RAG, Python)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+</p>
+
+**The big advantage?** By using RAG or embedding our knowledge base, we can achieve impressive results with much smaller models and keep everything private on your computer.
 
 <details>
-  <summary>I want to know more! 💡</summary>
-
+  <summary>Tell me more 💡</summary>
 With our embedded knowledge base, we essentially give our local Ollama model a "notebook" to reference. So, when we ask it something like, "Who is the best golden retriever in the universe?" it quickly checks a database, ElasticSearch in our case, to see if it has any relevant information. The database then returns embeddings to augment the model's response, making the process super fast and awesome!
 
 Chipper essentially provides an end-to-end architecture for experimenting with embeddings right from your command line. It leverages many awesome open-source tools like [Haystack](https://haystack.deepset.ai/) to manage embeddings and queries, [Docker](https://www.docker.com/) to eliminate system dependencies and make setup a breeze, and [TailwindCSS](https://tailwindcss.com/) to simplify visual changes. Plus, it includes many other small but powerful tools to make your exploration effortless and enjoyable. Mostly written in [Python](https://www.python.org/).
@@ -16,17 +22,7 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 
 - https://en.wikipedia.org/wiki/Retrieval-augmented_generation is a good start.
 - https://www.youtube.com/watch?v=T-D1OfcDW1M is an amazing video about it by IBM.
-
 </details>
-
----
-
-<p align="center">
-<div style="position: relative; padding-top: 56.25%;">
-  <iframe 
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"  src="https://www.youtube.com/embed/WFAGn9BjN9M" title="Chipper AI -  AI interface for tinkerers (Ollama, Haystack RAG, Python)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</div>
-</p>
 
 ## Step 1: Setting Up Chipper 🛠️
 
@@ -60,13 +56,13 @@ git clone git@github.com:TilmanGriesel/chipper.git
 
 Now we’re getting somewhere! Chipper uses [Docker Compose](https://docs.docker.com/compose/) to orchestrate the various components we need to work together, such as ElasticSearch and Chipper services. The best part? You don’t have to do much to get started, Chipper comes with a default configuration ready for experimentation.
 
-#### 2.2.1 - Navigate to your cloned Chipper directory
+#### 2.2.1 Navigate to your cloned Chipper directory
 
 ```bash
 cd chipper
 ```
 
-#### 2.2.2 - Run the setup script
+#### 2.2.2 Run the setup script
 
 ```bash
 ./run.sh up
@@ -133,7 +129,7 @@ You can set the index using the `--es-index <name>` parameter, specify the embed
 
 ## Step 5: Next Steps and Exploration 🔍
 
-First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to "chip" wood, just like we need to split and chip the data we want to embed. And as for "retriever", - well ...
+First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to *chip* wood, just like we need to split and chip the data we want to embed. And as for *retriever*, - well ...
 
 Jokes aside, this project offers plenty more tools to explore. You can transcribe audio files into text and embed it, scrape websites (only your own or with proper consent), or dive into the frontend, here you can write `/help` to see some options or backend to customize and change Chipper to suit your needs.
 
@@ -141,4 +137,4 @@ While I plan to expand this documentation, I generally prefer to keep things doc
 
 If you enjoy what you see, [leaving a star on the GitHub repo](https://github.com/TilmanGriesel/chipper) would mean the world to me.
 
-Have a nice day!
+**Have a nice day!**
