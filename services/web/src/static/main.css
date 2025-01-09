@@ -25,6 +25,7 @@ body {
 
 body {
   line-height: 26px;
+  text-rendering: optimizeLegibility;
 }
 
 /* Typography Styles */
@@ -104,7 +105,8 @@ a.chipper-font:hover {
 
 .assistant-message {
   font-family: "PTSerif", serif !important;
-  font-size: 16.5px;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
 }
 
 @keyframes es-fadeIn {

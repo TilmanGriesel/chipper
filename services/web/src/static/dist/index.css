@@ -941,8 +941,8 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
-.opacity-70 {
-  opacity: 0.7;
+.opacity-90 {
+  opacity: 0.9;
 }
 
 .ring-1 {
@@ -977,6 +977,7 @@ video {
 
 body {
   line-height: 26px;
+  text-rendering: optimizeLegibility;
 }
 
 /* Typography Styles */
@@ -1084,7 +1085,8 @@ a.chipper-font:hover {
 
 .assistant-message {
   font-family: "PTSerif", serif !important;
-  font-size: 16.5px;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
 }
 
 @keyframes es-fadeIn {
