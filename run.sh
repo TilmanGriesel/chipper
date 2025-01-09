@@ -305,9 +305,12 @@ case "$1" in
         run_in_directory "tools/embed" ./run.sh "$(pwd)/tools/embed/testdata" "$@"
         ;;
     "embed"|"scrape")
+        command="$1"
         shift
-        [ $# -eq 0 ] && error_exit "Error: ${1} command requires arguments"
-        run_in_directory "tools/${1}" ./run.sh "$@"
+        
+        [ $# -eq 0 ] && error_exit "Error: ${command} command requires arguments"
+        
+        run_in_directory "tools/${command}" ./run.sh "$@"
         ;;
     "dev-api"|"dev-web")
         run_in_directory "services/${1#dev-}" make dev
