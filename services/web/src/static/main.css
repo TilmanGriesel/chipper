@@ -52,6 +52,39 @@ body {
   font-display: swap;
 }
 
+@font-face {
+  font-family: "PTSerif";
+  src: url("/static/font/PTSerif-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PTSerif";
+  src: url("/static/font/PTSerif-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PTSerif";
+  src: url("/static/font/PTSerif-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PTSerif";
+  src: url("/static/font/PTSerif-BoldItalic.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+
 .chipper-font {
   font-family: "Just Another Hand", serif !important;
   letter-spacing: 2.2px;
@@ -67,6 +100,11 @@ a.chipper-font:hover {
 
 .empty-state-fade-in {
   animation: es-fadeIn 2.2s forwards;
+}
+
+.assistant-message {
+  font-family: "PTSerif", serif !important;
+  font-size: 16.5px;
 }
 
 @keyframes es-fadeIn {

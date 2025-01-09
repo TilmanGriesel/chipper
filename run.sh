@@ -189,7 +189,7 @@ function print_local_url() {
     local bold="\033[1m"
     
     echo
-    echo -e "Open the Chipper web interface at:"
+    echo -e "Open the Chipper Web-Interface at:"
     echo -e "${bold}${green}➜${reset} ${bold}$LOCAL_URL${reset}"
     echo
 }

@@ -25,12 +25,12 @@ export class MessageRenderer {
     });
   }
 
-  createMessageElement(content, type = "assistant", isThinking = false) {
+  createMessageElement(content, type = "assistant", isThinking = false, includeHeader = false) {
     const messageContainer = document.createElement("div");
     messageContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-4`;
 
     const messageDiv = document.createElement("div");
-    messageDiv.className = "p-4 rounded-3xl min-w-48 max-w-3xl";
+    messageDiv.className = "message p-4 rounded-3xl min-w-48 max-w-3xl";
 
     const typeClasses = {
       user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
@@ -52,7 +52,7 @@ export class MessageRenderer {
     const contentDiv = document.createElement("div");
 
     if (isThinking) {
-      contentDiv.className = "dots-animation ml-1 flex items-center space-x-2";
+      contentDiv.className = "message dots-animation ml-1 flex items-center space-x-2";
       const thinkingText = document.createElement("span");
       thinkingText.textContent = "Chipper is thinking";
       contentDiv.appendChild(thinkingText);
@@ -71,7 +71,9 @@ export class MessageRenderer {
       contentDiv.className = "prose prose-sm max-w-none break-words";
     }
 
-    messageDiv.appendChild(header);
+    if (includeHeader)
+      messageDiv.appendChild(header);
+    
     messageDiv.appendChild(contentDiv);
     messageContainer.appendChild(messageDiv);
 
