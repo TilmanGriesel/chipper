@@ -25,7 +25,6 @@ body {
 
 body {
   line-height: 26px;
-  text-rendering: optimizeLegibility;
 }
 
 /* Typography Styles */
@@ -54,32 +53,32 @@ body {
 }
 
 @font-face {
-  font-family: "PTSerif";
-  src: url("/static/font/PTSerif-Regular.ttf") format("truetype");
+  font-family: "Lora";
+  src: url("/static/font/Lora-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "PTSerif";
-  src: url("/static/font/PTSerif-Italic.ttf") format("truetype");
+  font-family: "Lora";
+  src: url("/static/font/Lora-Italic.ttf") format("truetype");
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "PTSerif";
-  src: url("/static/font/PTSerif-Bold.ttf") format("truetype");
+  font-family: "Lora";
+  src: url("/static/font/Lora-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "PTSerif";
-  src: url("/static/font/PTSerif-BoldItalic.ttf") format("truetype");
+  font-family: "Lora";
+  src: url("/static/font/Lora-BoldItalic.ttf") format("truetype");
   font-weight: bold;
   font-style: italic;
   font-display: swap;
@@ -104,8 +103,7 @@ a.chipper-font:hover {
 }
 
 .assistant-message {
-  font-family: "PTSerif", serif !important;
-  font-size: 17px;
+  font-family: "Lora", serif !important;
   text-rendering: optimizeLegibility;
 }
 
@@ -246,7 +244,6 @@ pre[class*="language-"] {
   );
   position: absolute;
   z-index: -1;
-
   animation: spin 5.5s linear infinite;
 }
 
