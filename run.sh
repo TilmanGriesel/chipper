@@ -160,7 +160,7 @@ function check_docker_running() {
 
 function docker_compose_down() {
     echo "Stopping containers..."
-    docker-compose -p "$PROJECT_NAME" down --remove-orphans
+    docker_compose_cmd -p "$PROJECT_NAME" down --remove-orphans
 }
 
 function docker_compose_down_clean() {

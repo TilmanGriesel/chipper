@@ -20,4 +20,4 @@ docker run --rm \
     --name "${IMAGE_NAME}" \
     -v "${PWD}/output:/app/data" \
     "${IMAGE_NAME}" \
-    --base-url="${BASE_URL}"
+    --base-url="${BASE_URL}" "$@"
