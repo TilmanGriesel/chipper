@@ -1,285 +1,323 @@
-/* Tailwind Imports */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/**
+ * Main Stylesheet
+ * 
+ * Structure:
+ * 1. Tailwind Imports
+ * 2. Custom Font Definitions
+ * 3. Base Styles & Mobile Safety
+ * 4. Typography & Prose Styles
+ * 5. Custom Components & Animations
+ * 6. Utility Classes
+ */
 
-@layer base {
-  @font-face {
-    font-family: 'Fira Code NF';
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-    src: url("/static/font/FiraCodeNerdFont-Regular.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Just Another Hand";
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-    src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Kalam";
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-    src: url("/static/font/Kalam-Light.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Lora";
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-    src: url("/static/font/Lora-Regular.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Lora";
-    font-weight: normal;
-    font-style: italic;
-    font-display: swap;
-    src: url("/static/font/Lora-Italic.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Lora";
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-    src: url("/static/font/Lora-Bold.ttf") format("truetype");
-  }
-
-  @font-face {
-    font-family: "Lora";
-    font-weight: bold;
-    font-style: italic;
-    font-display: swap;
-    src: url("/static/font/Lora-BoldItalic.ttf") format("truetype");
-  }
-}
-
-/* safe area insets */
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-/* improve touch handling */
-textarea,
-button {
-  touch-action: manipulation;
-}
-
-/* prevent pull-to-refresh on mobile */
-html,
-body {
-  overscroll-behavior-y: contain;
-}
-
-body {
-  line-height: 26px;
-}
-
-.chipper-font {
-  font-family: "Just Another Hand", serif !important;
-  letter-spacing: 2.2px;
-}
-
-a.chipper-font:hover {
-  text-decoration: underline !important;
-}
-
-.empty-state-fade-in {
-  animation: es-fadeIn 2.2s forwards;
-}
-
-.assistant-message {
-  text-rendering: optimizeLegibility;
-}
-
-@keyframes es-fadeIn {
-  from { opacity: 0; }
-  to { opacity: 0.85; }
-}
-
-/* Prose Typography Styles */
-/* Headings */
-.prose h1 {
-  font-size: 2em;
-  font-weight: bold;
-  margin: 0.67em 0;
-}
-
-.prose h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin: 0.83em 0;
-}
-
-.prose h3 {
-  font-size: 1.17em;
-  font-weight: bold;
-  margin: 1em 0;
-}
-
-/* Lists */
-.prose ul {
-  list-style-type: disc;
-  padding-left: 2em;
-  margin: 1em 0;
-}
-
-.prose ol {
-  list-style-type: decimal;
-  padding-left: 2em;
-  margin: 1em 0;
-}
-
-/* Text Elements */
-.prose p {
-  margin: 1em 0;
-}
-
-/* Code Blocks */
-.prose code:not([class*="language-"]) {
-  @apply bg-brand-a-50 dark:bg-brand-b-800;
-  padding: 0.2em 0.4em;
-  border-radius: 0.25em;
-  font-family: ui-monospace, monospace;
-}
-
-.system-message .prose code:not([class*="language-"]) {
-  @apply bg-purple-800 dark:bg-purple-700;
-}
-
-pre[class*="language-"] {
-  border-radius: 16px;
-}
-
-.code-toolbar {
-  font-size: 14px;
-}
-
-code[class*="language-"],
-pre[class*="language-"] {
-  font-family: "Fira Code NF", ui-monospace, "Source Code Pro", Menlo, Monaco,
-    Consolas, monospace;
-}
-
-/* Content Elements */
-.prose blockquote {
-  border-left: 4px solid #e5e7eb;
-  padding-left: 1em;
-  margin: 1em 0;
-}
-
-.prose a {
-  color: #3b82f6;
-  text-decoration: underline;
-}
-
-.prose img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Tables */
-.prose table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 1em 0;
-}
-
-.prose th,
-.prose td {
-  border: 1px solid #e5e7eb;
-  padding: 0.5em;
-  text-align: left;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-brand-b-300 dark:bg-brand-b-900;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-brand-b-600 dark:bg-brand-b-700;
-}
-
-/* Busy Indicator */
-
-@property --rotate {
-  syntax: "<angle>";
-  initial-value: 132deg;
-  inherits: false;
-}
-
-#busy-indicator {
-  @apply opacity-40 dark:opacity-25 transition-opacity duration-1000;
-  width: 100%;
-  height: 100%;
-  background-image: linear-gradient(
-    var(--rotate),
-    #5ddcff,
-    #f53ec7 43%,
-    #a162ff
-  );
-  position: absolute;
-  z-index: -1;
-  animation: spin 5.5s linear infinite;
-}
-
-#busy-indicator.off {
-  @apply transition-opacity duration-1000;
-  opacity: 0;
-}
-
-@keyframes spin {
-  0% {
-    --rotate: 0deg;
-  }
-  100% {
-    --rotate: 360deg;
-  }
-}
-
-.dots-animation {
-  display: inline-block;
-}
-
-.dots-animation .dot {
-  opacity: 0;
-  animation: dot-fade 1.4s infinite;
-  animation-fill-mode: forwards;
-}
-
-.dots-animation .dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dots-animation .dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes dot-fade {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}
+/* -----------------------------------------------------------------------------
+ * 1. Tailwind Imports
+ * ---------------------------------------------------------------------------*/
+ @tailwind base;
+ @tailwind components;
+ @tailwind utilities;
+ 
+ /* -----------------------------------------------------------------------------
+  * 2. Custom Font Definitions
+  * ---------------------------------------------------------------------------*/
+ @layer base {
+   /* Fira Code NF - Monospace font for code blocks */
+   @font-face {
+     font-family: 'Fira Code NF';
+     font-weight: normal;
+     font-style: normal;
+     font-display: swap;
+     src: url("/static/font/FiraCodeNerdFont-Regular.ttf") format("truetype");
+   }
+ 
+   /* Just Another Hand - Decorative font for special elements */
+   @font-face {
+     font-family: "Just Another Hand";
+     font-weight: normal;
+     font-style: normal;
+     font-display: swap;
+     src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
+   }
+ 
+   /* Kalam - Handwriting style font */
+   @font-face {
+     font-family: "Kalam";
+     font-weight: normal;
+     font-style: normal;
+     font-display: swap;
+     src: url("/static/font/Kalam-Light.ttf") format("truetype");
+   }
+ 
+   /* Lora - Primary serif font with its variations */
+   @font-face {
+     font-family: "Lora";
+     font-weight: normal;
+     font-style: normal;
+     font-display: swap;
+     src: url("/static/font/Lora-Regular.ttf") format("truetype");
+   }
+ 
+   @font-face {
+     font-family: "Lora";
+     font-weight: normal;
+     font-style: italic;
+     font-display: swap;
+     src: url("/static/font/Lora-Italic.ttf") format("truetype");
+   }
+ 
+   @font-face {
+     font-family: "Lora";
+     font-weight: bold;
+     font-style: normal;
+     font-display: swap;
+     src: url("/static/font/Lora-Bold.ttf") format("truetype");
+   }
+ 
+   @font-face {
+     font-family: "Lora";
+     font-weight: bold;
+     font-style: italic;
+     font-display: swap;
+     src: url("/static/font/Lora-BoldItalic.ttf") format("truetype");
+   }
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * 3. Base Styles & Mobile Safety
+  * ---------------------------------------------------------------------------*/
+ /* Safe area insets for mobile devices */
+ body {
+   padding-top: env(safe-area-inset-top);
+   padding-bottom: env(safe-area-inset-bottom);
+   padding-left: env(safe-area-inset-left);
+   padding-right: env(safe-area-inset-right);
+   line-height: 26px;
+ }
+ 
+ /* Mobile touch optimizations */
+ textarea,
+ button {
+   touch-action: manipulation;
+ }
+ 
+ /* Prevent pull-to-refresh behavior */
+ html,
+ body {
+   overscroll-behavior-y: contain;
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * 4. Typography & Prose Styles
+  * ---------------------------------------------------------------------------*/
+ /* Prose typography configuration */
+ .prose {
+   /* Headings */
+   & h1 {
+     font-size: 2em;
+     font-weight: bold;
+     margin: 0.67em 0;
+   }
+ 
+   & h2 {
+     font-size: 1.5em;
+     font-weight: bold;
+     margin: 0.83em 0;
+   }
+ 
+   & h3 {
+     font-size: 1.17em;
+     font-weight: bold;
+     margin: 1em 0;
+   }
+ 
+   /* Lists */
+   & ul {
+     list-style-type: disc;
+     padding-left: 2em;
+     margin: 1em 0;
+   }
+ 
+   & ol {
+     list-style-type: decimal;
+     padding-left: 2em;
+     margin: 1em 0;
+   }
+ 
+   /* Text elements */
+   & p {
+     margin: 1em 0;
+   }
+ 
+   /* Code blocks */
+   & code:not([class*="language-"]) {
+     @apply bg-brand-a-50 dark:bg-brand-b-800;
+     padding: 0.2em 0.4em;
+     border-radius: 0.25em;
+     font-family: ui-monospace, monospace;
+   }
+ 
+   /* Block elements */
+   & blockquote {
+     border-left: 4px solid #e5e7eb;
+     padding-left: 1em;
+     margin: 1em 0;
+   }
+ 
+   & a {
+     color: #3b82f6;
+     text-decoration: underline;
+   }
+ 
+   & img {
+     max-width: 100%;
+     height: auto;
+   }
+ 
+   /* Tables */
+   & table {
+     border-collapse: collapse;
+     width: 100%;
+     margin: 1em 0;
+   }
+ 
+   & th,
+   & td {
+     border: 1px solid #e5e7eb;
+     padding: 0.5em;
+     text-align: left;
+   }
+ }
+ 
+ /* Special system message styling */
+ .system-message .prose code:not([class*="language-"]) {
+   @apply bg-purple-800 dark:bg-purple-700;
+ }
+ 
+ /* Code-specific styles */
+ pre[class*="language-"] {
+   border-radius: 16px;
+ }
+ 
+ .code-toolbar {
+   font-size: 14px;
+ }
+ 
+ code[class*="language-"],
+ pre[class*="language-"] {
+   font-family: "Fira Code NF", ui-monospace, "Source Code Pro", Menlo, Monaco,
+     Consolas, monospace;
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * 5. Custom Components & Animations
+  * ---------------------------------------------------------------------------*/
+ /* Chipper font styling */
+ .chipper-font {
+   font-family: "Just Another Hand", serif !important;
+   letter-spacing: 2.2px;
+ }
+ 
+ a.chipper-font:hover {
+   text-decoration: underline !important;
+ }
+ 
+ /* Message styling */
+ .assistant-message {
+   text-rendering: optimizeLegibility;
+ }
+ 
+ /* Empty state animation */
+ .empty-state-fade-in {
+   animation: es-fadeIn 2.2s forwards;
+ }
+ 
+ @keyframes es-fadeIn {
+   from { opacity: 0; }
+   to { opacity: 0.85; }
+ }
+ 
+ /* Busy indicator animation */
+ @property --rotate {
+   syntax: "<angle>";
+   initial-value: 132deg;
+   inherits: false;
+ }
+ 
+ #busy-indicator {
+   @apply opacity-40 dark:opacity-25 transition-opacity duration-1000;
+   width: 100%;
+   height: 100%;
+   background-image: linear-gradient(
+     var(--rotate),
+     #5ddcff,
+     #f53ec7 43%,
+     #a162ff
+   );
+   position: absolute;
+   z-index: -1;
+   animation: spin 5.5s linear infinite;
+ }
+ 
+ #busy-indicator.off {
+   @apply transition-opacity duration-1000;
+   opacity: 0;
+ }
+ 
+ @keyframes spin {
+   0% {
+     --rotate: 0deg;
+   }
+   100% {
+     --rotate: 360deg;
+   }
+ }
+ 
+ /* Dots animation */
+ .dots-animation {
+   display: inline-block;
+ 
+   & .dot {
+     opacity: 0;
+     animation: dot-fade 1.4s infinite;
+     animation-fill-mode: forwards;
+   }
+ 
+   & .dot:nth-child(2) {
+     animation-delay: 0.2s;
+   }
+ 
+   & .dot:nth-child(3) {
+     animation-delay: 0.4s;
+   }
+ }
+ 
+ @keyframes dot-fade {
+   0%,
+   100% {
+     opacity: 0;
+   }
+   50% {
+     opacity: 1;
+   }
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * 6. Utility Classes
+  * ---------------------------------------------------------------------------*/
+ /* Scrollbar styling */
+ ::-webkit-scrollbar {
+   width: 10px;
+ }
+ 
+ ::-webkit-scrollbar-track {
+   background: transparent;
+ }
+ 
+ ::-webkit-scrollbar-thumb {
+   @apply bg-brand-b-300 dark:bg-brand-b-900;
+   border-radius: 5px;
+ 
+   &:hover {
+     @apply bg-brand-b-600 dark:bg-brand-b-700;
+   }
+ }

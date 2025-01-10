@@ -1,4 +1,18 @@
-/* Tailwind Imports */
+/**
+ * Main Stylesheet
+ * 
+ * Structure:
+ * 1. Tailwind Imports
+ * 2. Custom Font Definitions
+ * 3. Base Styles & Mobile Safety
+ * 4. Typography & Prose Styles
+ * 5. Custom Components & Animations
+ * 6. Utility Classes
+ */
+
+/* -----------------------------------------------------------------------------
+ * 1. Tailwind Imports
+ * ---------------------------------------------------------------------------*/
 
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
@@ -108,7 +122,8 @@
   --tw-contain-style:  ;
 }
 
-/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com
+ */
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -554,6 +569,8 @@ video {
   display: none;
 }
 
+/* Fira Code NF - Monospace font for code blocks */
+
 @font-face {
   font-family: 'Fira Code NF';
 
@@ -565,6 +582,8 @@ video {
 
   src: url("/static/font/FiraCodeNerdFont-Regular.ttf") format("truetype");
 }
+
+/* Just Another Hand - Decorative font for special elements */
 
 @font-face {
   font-family: "Just Another Hand";
@@ -578,6 +597,8 @@ video {
   src: url("/static/font/JustAnotherHand-Regular.ttf") format("truetype");
 }
 
+/* Kalam - Handwriting style font */
+
 @font-face {
   font-family: "Kalam";
 
@@ -589,6 +610,8 @@ video {
 
   src: url("/static/font/Kalam-Light.ttf") format("truetype");
 }
+
+/* Lora - Primary serif font with its variations */
 
 @font-face {
   font-family: "Lora";
@@ -1044,32 +1067,151 @@ video {
   transition-duration: 200ms;
 }
 
-/* safe area insets */
+/* -----------------------------------------------------------------------------
+  * 2. Custom Font Definitions
+  * ---------------------------------------------------------------------------*/
+
+/* -----------------------------------------------------------------------------
+  * 3. Base Styles & Mobile Safety
+  * ---------------------------------------------------------------------------*/
+
+/* Safe area insets for mobile devices */
 
 body {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  line-height: 26px;
 }
 
-/* improve touch handling */
+/* Mobile touch optimizations */
 
 textarea,
-button {
+ button {
   touch-action: manipulation;
 }
 
-/* prevent pull-to-refresh on mobile */
+/* Prevent pull-to-refresh behavior */
 
 html,
-body {
+ body {
   overscroll-behavior-y: contain;
 }
 
-body {
-  line-height: 26px;
+/* -----------------------------------------------------------------------------
+  * 4. Typography & Prose Styles
+  * ---------------------------------------------------------------------------*/
+
+/* Prose typography configuration */
+
+.prose {
+  /* Headings */
+  & h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0.67em 0;
+  }
+  & h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0.83em 0;
+  }
+  & h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin: 1em 0;
+  }
+  /* Lists */
+  & ul {
+    list-style-type: disc;
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+  & ol {
+    list-style-type: decimal;
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+  /* Text elements */
+  & p {
+    margin: 1em 0;
+  }
+  /* Code blocks */
+  & code:not([class*="language-"]) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(246 241 237 / var(--tw-bg-opacity, 1));
+  }
+  & code:not([class*="language-"]):is(.dark *) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
+  }
+  & code:not([class*="language-"]) {
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+    font-family: ui-monospace, monospace;
+  }
+  /* Block elements */
+  & blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1em;
+    margin: 1em 0;
+  }
+  & a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+  & img {
+    max-width: 100%;
+    height: auto;
+  }
+  /* Tables */
+  & table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+  }
+  & th,
+   & td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5em;
+    text-align: left;
+  }
 }
+
+/* Special system message styling */
+
+.system-message .prose code:not([class*="language-"]) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 33 168 / var(--tw-bg-opacity, 1));
+}
+
+.system-message .prose code:not([class*="language-"]):is(.dark *) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(126 34 206 / var(--tw-bg-opacity, 1));
+}
+
+/* Code-specific styles */
+
+pre[class*="language-"] {
+  border-radius: 16px;
+}
+
+.code-toolbar {
+  font-size: 14px;
+}
+
+code[class*="language-"],
+ pre[class*="language-"] {
+  font-family: "Fira Code NF", ui-monospace, "Source Code Pro", Menlo, Monaco,
+     Consolas, monospace;
+}
+
+/* -----------------------------------------------------------------------------
+  * 5. Custom Components & Animations
+  * ---------------------------------------------------------------------------*/
+
+/* Chipper font styling */
 
 .chipper-font {
   font-family: "Just Another Hand", serif !important;
@@ -1080,12 +1222,16 @@ a.chipper-font:hover {
   text-decoration: underline !important;
 }
 
-.empty-state-fade-in {
-  animation: es-fadeIn 2.2s forwards;
-}
+/* Message styling */
 
 .assistant-message {
   text-rendering: optimizeLegibility;
+}
+
+/* Empty state animation */
+
+.empty-state-fade-in {
+  animation: es-fadeIn 2.2s forwards;
 }
 
 @keyframes es-fadeIn {
@@ -1098,156 +1244,7 @@ a.chipper-font:hover {
   }
 }
 
-/* Prose Typography Styles */
-
-/* Headings */
-
-.prose h1 {
-  font-size: 2em;
-  font-weight: bold;
-  margin: 0.67em 0;
-}
-
-.prose h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin: 0.83em 0;
-}
-
-.prose h3 {
-  font-size: 1.17em;
-  font-weight: bold;
-  margin: 1em 0;
-}
-
-/* Lists */
-
-.prose ul {
-  list-style-type: disc;
-  padding-left: 2em;
-  margin: 1em 0;
-}
-
-.prose ol {
-  list-style-type: decimal;
-  padding-left: 2em;
-  margin: 1em 0;
-}
-
-/* Text Elements */
-
-.prose p {
-  margin: 1em 0;
-}
-
-/* Code Blocks */
-
-.prose code:not([class*="language-"]) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(246 241 237 / var(--tw-bg-opacity, 1));
-}
-
-.prose code:not([class*="language-"]):is(.dark *) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
-}
-
-.prose code:not([class*="language-"]) {
-  padding: 0.2em 0.4em;
-  border-radius: 0.25em;
-  font-family: ui-monospace, monospace;
-}
-
-.system-message .prose code:not([class*="language-"]) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(107 33 168 / var(--tw-bg-opacity, 1));
-}
-
-.system-message .prose code:not([class*="language-"]):is(.dark *) {
-  --tw-bg-opacity: 1;
-  background-color: rgb(126 34 206 / var(--tw-bg-opacity, 1));
-}
-
-pre[class*="language-"] {
-  border-radius: 16px;
-}
-
-.code-toolbar {
-  font-size: 14px;
-}
-
-code[class*="language-"],
-pre[class*="language-"] {
-  font-family: "Fira Code NF", ui-monospace, "Source Code Pro", Menlo, Monaco,
-    Consolas, monospace;
-}
-
-/* Content Elements */
-
-.prose blockquote {
-  border-left: 4px solid #e5e7eb;
-  padding-left: 1em;
-  margin: 1em 0;
-}
-
-.prose a {
-  color: #3b82f6;
-  text-decoration: underline;
-}
-
-.prose img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Tables */
-
-.prose table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 1em 0;
-}
-
-.prose th,
-.prose td {
-  border: 1px solid #e5e7eb;
-  padding: 0.5em;
-  text-align: left;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  --tw-bg-opacity: 1;
-  background-color: rgb(212 212 216 / var(--tw-bg-opacity, 1));
-}
-
-:is(.dark *)::-webkit-scrollbar-thumb {
-  --tw-bg-opacity: 1;
-  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
-}
-
-:is(.dark *)::-webkit-scrollbar-thumb:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
-}
-
-/* Busy Indicator */
+/* Busy indicator animation */
 
 @property --rotate {
   syntax: "<angle>";
@@ -1272,11 +1269,11 @@ pre[class*="language-"] {
   width: 100%;
   height: 100%;
   background-image: linear-gradient(
-    var(--rotate),
-    #5ddcff,
-    #f53ec7 43%,
-    #a162ff
-  );
+     var(--rotate),
+     #5ddcff,
+     #f53ec7 43%,
+     #a162ff
+   );
   position: absolute;
   z-index: -1;
   animation: spin 5.5s linear infinite;
@@ -1299,32 +1296,67 @@ pre[class*="language-"] {
   }
 }
 
+/* Dots animation */
+
 .dots-animation {
   display: inline-block;
-}
-
-.dots-animation .dot {
-  opacity: 0;
-  animation: dot-fade 1.4s infinite;
-  animation-fill-mode: forwards;
-}
-
-.dots-animation .dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dots-animation .dot:nth-child(3) {
-  animation-delay: 0.4s;
+  & .dot {
+    opacity: 0;
+    animation: dot-fade 1.4s infinite;
+    animation-fill-mode: forwards;
+  }
+  & .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  & .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
 }
 
 @keyframes dot-fade {
   0%,
-  100% {
+   100% {
     opacity: 0;
   }
 
   50% {
     opacity: 1;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+  * 6. Utility Classes
+  * ---------------------------------------------------------------------------*/
+
+/* Scrollbar styling */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  --tw-bg-opacity: 1;
+  background-color: rgb(212 212 216 / var(--tw-bg-opacity, 1));
+}
+
+:is(.dark *)::-webkit-scrollbar-thumb {
+  --tw-bg-opacity: 1;
+  background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  &:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
+  }
+  &:hover:is(.dark *) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
   }
 }
 
