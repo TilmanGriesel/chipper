@@ -150,7 +150,7 @@ export class ChatService {
   addMessage(role, content) {
     this.messages.push({ role, content });
 
-    console.info("----------Adding message----------");
+    console.info("---------- Adding message ----------");
     console.info("Added message:", {
       role,
       content,
@@ -158,7 +158,7 @@ export class ChatService {
     console.info("Current model:", this.currentModel);
     console.info("Current index:", this.currentIndex);
     console.info("Message history:", this.messages);
-    console.info("----------------------------------");
+    console.info("------------------------------------");
   }
 
   clearMessages() {
