@@ -34,7 +34,7 @@ export class MessageRenderer {
 
     const typeClasses = {
       user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
-      assistant: "bg-brand-a-100 dark:bg-brand-b-700 selection:bg-brand-a-300 selection:dark:bg-brand-b-800 assistant-message",
+      assistant: "bg-brand-a-100 dark:bg-brand-b-700 selection:bg-brand-a-300 selection:dark:bg-brand-b-800 assistant-message font-serif dark:font-sans",
       error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
       system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };

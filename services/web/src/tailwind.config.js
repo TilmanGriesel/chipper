@@ -2,6 +2,11 @@ module.exports = {
   darkMode: 'class',
   content: ["templates/*.html", "static/js/*.js"],
   theme: {
+    fontFamily: {
+      'sans': ['ui-sans-serif', 'system-ui'],
+      'serif': ['Lora', 'ui-serif', 'serif'],
+      'mono': ['Fira Code NF', 'ui-monospace'],
+    },
     extend: {
       colors: {
         'brand-a': {
