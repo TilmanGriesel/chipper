@@ -9,7 +9,7 @@ readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
-readonly SCRIPT_VERSION="1.1.0"
+readonly SCRIPT_VERSION="1.2.0"
 
 # common messages
 readonly WARN_CLEAN_PROMPT="⚠️  WARNING: This will delete all %s. Are you sure? [y/N] "

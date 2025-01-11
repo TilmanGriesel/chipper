@@ -2,9 +2,9 @@ x-healthcheck: &default-healthcheck
   interval: 5s
   retries: 10
 
-services:
-  # Base service configuration
-  ollama: &ollama-base
+# Base service configuration
+x-ollama: &ollama-base
+    hostname: ollama
     image: ollama/ollama:latest
     pull_policy: always
     tty: true
@@ -17,9 +17,8 @@ services:
       - ollama-data:/root/.ollama
     networks:
       - backend
-    profiles:
-      - cpu
 
+services:
   # NVIDIA GPU configuration
   ollama-nvidia:
     <<: *ollama-base
@@ -74,7 +73,7 @@ services:
     deploy:
       resources:
          limits:
-          memory: 16g
+          memory: 8g
 
 networks:
   frontend:

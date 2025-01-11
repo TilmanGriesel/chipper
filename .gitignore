@@ -30,3 +30,4 @@ output
 /docker/volumes
 /node_modules
 /docs/.vitepress/cache
+*.bak
