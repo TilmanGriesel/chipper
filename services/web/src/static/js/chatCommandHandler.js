@@ -1,10 +1,11 @@
 export class ChatCommandHandler {
-  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme, urlParamsHandler) {
+  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme, onToggleWide, urlParamsHandler) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
     this.onStreamChange = onStreamChange;
     this.onClear = onClear;
     this.onToggleTheme = onToggleTheme;
+    this.onToggleWide = onToggleWide;
     this.urlParamsHandler = urlParamsHandler;
   }
 
@@ -56,6 +57,14 @@ export class ChatCommandHandler {
         }
         return { type: "system", content: "Theme toggled" };
       },
+      "/wide": () => {
+        this.onToggleWide();
+        if (this.urlParamsHandler) {
+          const isWide = document.documentElement.classList.contains('wide-mode');
+          this.urlParamsHandler.updateURL('wide', isWide ? "1" : "0");
+        }
+        return { type: "system", content: "Wide mode toggled" };
+      },
     };
 
     const command = commands[parts[0]];
@@ -70,9 +79,10 @@ export class ChatCommandHandler {
   \`/stream [0/1]\` - Enable or disable response streaming
   \`/clear\` - Clear chat history
   \`/theme\` - Toggle theme
+  \`/wide\` - Toggle wide mode
   \`/help\` - Show this help message
   
   You can also set initial values using URL parameters:
-  \`?model=name&index=name&stream=1&theme=dark\``;
+  \`?model=name&index=name&stream=1&theme=dark&wide=1\``;
   }
 }

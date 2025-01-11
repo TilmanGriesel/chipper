@@ -35,12 +35,20 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.chatMessages.innerHTML = "";
     },
     () => uiManager.toggleTheme(),
+    () => uiManager.toggleWideMode(),
     null
   );
 
   urlParamsHandler = new URLParamsHandler(chatCommandHandler);
   chatCommandHandler.urlParamsHandler = urlParamsHandler;
 
+  if (localStorage.wideMode === 'true' || urlParamsHandler.getParam('wide') === '1') {
+    document.documentElement.classList.add('wide-mode');
+    const mainContainer = document.getElementById('main');
+    mainContainer.classList.remove('max-w-3xl');
+    mainContainer.classList.add('max-w-full');
+  }
+  
   urlParamsHandler.handleURLParams();
 
   elements.messageInput.addEventListener("keydown", (e) => {

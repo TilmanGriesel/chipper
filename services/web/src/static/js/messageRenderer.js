@@ -30,7 +30,7 @@ export class MessageRenderer {
     messageContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-4`;
 
     const messageDiv = document.createElement("div");
-    messageDiv.className = "message p-4 rounded-3xl min-w-48 max-w-3xl";
+    messageDiv.className = "message p-4 rounded-3xl min-w-48";
 
     const typeClasses = {
       user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
