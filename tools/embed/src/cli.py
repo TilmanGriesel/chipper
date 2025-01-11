@@ -26,15 +26,82 @@ def parse_args():
         type=str,
         nargs="+",
         default=[
+            # Text files
             ".txt",
             ".md",
-            ".py",
+            ".rst",
+            ".log",
+            ".csv",
+            ".json",
+            ".yaml",
+            ".yml",
+            # Web development
             ".html",
+            ".htm",
+            ".css",
             ".js",
+            ".jsx",
+            ".ts",
+            ".tsx",
+            ".php",
+            # Python
+            ".py",
+            ".pyx",
+            ".pyi",
+            ".ipynb",
+            # C/C++
+            ".c",
             ".cpp",
+            ".cc",
+            ".cxx",
+            ".h",
             ".hpp",
-            ".qml",
+            ".hxx",
+            # Java/Kotlin
+            ".java",
+            ".kt",
+            ".gradle",
+            # C#
+            ".cs",
+            ".csproj",
+            ".cshtml",
+            # Ruby
+            ".rb",
+            ".erb",
+            ".rake",
+            # Shell scripts
+            ".sh",
+            ".bash",
+            ".zsh",
+            # Windows scripts
+            ".bat",
+            ".cmd",
+            ".ps1",
+            ".vbs",
+            ".vbe",
+            ".js",
+            ".jse",
+            ".wsf",
+            ".wsh",
+            # Apple scripts
+            ".scpt",
+            ".scptd",
+            ".applescript",
+            # Configuration files
             ".xml",
+            ".ini",
+            ".conf",
+            ".cfg",
+            ".toml",
+            # QML/Qt
+            ".qml",
+            ".ui",
+            # Rust
+            ".rs",
+            # Go
+            ".go",
+            # Swift
+            ".swift",
         ],
         help="List of file extensions to process",
     )
