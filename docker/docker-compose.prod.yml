@@ -17,8 +17,7 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - backend
-      - frontend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -33,7 +32,7 @@ services:
       api:
         condition: service_healthy
     networks:
-      - frontend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
@@ -51,7 +50,7 @@ services:
       - nginx-proxy-data:/data
       - nginx-proxy-letsencrypt:/etc/letsencrypt
     networks:
-      - frontend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:81"]

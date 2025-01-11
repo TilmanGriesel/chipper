@@ -16,7 +16,7 @@ x-ollama: &ollama-base
     volumes:
       - ollama-data:/root/.ollama
     networks:
-      - backend
+      - default
 
 services:
   # NVIDIA GPU configuration
@@ -66,7 +66,7 @@ services:
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      - backend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
@@ -76,10 +76,8 @@ services:
           memory: 8g
 
 networks:
-  frontend:
-    name: frontend_network
-  backend:
-    name: backend_network
+  default:
+    name: chipper_network
 
 volumes:
   ollama-data:

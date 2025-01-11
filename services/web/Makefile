@@ -15,26 +15,37 @@ ifneq (,$(findstring MINGW,$(OS_TYPE)))
     export MSYS_NO_PATHCONV=1
 endif
 
+# Container engine detection
+CONTAINER_ENGINE := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+ifeq ($(CONTAINER_ENGINE),)
+    $(error No container engine found. Please install podman or docker)
+endif
+
+CONTAINER_CMD := $(shell basename $(CONTAINER_ENGINE))
+
+# Network configuration
+NETWORK = chipper_network
 
 build-dev:
-	docker build -f $(DEV_DOCKERFILE) -t $(IMAGE_NAME) .
+	$(CONTAINER_CMD) build -f $(DEV_DOCKERFILE) -t $(IMAGE_NAME) .
 
 run-dev:
-	docker run \
+	$(CONTAINER_CMD) run \
 		--rm  \
 		--name chipper-web-dev \
 		--env-file .env \
-		-v "$(CURDIR)/src:/app/src" \
+		-v "$(CURDIR)/src:/app/src:z" \
 		-p 21200:5000 \
 		--name $(CONTAINER_NAME) \
+		--network=$(NETWORK) \
 		$(IMAGE_NAME)
 
 stop-dev:
-	docker stop $(CONTAINER_NAME) || true
-	docker rm $(CONTAINER_NAME) || true
+	$(CONTAINER_CMD) stop $(CONTAINER_NAME) || true
+	$(CONTAINER_CMD) rm $(CONTAINER_NAME) || true
 
 clean-dev: stop-dev
-	docker rmi $(IMAGE_NAME) || true
+	$(CONTAINER_CMD) rmi $(IMAGE_NAME) || true
 
 dev: stop-dev build-dev run-dev
 
@@ -43,4 +54,3 @@ build-css:
 
 build-watch-css:
 	@cd $(WEB_BASE_DIR) && $(TAILWIND) -i $(CSS_INPUT) -o $(CSS_OUTPUT) --watch --config $(TAILWIND_CONFIG) || (echo "CSS watch failed"; exit 1)
-

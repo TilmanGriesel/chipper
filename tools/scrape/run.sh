@@ -18,6 +18,6 @@ docker build -t $IMAGE_NAME .
 
 docker run --rm \
     --name "${IMAGE_NAME}" \
-    -v "${PWD}/output:/app/data" \
+    -v "${PWD}/output:/app/data:z" \
     "${IMAGE_NAME}" \
     --base-url="${BASE_URL}" "$@"

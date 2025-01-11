@@ -63,9 +63,9 @@ for FILE in "${FILES[@]}"; do
     echo "Processing file: $FILE"
 
     docker run --rm --name chipper-transcribe --gpus all -it \
-        -v ${PWD}/models:/root/.cache/whisper \
-        -v ${PWD}/output:/output \
-        -v "$(dirname "$FILE"):/app" \
+        -v ${PWD}/models:/root/.cache/whisper:z \
+        -v ${PWD}/output:/output:z \
+        -v "$(dirname "$FILE"):/app:z" \
         ${IMAGE_NAME} whisper "/app/$(basename "$FILE")" --device cuda --model "$MODEL" --language "$LANGUAGE" --output_dir /output --output_format txt
 
 done

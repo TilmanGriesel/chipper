@@ -9,14 +9,18 @@ readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
-readonly SCRIPT_VERSION="1.2.0"
+readonly SCRIPT_VERSION="1.3.0"
+
+# Container engine configuration
+CONTAINER_ENGINE="${CONTAINER_ENGINE:-docker}"
 
 # common messages
 readonly WARN_CLEAN_PROMPT="⚠️  WARNING: This will delete all %s. Are you sure? [y/N] "
 readonly ERR_DIR_NOT_FOUND="Error: Directory '%s' not found"
 readonly ERR_CMD_NOT_FOUND="Error: '%s' is not available. Please install it and try again."
-readonly ERR_DOCKER_NOT_RUNNING="Error: Docker is not running. Please start Docker and try again."
+readonly ERR_ENGINE_NOT_RUNNING="Error: %s is not running. Please start %s and try again."
 readonly ERR_COMPOSE_FILE_NOT_FOUND="Error: Docker compose file '%s' not found"
+readonly ERR_INVALID_ENGINE="Error: Invalid container engine '%s'. Supported engines: docker, podman"
 
 function show_welcome() {
     printf "\n"
@@ -29,6 +33,7 @@ function show_welcome() {
     printf "           /_/   /_/                 \n"
     printf "\033[0m\n"
     printf "\033[34m        Chipper Run v%s\033[0m\n" "${SCRIPT_VERSION}"
+    printf "\033[34m        Using %s engine\033[0m\n" "${CONTAINER_ENGINE}"
     printf "\n"
 }
 
@@ -40,6 +45,7 @@ Usage: $0 <command> [args]
 
 Options:
   -f, --file         - Specify custom docker-compose file path
+  -e, --engine       - Specify container engine (docker|podman)
 
 Commands:
   up                  - Start containers in detached mode
@@ -96,21 +102,43 @@ function check_directory() {
     [ -d "$dir" ] || error_exit "$(printf "$ERR_DIR_NOT_FOUND" "$dir")"
 }
 
-function detect_docker_compose() {
-    if docker compose version >/dev/null 2>&1; then
-        echo "docker compose"
-    elif docker-compose version >/dev/null 2>&1; then
-        echo "docker-compose"
+function detect_compose_cmd() {
+    local engine="$1"
+    if [ "$engine" = "podman" ]; then
+        if podman-compose version >/dev/null 2>&1; then
+            echo "podman-compose"
+        else
+            error_exit "$(printf "$ERR_CMD_NOT_FOUND" "podman-compose")"
+        fi
     else
-        error_exit "Neither 'docker compose' nor 'docker-compose' is available"
+        if docker compose version >/dev/null 2>&1; then
+            echo "docker compose"
+        elif docker-compose version >/dev/null 2>&1; then
+            echo "docker-compose"
+        else
+            error_exit "Neither 'docker compose' nor 'docker-compose' is available"
+        fi
     fi
 }
 
-DOCKER_COMPOSE_CMD=$(detect_docker_compose)
+function validate_container_engine() {
+    case "$1" in
+        docker|podman)
+            return 0
+            ;;
+        *)
+            error_exit "$(printf "$ERR_INVALID_ENGINE" "$1")"
+            ;;
+    esac
+}
 
-function docker_compose_cmd() {
-    if [ "$DOCKER_COMPOSE_CMD" = "docker compose" ]; then
+COMPOSE_CMD=$(detect_compose_cmd "$CONTAINER_ENGINE")
+
+function compose_cmd() {
+    if [ "$COMPOSE_CMD" = "docker compose" ]; then
         docker compose "${COMPOSE_FILES[@]}" "$@"
+    elif [ "$COMPOSE_CMD" = "podman-compose" ]; then
+        podman-compose "${COMPOSE_FILES[@]}" "$@"
     else
         docker-compose "${COMPOSE_FILES[@]}" "$@"
     fi
@@ -154,18 +182,22 @@ function open_elasticvue() {
     open_url "$ELASTICVUE_URL"
 }
 
-function check_docker_running() {
-    docker info >/dev/null 2>&1 || error_exit "$ERR_DOCKER_NOT_RUNNING"
+function check_engine_running() {
+    if [ "$CONTAINER_ENGINE" = "podman" ]; then
+        podman info >/dev/null 2>&1 || error_exit "$(printf "$ERR_ENGINE_NOT_RUNNING" "Podman" "Podman")"
+    else
+        docker info >/dev/null 2>&1 || error_exit "$(printf "$ERR_ENGINE_NOT_RUNNING" "Docker" "Docker")"
+    fi
 }
 
-function docker_compose_down() {
+function compose_down() {
     echo "Stopping containers..."
-    docker_compose_cmd -p "$PROJECT_NAME" down --remove-orphans
+    compose_cmd -p "$PROJECT_NAME" down --remove-orphans
 }
 
-function docker_compose_down_clean() {
+function compose_down_clean() {
     echo "Stopping containers and removing volumes..."
-    docker_compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
+    compose_cmd -p "$PROJECT_NAME" down -v --remove-orphans
 }
 
 function clean_environment() {
@@ -179,7 +211,7 @@ function ensure_environment() {
 
 function clean_project_images() {
     echo "Removing project-related images..."
-    docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f
+    $CONTAINER_ENGINE images --filter "reference=$PROJECT_NAME*" -q | xargs -r $CONTAINER_ENGINE rmi -f
     echo "Project images cleaned"
 }
 
@@ -205,6 +237,12 @@ while [[ $# -gt 0 ]]; do
             COMPOSE_FILES+=(-f "$2")
             shift 2
             ;;
+        -e|--engine)
+            validate_container_engine "$2"
+            CONTAINER_ENGINE="$2"
+            COMPOSE_CMD=$(detect_compose_cmd "$CONTAINER_ENGINE")
+            shift 2
+            ;;
         *)
             break
             ;;
@@ -223,7 +261,8 @@ fi
 # pre-command dependency checks
 case "$1" in
     up|down|logs|ps|rebuild|clean-volumes|embed*|scrape)
-        check_docker_running
+        check_engine_running
+        check_dependency "$CONTAINER_ENGINE"
         ;;
     dev-api|dev-web)
         check_dependency make "Error: 'make' is required for development mode"
@@ -243,16 +282,16 @@ esac
 case "$1" in
     "up")
         ensure_environment
-        docker_compose_down
-        docker_compose_cmd -p "$PROJECT_NAME" up -d
+        compose_down
+        compose_cmd -p "$PROJECT_NAME" up -d
         print_local_url
         ;;
     "down")
-        docker_compose_down
+        compose_down
         ;;
     "rebuild")
         confirm_clean "containers and rebuild all images"
-        docker_compose_down
+        compose_down
     
         clean_project_images
         
@@ -260,19 +299,19 @@ case "$1" in
         ensure_environment
 
         echo "Rebuilding containers..."
-        docker_compose_cmd build --no-cache
+        compose_cmd build --no-cache
 
         echo "Starting containers..."
-        docker_compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
+        compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
         
         echo "Clean and rebuild complete!"
         print_local_url
         ;;
     "logs")
-        docker_compose_cmd -p "$PROJECT_NAME" logs -f
+        compose_cmd -p "$PROJECT_NAME" logs -f
         ;;
     "ps")
-        docker_compose_cmd -p "$PROJECT_NAME" ps
+        compose_cmd -p "$PROJECT_NAME" ps
         ;;
     "env")
         echo "Creating environment files..."
@@ -280,7 +319,7 @@ case "$1" in
         ;;
     "clean-full")
         confirm_clean "containers, volumes, environment files"
-        docker_compose_down_clean
+        compose_down_clean
         clean_project_images
         clean_environment
         ;;
@@ -288,7 +327,7 @@ case "$1" in
         confirm_clean "Docker volumes and volume directories"
         ensure_environment
 
-        docker_compose_down_clean
+        compose_down_clean
         
         echo "Cleaning up volume directories..."
         rm -rfv docker/volumes

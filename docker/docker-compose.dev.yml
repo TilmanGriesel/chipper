@@ -19,7 +19,7 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - backend
+      - default
 
   api:
     build:
@@ -33,8 +33,7 @@ services:
       elasticsearch:
         condition: service_healthy
     networks:
-      - backend
-      - frontend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -52,7 +51,7 @@ services:
       api:
         condition: service_healthy
     networks:
-      - frontend
+      - default
     healthcheck:
       <<: *default-healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
