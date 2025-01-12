@@ -86,6 +86,7 @@ export class ChatService {
     const reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
+    let isFirstChunk = true;
 
     try {
       while (true) {
@@ -112,7 +113,12 @@ export class ChatService {
               return;
             }
             if (data.chunk) {
-              onChunk(data.chunk);
+              // trim the first chunk to remove potential leading whitespace
+              const chunk = isFirstChunk ? data.chunk.trimLeft() : data.chunk;
+              if (chunk.length > 0) {
+                onChunk(chunk);
+                isFirstChunk = false;
+              }
             }
             if (data.done) break;
           } catch (parseError) {
@@ -141,7 +147,9 @@ export class ChatService {
     if (data.success && data.messages) {
       const lastMessage = data.messages[data.messages.length - 1];
       if (lastMessage.role === "assistant") {
-        onChunk(lastMessage.content);
+        // trim leading whitespace
+        const trimmedContent = lastMessage.content.trimLeft();
+        onChunk(trimmedContent);
         this.messages = data.messages;
       }
     }
