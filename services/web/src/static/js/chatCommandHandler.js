@@ -47,7 +47,7 @@ export class ChatCommandHandler {
       },
       "/clear": () => {
         this.onClear();
-        return { type: "system", content: "Chat history cleared" };
+        return { type: "system", content: null };
       },
       "/theme": () => {
         this.onToggleTheme();

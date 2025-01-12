@@ -93,12 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const commandResult = chatCommandHandler.handleCommand(message);
     if (commandResult) {
-      elements.chatMessages.appendChild(
-        messageRenderer.createMessageElement(
-          commandResult.content,
-          commandResult.type
-        ).container
-      );
+      if (commandResult.content) {
+        elements.chatMessages.appendChild(
+          messageRenderer.createMessageElement(
+            commandResult.content,
+            commandResult.type
+          ).container
+        );
+      }
       uiManager.updateMessageInput("");
       uiManager.scrollToBottomDesired();
       return;
