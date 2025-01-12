@@ -50,23 +50,31 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 - [x] Docker
 - [x] Improved Web UI with better mobile support
 - [x] Improve linting and formatting
-- [ ] React based web app
-- [ ] CI test
 - [x] Docker Hub registry images
+- [x] Edge inference TTS
+- [ ] Automated unit-tests
+- [ ] React based web app
 - [ ] Smart document chunking and embedding
 
 ---
 
-## Special Thanks
+## Acknowledgments
 
-A huge shoutout and heartfelt thanks to all the incredible projects that make Chipper possible:
+My sincere gratitude goes to the remarkable projects that have helped making Chipper a reality.
 
-- [Haystack](https://haystack.deepset.ai/) for providing the foundation for embedding and retrieval.
-- [Ollama](https://ollama.com/) for their amazing models and project.
-- [Hugging Face](https://huggingface.co/) for the ease of use.
-- [Elastic](https://www.elastic.co) and [Elasticvue](https://elasticvue.com/) for powering fast and efficient data retrieval.
-- [Docker](https://docker.com) for simplifying deployment and making setup a breeze.
-- [VitePress](https://vitepress.dev/), just the most lovely static site generator.
+- **[Haystack](https://haystack.deepset.ai/):**
+- **[Ollama](https://ollama.com/):**
+- **[Hugging Face](https://huggingface.co/):**
+- **[Elastic](https://www.elastic.co)**
+- **[Elasticvue](https://elasticvue.com/):**
+- **[Docker](https://docker.com):**
+- **[VitePress](https://vitepress.dev/):**
+- **[Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx):**
+- **[Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main):**
+
+---
+
+This revision maintains professionalism while expressing gratitude and clearly attributing contributions.
 
 These projects are the backbone of Chipper, and their contributions inspire endless possibilities.
 

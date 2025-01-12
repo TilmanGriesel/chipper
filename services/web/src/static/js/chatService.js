@@ -120,7 +120,20 @@ export class ChatService {
                 isFirstChunk = false;
               }
             }
-            if (data.done) break;
+            if (data.done) {
+              const ttsText = data.full_response.llm.replies[0];
+              console.log(ttsText);
+              window.postMessage(
+                {
+                  type: "tts-message",
+                  text: ttsText,
+                  sid: 0,
+                  speed: 1,
+                },
+                "*"
+              );
+              break;
+            }
           } catch (parseError) {
             console.error("Failed to parse JSON:", parseError);
           }

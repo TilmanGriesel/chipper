@@ -6,7 +6,8 @@ export class ChatCommandHandler {
     onClear,
     onToggleTheme,
     onToggleWide,
-    urlParamsHandler
+    urlParamsHandler,
+    onToggleTTS
   ) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
@@ -15,6 +16,7 @@ export class ChatCommandHandler {
     this.onToggleTheme = onToggleTheme;
     this.onToggleWide = onToggleWide;
     this.urlParamsHandler = urlParamsHandler;
+    this.onToggleTTS = onToggleTTS;
   }
 
   handleCommand(message) {
@@ -74,6 +76,21 @@ export class ChatCommandHandler {
         }
         return { type: "system", content: "Wide mode toggled" };
       },
+      "/tts": () => {
+        const value = parts[1] || "true";
+        const enabled = value === "true" || value === "1" || value === "on";
+        this.onToggleTTS(enabled);
+        return {
+          type: "system",
+          content: `Text-to-speech is \`${enabled ? "on" : "off"}\`\n${
+            enabled
+              ? "> **Note:** A TTS model (90 MByte) will be downloaded and client side Wasm inference will be initialized. This may temporarily causes lags. "
+              + "There is also no indication on the TTS inference status in the UI, watch the logs for more information. "
+              + "The client side TTS is considered very experimental."
+              : ""
+          }`,
+        };
+      },
     };
 
     const command = commands[parts[0]];
@@ -89,9 +106,11 @@ export class ChatCommandHandler {
   \`/clear\` - Clear chat history
   \`/theme\` - Toggle theme
   \`/wide\` - Toggle wide mode
+  \`/tts [on/off]\` - Toggle client side Wasm TTS (Beta)
   \`/help\` - Show this help message
   
   You can also set initial values using URL parameters:
   \`?model=name&index=name&stream=1&theme=dark&wide=1\``;
   }
 }
+0

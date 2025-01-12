@@ -2,23 +2,21 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
-    <link href="static/favicon//favicon-96x96.png" rel="icon" sizes="96x96" type="image/png" />
-    <link href="static/favicon/favicon.svg" rel="icon" type="image/svg+xml" />
-    <link href="static/favicon/favicon.ico" rel="shortcut icon" />
-    <link href="static/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
-    <meta content="Chipper" name="apple-mobile-web-app-title" />
-    <link href="static/site.webmanifest" rel="manifest" />
+    <link href="static/favicon//favicon-96x96.png" rel="icon" sizes="96x96" type="image/png">
+    <link href="static/favicon/favicon.svg" rel="icon" type="image/svg+xml">
+    <link href="static/favicon/favicon.ico" rel="shortcut icon">
+    <link href="static/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
+    <meta content="Chipper" name="apple-mobile-web-app-title">
+    <link href="static/site.webmanifest" rel="manifest">
     <script src="static/vendor/marked.min_9_1_6.js"></script>
     <script src="static/vendor/prism.js"></script>
-
-    <link href="static/vendor/prism.css" rel="stylesheet" />
-    <link href="static/vendor/prism-atom-dark.css" rel="stylesheet" />
-    <link href="static/dist/index.css" rel="stylesheet" />
-
+    <link href="static/vendor/prism.css" rel="stylesheet">
+    <link href="static/vendor/prism-atom-dark.css" rel="stylesheet">
+    <link href="static/dist/index.css" rel="stylesheet">
     <link rel="preload" href="/static/font/FiraCodeNerdFont-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="/static/font/JustAnotherHand-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="/static/font/Kalam-Light.ttf" as="font" type="font/ttf" crossorigin>
@@ -36,29 +34,29 @@
                 <div class="flex flex-1 items-center justify-between">
                     <div class="flex items-center space-x-2">
                         <span class="text-2xl font-normal text-brand-a-900 dark:text-brand-b-100">
-                            <a class="chipper-font" href="https://chipper.tilmangriesel.com/"
-                                target="_blank">Chipper</a>
+                            <a class="chipper-font" href="https://chipper.tilmangriesel.com/" target="_blank">Chipper
+                            </a>
                         </span>
                     </div>
-                    <!-- theme toggle button -->
-                    <button aria-label="Toggle dark mode"
-                        class="inline-flex items-center justify-center rounded-full p-2.5 text-brand-a-700 hover:bg-brand-a-100 dark:text-brand-b-200 dark:hover:bg-brand-b-800"
-                        id="theme-button">
-                        <svg class="w-5 h-5" fill="none" id="theme-toggle-icon" stroke="currentColor" stroke-width="1.5"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                        </svg>
-                    </button>
+                    <div class="flex-row">
+                        <!-- theme toggle button -->
+                        <button aria-label="Toggle dark mode"
+                            class="inline-flex items-center justify-center rounded-full p-2.5 text-brand-a-700 hover:bg-brand-a-100 dark:text-brand-b-200 dark:hover:bg-brand-b-800"
+                            id="theme-button">
+                            <svg class="w-5 h-5" fill="none" id="theme-toggle-icon" stroke="currentColor"
+                                stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
-
         <!-- message container -->
         <div class="flex-1 min-h-0 mb-2">
             <div class="relative h-full flex flex-col">
-                <div class="off absolute -inset-1 rounded-3xl blur-xl" id="busy-indicator">
-                </div>
+                <div class="off absolute -inset-1 rounded-3xl blur-xl" id="busy-indicator"></div>
                 <!-- welcome message -->
                 <div class="absolute inset-0 flex items-center justify-center flex-col p-6 pointer-events-none z-10 opacity-90"
                     id="welcome-message">
@@ -76,15 +74,13 @@
                 </div>
             </div>
         </div>
-        
         <!-- user input -->
         <div
             class="flex-none bg-white dark:bg-brand-b-800 ring-1 ring-brand-a-900/5 dark:ring-brand-b-100/10 rounded-3xl p-3">
             <div class="flex space-x-2">
                 <textarea
-                class="max-h-72 min-h-12 h-12 flex-1 border dark:border-brand-b-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-b-900 dark:focus:ring-brand-b-100 resize-none overflow-y-auto bg-white dark:bg-brand-b-700 text-brand-a-900 dark:text-brand-b-100 selection:bg-brand-b-400 selection:dark:bg-brand-b-600 touch-manipulation"
-                enterkeyhint="send" id="message-input" placeholder="Message Chipper"
-                rows="1"></textarea>
+                    class="max-h-72 min-h-12 h-12 flex-1 border dark:border-brand-b-600 rounded-2xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-b-900 dark:focus:ring-brand-b-100 resize-none overflow-y-auto bg-white dark:bg-brand-b-700 text-brand-a-900 dark:text-brand-b-100 selection:bg-brand-b-400 selection:dark:bg-brand-b-600 touch-manipulation"
+                    enterkeyhint="send" id="message-input" placeholder="Message Chipper" rows="1"></textarea>
                 <button
                     class="max-h-12 px-3 py-3 bg-brand-b-900 dark:bg-brand-b-100 text-white dark:text-brand-b-900 rounded-full hover:bg-brand-b-800 dark:hover:bg-brand-b-200 focus:outline-none focus:ring-1 focus:ring-brand-b-900 dark:focus:ring-brand-b-100 touch-manipulation transition-all duration-200"
                     data-state="send" id="send-button">
@@ -102,10 +98,10 @@
                     </svg>
                 </button>
             </div>
-
         </div>
     </div>
     <script src="static/js/main.js" type="module"></script>
+    <div id="tts-container" style="visibility: hidden; height: 0; width: 0"></div>
 </body>
 
 </html>

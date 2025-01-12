@@ -4,6 +4,7 @@ import { URLParamsHandler } from "./urlParamsHandler.js";
 import { UIManager } from "./uiManager.js";
 import { ChatService } from "./chatService.js";
 import InputHistoryManager from "./inputHistoryManager.js";
+import { TTSManager } from "./ttsManager.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const elements = {
@@ -24,6 +25,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const messageRenderer = new MessageRenderer();
   const chatService = new ChatService();
   const uiManager = new UIManager(elements);
+  const ttsManager = new TTSManager({});
+
+  const handleTTSToggle = (enabled) => {
+    if (enabled) {
+      ttsManager.init().catch(error => {
+        console.error('Failed to initialize TTS:', error);
+      });
+    } else {
+      ttsManager.destroy();
+    }
+  };
 
   let urlParamsHandler;
   const chatCommandHandler = new ChatCommandHandler(
@@ -36,7 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     () => uiManager.toggleTheme(),
     () => uiManager.toggleWideMode(),
-    null
+    null,
+    handleTTSToggle
   );
 
   urlParamsHandler = new URLParamsHandler(chatCommandHandler);
