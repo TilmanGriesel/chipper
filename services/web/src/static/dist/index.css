@@ -1184,7 +1184,7 @@ pre[class*="language-"] {
     Consolas, monospace;
 }
 
-code {
+code:not([class*="language-"]) {
   border-radius: 0.375rem;
   --tw-bg-opacity: 1;
   background-color: rgb(221 193 177 / var(--tw-bg-opacity, 1));
@@ -1194,7 +1194,7 @@ code {
   padding-right: 0.25rem;
 }
 
-code:is(.dark *) {
+code:not([class*="language-"]):is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(39 39 42 / var(--tw-bg-opacity, 1));
 }

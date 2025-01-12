@@ -202,7 +202,7 @@ pre[class*="language-"] {
     Consolas, monospace;
 }
 
-code {
+code:not([class*="language-"]) {
   @apply bg-brand-a-300 dark:bg-brand-b-800 rounded-md py-0.5 px-1;
 }
 
