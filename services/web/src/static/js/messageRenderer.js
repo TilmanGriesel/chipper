@@ -25,7 +25,7 @@ export class MessageRenderer {
     });
   }
 
-  createMessageElement(content, type = "assistant", isThinking = false, includeHeader = false) {
+  createMessageElement(content, type = "assistant", assistantIsBusy = false, includeHeader = false) {
     const messageContainer = document.createElement("div");
     messageContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-4`;
 
@@ -34,7 +34,7 @@ export class MessageRenderer {
 
     const typeClasses = {
       user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
-      assistant: "bg-brand-a-100 dark:bg-brand-b-700 selection:bg-brand-a-300 selection:dark:bg-brand-b-800 assistant-message font-serif dark:font-sans",
+      assistant: "bg-brand-a-100 dark:bg-brand-b-700 assistant-message font-serif dark:font-sans",
       error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
       system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
@@ -51,7 +51,7 @@ export class MessageRenderer {
 
     const contentDiv = document.createElement("div");
 
-    if (isThinking) {
+    if (assistantIsBusy) {
       contentDiv.className = "message dots-animation ml-1 flex items-center space-x-2";
       const thinkingText = document.createElement("span");
       thinkingText.textContent = "Chipper is thinking";
