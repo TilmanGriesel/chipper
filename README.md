@@ -60,8 +60,6 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 
 ## Acknowledgments
 
-My sincere gratitude goes to the remarkable projects that have helped making Chipper a reality.
-
 - [Haystack](https://haystack.deepset.ai/)
 - [Ollama](https://ollama.com/)
 - [Hugging Face](https://huggingface.co/)
@@ -71,12 +69,6 @@ My sincere gratitude goes to the remarkable projects that have helped making Chi
 - [VitePress](https://vitepress.dev/)
 - [Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx)
 - [Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main)
-
----
-
-This revision maintains professionalism while expressing gratitude and clearly attributing contributions.
-
-These projects are the backbone of Chipper, and their contributions inspire endless possibilities.
 
 ## Star History
 
