@@ -3,7 +3,4 @@
 *.png binary
 *.gif binary
 *.ttf binary
-
-# Git config
-# git config core.eol lf
-# git config core.autocrlf input
+*.data filter=lfs diff=lfs merge=lfs -text

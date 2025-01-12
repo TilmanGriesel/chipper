@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.DOCKER_API_KEY }}
 
       - name: Pull TTS Model
-        run: ./services/web/scripts/pull_tts_model.sh
+        run: python ./services/web/scripts/pull_tts_assets.py
 
       - name: Build and Push API Image
         run: |

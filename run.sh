@@ -207,7 +207,7 @@ function clean_environment() {
 
 function pull_assets() {
     echo "Pulling additional assets..."
-    ./services/web/scripts/pull_tts_model.sh
+    python ./services/web/scripts/pull_tts_assets.py
 }
 
 function ensure_environment() {
