@@ -62,15 +62,15 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 
 My sincere gratitude goes to the remarkable projects that have helped making Chipper a reality.
 
-- **[Haystack](https://haystack.deepset.ai/):**
-- **[Ollama](https://ollama.com/):**
-- **[Hugging Face](https://huggingface.co/):**
-- **[Elastic](https://www.elastic.co)**
-- **[Elasticvue](https://elasticvue.com/):**
-- **[Docker](https://docker.com):**
-- **[VitePress](https://vitepress.dev/):**
-- **[Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx):**
-- **[Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main):**
+- [Haystack](https://haystack.deepset.ai/)
+- [Ollama](https://ollama.com/)
+- [Hugging Face](https://huggingface.co/)
+- [Elastic](https://www.elastic.co)
+- [Elasticvue](https://elasticvue.com/)
+- [Docker](https://docker.com)
+- [VitePress](https://vitepress.dev/)
+- [Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx)
+- [Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main)
 
 ---
 
