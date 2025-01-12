@@ -42,13 +42,16 @@ document.addEventListener("DOMContentLoaded", () => {
   urlParamsHandler = new URLParamsHandler(chatCommandHandler);
   chatCommandHandler.urlParamsHandler = urlParamsHandler;
 
-  if (localStorage.wideMode === 'true' || urlParamsHandler.getParam('wide') === '1') {
-    document.documentElement.classList.add('wide-mode');
-    const mainContainer = document.getElementById('main');
-    mainContainer.classList.remove('max-w-3xl');
-    mainContainer.classList.add('max-w-full');
+  if (
+    localStorage.wideMode === "true" ||
+    urlParamsHandler.getParam("wide") === "1"
+  ) {
+    document.documentElement.classList.add("wide-mode");
+    const mainContainer = document.getElementById("main");
+    mainContainer.classList.remove("max-w-3xl");
+    mainContainer.classList.add("max-w-full");
   }
-  
+
   urlParamsHandler.handleURLParams();
 
   elements.messageInput.addEventListener("keydown", (e) => {
@@ -62,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           elements.messageInput.selectionStart =
             elements.messageInput.selectionEnd =
-            elements.messageInput.value.length;
+              elements.messageInput.value.length;
         }, 0);
       }
     }
@@ -75,20 +78,20 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           elements.messageInput.selectionStart =
             elements.messageInput.selectionEnd =
-            elements.messageInput.value.length;
+              elements.messageInput.value.length;
         }, 0);
       }
     }
   });
 
-  uiManager.updateGreeting()
+  uiManager.updateGreeting();
 
   // message send handling
   async function sendMessage() {
     const message = elements.messageInput.value.trim();
     if (!message) return;
 
-    elements.welcomeMessage.classList.add('hidden');
+    elements.welcomeMessage.classList.add("hidden");
     historyManager.addToHistory(message);
 
     const commandResult = chatCommandHandler.handleCommand(message);
@@ -102,14 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
       uiManager.updateMessageInput("");
-      uiManager.scrollToBottomDesired();
+      uiManager.scrollToBottomDesired(true, true);
       return;
     }
 
     const userMessage = messageRenderer.createMessageElement(message, "user");
     elements.chatMessages.appendChild(userMessage.container);
     uiManager.updateMessageInput("");
-    uiManager.scrollToBottomDesired();
+    uiManager.scrollToBottomDesired(true, true);
 
     uiManager.setBusy(true);
     chatService.addMessage("user", message);
@@ -126,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       await chatService.sendMessage(
         (chunk) => {
-          if (outputDiv.classList.contains('dots-animation')) {
+          if (outputDiv.classList.contains("dots-animation")) {
             const newContentDiv = document.createElement("div");
             outputDiv.parentNode.replaceChild(newContentDiv, outputDiv);
             outputDiv = newContentDiv;
@@ -138,9 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
           uiManager.scrollToBottomDesired();
         },
         (error) => {
-          if (error !== 'AbortError') {
+          if (error !== "AbortError") {
             elements.chatMessages.appendChild(
-              messageRenderer.createMessageElement(`${error}`, "error").container
+              messageRenderer.createMessageElement(`${error}`, "error")
+                .container
             );
             uiManager.scrollToBottomDesired();
           }
@@ -181,18 +185,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   elements.sendButton.addEventListener("click", sendMessage);
 
-  elements.messageInput.addEventListener("input", () => uiManager.scrollToBottomDesired());
-  elements.messageInput.addEventListener("focus", () => uiManager.scrollToBottomDesired());
-  elements.messageInput.addEventListener("blur", () => uiManager.scrollToBottomDesired());
-  elements.messageInput.addEventListener('touchstart', () => uiManager.scrollToBottomDesired());
-  elements.messageInput.addEventListener('click', () => uiManager.scrollToBottomDesired());
+  elements.messageInput.addEventListener("input", () =>
+    uiManager.scrollToBottomDesired()
+  );
+  elements.messageInput.addEventListener("focus", () =>
+    uiManager.scrollToBottomDesired()
+  );
+  elements.messageInput.addEventListener("blur", () =>
+    uiManager.scrollToBottomDesired()
+  );
+  elements.messageInput.addEventListener("touchstart", () =>
+    uiManager.scrollToBottomDesired()
+  );
+  elements.messageInput.addEventListener("click", () =>
+    uiManager.scrollToBottomDesired()
+  );
 
   elements.themeButton.addEventListener("click", uiManager.toggleTheme);
 
   // theme handling
-  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark')
+  if (
+    localStorage.theme === "dark" ||
+    (!("theme" in localStorage) &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+  ) {
+    document.documentElement.classList.add("dark");
   } else {
-    document.documentElement.classList.remove('dark')
+    document.documentElement.classList.remove("dark");
   }
 });

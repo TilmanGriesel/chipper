@@ -1,5 +1,13 @@
 export class ChatCommandHandler {
-  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme, onToggleWide, urlParamsHandler) {
+  constructor(
+    onModelChange,
+    onIndexChange,
+    onStreamChange,
+    onClear,
+    onToggleTheme,
+    onToggleWide,
+    urlParamsHandler
+  ) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
     this.onStreamChange = onStreamChange;
@@ -21,7 +29,7 @@ export class ChatCommandHandler {
         const model = parts[1] || null;
         this.onModelChange(model);
         if (this.urlParamsHandler) {
-          this.urlParamsHandler.updateURL('model', model);
+          this.urlParamsHandler.updateURL("model", model);
         }
         return { type: "system", content: `Model set to: \`${model}\`` };
       },
@@ -29,7 +37,7 @@ export class ChatCommandHandler {
         const index = parts[1] || null;
         this.onIndexChange(index);
         if (this.urlParamsHandler) {
-          this.urlParamsHandler.updateURL('index', index);
+          this.urlParamsHandler.updateURL("index", index);
         }
         return { type: "system", content: `Index set to: \`${index}\`` };
       },
@@ -38,7 +46,7 @@ export class ChatCommandHandler {
         const enabled = value === "true" || value === "1";
         this.onStreamChange(enabled);
         if (this.urlParamsHandler) {
-          this.urlParamsHandler.updateURL('stream', enabled ? "1" : "0");
+          this.urlParamsHandler.updateURL("stream", enabled ? "1" : "0");
         }
         return {
           type: "system",
@@ -52,16 +60,17 @@ export class ChatCommandHandler {
       "/theme": () => {
         this.onToggleTheme();
         if (this.urlParamsHandler) {
-          const isDark = document.documentElement.classList.contains('dark');
-          this.urlParamsHandler.updateURL('theme', isDark ? 'dark' : 'light');
+          const isDark = document.documentElement.classList.contains("dark");
+          this.urlParamsHandler.updateURL("theme", isDark ? "dark" : "light");
         }
         return { type: "system", content: "Theme toggled" };
       },
       "/wide": () => {
         this.onToggleWide();
         if (this.urlParamsHandler) {
-          const isWide = document.documentElement.classList.contains('wide-mode');
-          this.urlParamsHandler.updateURL('wide', isWide ? "1" : "0");
+          const isWide =
+            document.documentElement.classList.contains("wide-mode");
+          this.urlParamsHandler.updateURL("wide", isWide ? "1" : "0");
         }
         return { type: "system", content: "Wide mode toggled" };
       },

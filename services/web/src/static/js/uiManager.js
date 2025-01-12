@@ -39,17 +39,20 @@ export class UIManager {
     input.style.height = input.scrollHeight + "px";
   }
 
-  scrollToBottomDesired(immediate = true) {
-    // only scroll if user has not manually scrolled aka. inspecting the feed
-    if (this.userIsInspecting) return;
-
+  scrollToBottomDesired(immediate = true, force = false) {
+    if (this.userIsInspecting && !force) return;
+  
+    const container = this.elements.chatMessages;
+    if (!container) return;
+  
     const scroll = () => {
-      const container = this.elements.chatMessages;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: immediate ? 'auto' : 'smooth'
+      });
     };
-    immediate ? scroll() : setTimeout(scroll, 200);
+  
+    scroll();
   }
 
   setBusy(busy) {
@@ -104,20 +107,20 @@ export class UIManager {
   }
 
   toggleWideMode() {
-    const mainContainer = document.getElementById('main');
-    if (document.documentElement.classList.contains('wide-mode')) {
-      document.documentElement.classList.remove('wide-mode');
-      mainContainer.classList.remove('max-w-full');
-      mainContainer.classList.add('max-w-3xl');
-      localStorage.wideMode = 'false';
+    const mainContainer = document.getElementById("main");
+    if (document.documentElement.classList.contains("wide-mode")) {
+      document.documentElement.classList.remove("wide-mode");
+      mainContainer.classList.remove("max-w-full");
+      mainContainer.classList.add("max-w-3xl");
+      localStorage.wideMode = "false";
     } else {
-      document.documentElement.classList.add('wide-mode');
-      mainContainer.classList.remove('max-w-3xl');
-      mainContainer.classList.add('max-w-full');
-      localStorage.wideMode = 'true';
+      document.documentElement.classList.add("wide-mode");
+      mainContainer.classList.remove("max-w-3xl");
+      mainContainer.classList.add("max-w-full");
+      localStorage.wideMode = "true";
     }
   }
-  
+
   isInProcessingState() {
     return this.isProcessing;
   }

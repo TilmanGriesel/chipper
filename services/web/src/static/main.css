@@ -104,6 +104,7 @@ button {
 html,
 body {
   overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
 }
 
 /* -----------------------------------------------------------------------------
@@ -203,7 +204,7 @@ pre[class*="language-"] {
 }
 
 code:not([class*="language-"]) {
-  @apply bg-brand-a-300 dark:bg-brand-b-800 rounded-md py-0.5 px-1;
+  @apply bg-brand-a-300 dark:bg-brand-b-800 rounded-md p-1;
 }
 
 /* -----------------------------------------------------------------------------

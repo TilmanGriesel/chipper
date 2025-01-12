@@ -2,16 +2,16 @@ export class URLParamsHandler {
   constructor(chatCommandHandler) {
     this.chatCommandHandler = chatCommandHandler;
     this.supportedParams = {
-      model: '/model',
-      index: '/index',
-      stream: '/stream',
-      theme: '/theme'
+      model: "/model",
+      index: "/index",
+      stream: "/stream",
+      theme: "/theme",
     };
   }
 
   handleURLParams() {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     for (const [param, command] of Object.entries(this.supportedParams)) {
       const value = urlParams.get(param);
       if (value !== null) {
@@ -28,11 +28,11 @@ export class URLParamsHandler {
 
   updateURL(param, value) {
     const url = new URL(window.location);
-    if (value === null || value === '') {
+    if (value === null || value === "") {
       url.searchParams.delete(param);
     } else {
       url.searchParams.set(param, value);
     }
-    window.history.replaceState({}, '', url);
+    window.history.replaceState({}, "", url);
   }
 }
