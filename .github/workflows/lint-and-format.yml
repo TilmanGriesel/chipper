@@ -5,20 +5,31 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  pre-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.12
+          
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
       - name: Install dependencies
         run: |
-          pip install black isort flake8
-      - name: Run Black
-        run: black --check .
-      - name: Run isort
-        run: isort --check-only .
-      - name: Run Flake8
-        run: flake8 .
+          python -m pip install --upgrade pip
+          pip install pre-commit
+          
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          
+      - name: Run pre-commit
+        run: pre-commit run --all-files
