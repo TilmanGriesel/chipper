@@ -28,9 +28,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_API_KEY }}
 
-      - name: Pull TTS Model
-        run: python ./services/web/scripts/pull_tts_assets.py
-
       - name: Build and Push API Image
         run: |
           docker build \

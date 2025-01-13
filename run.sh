@@ -205,14 +205,8 @@ function clean_environment() {
     python setup.py --clean
 }
 
-function pull_assets() {
-    echo "Pulling additional assets..."
-    python ./services/web/scripts/pull_tts_assets.py
-}
-
 function ensure_environment() {
     python setup.py
-    pull_assets
 }
 
 function clean_project_images() {
