@@ -33,13 +33,18 @@ repos:
     rev: v4.4.0
     hooks:
       - id: trailing-whitespace
+        stages: [pre-commit]
         exclude: ^services/web/src/static/vendor/
       - id: end-of-file-fixer
+        stages: [pre-commit]
         exclude: ^services/web/src/static/vendor/
       - id: check-yaml
+        stages: [pre-commit]
         exclude: ^services/web/src/static/vendor/
       - id: check-json
+        stages: [pre-commit]
         exclude: ^services/web/src/static/vendor/
       - id: mixed-line-ending
+        stages: [pre-commit]
         exclude: ^services/web/src/static/vendor/
         args: [--fix=lf]

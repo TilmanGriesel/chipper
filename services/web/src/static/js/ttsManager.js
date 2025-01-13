@@ -38,11 +38,7 @@ export class TTSManager {
       queueLength: this.messageQueue.length,
       hasFrame: !!this.ttsIframeElement,
     };
-    this.log(
-      "Queue status check",
-      status,
-      status.queueLength > 0 ? "warn" : "info",
-    );
+    this.log("Queue status check", status, status.queueLength > 0 ? "warn" : "info");
     return status;
   }
 
@@ -70,9 +66,7 @@ export class TTSManager {
     window.addEventListener("message", this.handleMessage);
 
     if (this.initPromise) {
-      this.log(
-        "Initialization already in progress, returning existing promise",
-      );
+      this.log("Initialization already in progress, returning existing promise");
       return this.initPromise;
     }
 
@@ -143,10 +137,7 @@ export class TTSManager {
       return;
     }
 
-    if (
-      !this.ttsIframeElement ||
-      event.source !== this.ttsIframeElement.contentWindow
-    ) {
+    if (!this.ttsIframeElement || event.source !== this.ttsIframeElement.contentWindow) {
       this.log("Ignoring message from unknown source");
       return;
     }
@@ -174,11 +165,7 @@ export class TTSManager {
         const wasProcessing = this.isProcessing;
         this.isProcessing = false;
         if (!wasProcessing) {
-          this.log(
-            "Warning: Received complete event while not processing",
-            null,
-            "warn",
-          );
+          this.log("Warning: Received complete event while not processing", null, "warn");
         }
         // TODO: tts-complete does not handle playback time; playback complete event yet, overlap will happen.
         this.processMessageQueue();

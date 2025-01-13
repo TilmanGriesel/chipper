@@ -18,9 +18,7 @@ export class UIManager {
 
     container.addEventListener("scroll", () => {
       const isScrollingUp = container.scrollTop < lastScrollTop;
-      const isNotAtBottom =
-        container.scrollTop + container.clientHeight <
-        container.scrollHeight - 10;
+      const isNotAtBottom = container.scrollTop + container.clientHeight < container.scrollHeight - 10;
 
       if (isScrollingUp || isNotAtBottom) {
         this.userIsInspecting = true;

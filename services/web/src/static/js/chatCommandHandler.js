@@ -1,14 +1,5 @@
 export class ChatCommandHandler {
-  constructor(
-    onModelChange,
-    onIndexChange,
-    onStreamChange,
-    onClear,
-    onToggleTheme,
-    onToggleWide,
-    urlParamsHandler,
-    onToggleTTS,
-  ) {
+  constructor(onModelChange, onIndexChange, onStreamChange, onClear, onToggleTheme, onToggleWide, urlParamsHandler, onToggleTTS) {
     this.onModelChange = onModelChange;
     this.onIndexChange = onIndexChange;
     this.onStreamChange = onStreamChange;
@@ -70,8 +61,7 @@ export class ChatCommandHandler {
       "/wide": () => {
         this.onToggleWide();
         if (this.urlParamsHandler) {
-          const isWide =
-            document.documentElement.classList.contains("wide-mode");
+          const isWide = document.documentElement.classList.contains("wide-mode");
           this.urlParamsHandler.updateURL("wide", isWide ? "1" : "0");
         }
         return { type: "system", content: "Wide mode toggled" };

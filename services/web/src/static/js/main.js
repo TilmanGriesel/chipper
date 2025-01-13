@@ -55,10 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   urlParamsHandler = new URLParamsHandler(chatCommandHandler);
   chatCommandHandler.urlParamsHandler = urlParamsHandler;
 
-  if (
-    localStorage.wideMode === "true" ||
-    urlParamsHandler.getParam("wide") === "1"
-  ) {
+  if (localStorage.wideMode === "true" || urlParamsHandler.getParam("wide") === "1") {
     document.documentElement.classList.add("wide-mode");
     const mainContainer = document.getElementById("main");
     mainContainer.classList.remove("max-w-3xl");
@@ -70,15 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.messageInput.addEventListener("keydown", (e) => {
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      const previousMessage = historyManager.navigateBack(
-        elements.messageInput.value,
-      );
+      const previousMessage = historyManager.navigateBack(elements.messageInput.value);
       if (previousMessage !== null) {
         uiManager.updateMessageInput(previousMessage);
         setTimeout(() => {
-          elements.messageInput.selectionStart =
-            elements.messageInput.selectionEnd =
-              elements.messageInput.value.length;
+          elements.messageInput.selectionStart = elements.messageInput.selectionEnd = elements.messageInput.value.length;
         }, 0);
       }
     }
@@ -89,9 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (nextMessage !== null) {
         uiManager.updateMessageInput(nextMessage);
         setTimeout(() => {
-          elements.messageInput.selectionStart =
-            elements.messageInput.selectionEnd =
-              elements.messageInput.value.length;
+          elements.messageInput.selectionStart = elements.messageInput.selectionEnd = elements.messageInput.value.length;
         }, 0);
       }
     }
@@ -110,12 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const commandResult = chatCommandHandler.handleCommand(message);
     if (commandResult) {
       if (commandResult.content) {
-        elements.chatMessages.appendChild(
-          messageRenderer.createMessageElement(
-            commandResult.content,
-            commandResult.type,
-          ).container,
-        );
+        elements.chatMessages.appendChild(messageRenderer.createMessageElement(commandResult.content, commandResult.type).container);
       }
       uiManager.updateMessageInput("");
       uiManager.scrollToBottomDesired(true, true);
@@ -155,10 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (error) => {
           if (error !== "AbortError") {
-            elements.chatMessages.appendChild(
-              messageRenderer.createMessageElement(`${error}`, "error")
-                .container,
-            );
+            elements.chatMessages.appendChild(messageRenderer.createMessageElement(`${error}`, "error").container);
             uiManager.scrollToBottomDesired();
           }
         },
@@ -198,30 +181,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   elements.sendButton.addEventListener("click", sendMessage);
 
-  elements.messageInput.addEventListener("input", () =>
-    uiManager.scrollToBottomDesired(),
-  );
-  elements.messageInput.addEventListener("focus", () =>
-    uiManager.scrollToBottomDesired(),
-  );
-  elements.messageInput.addEventListener("blur", () =>
-    uiManager.scrollToBottomDesired(),
-  );
-  elements.messageInput.addEventListener("touchstart", () =>
-    uiManager.scrollToBottomDesired(),
-  );
-  elements.messageInput.addEventListener("click", () =>
-    uiManager.scrollToBottomDesired(),
-  );
+  elements.messageInput.addEventListener("input", () => uiManager.scrollToBottomDesired());
+  elements.messageInput.addEventListener("focus", () => uiManager.scrollToBottomDesired());
+  elements.messageInput.addEventListener("blur", () => uiManager.scrollToBottomDesired());
+  elements.messageInput.addEventListener("touchstart", () => uiManager.scrollToBottomDesired());
+  elements.messageInput.addEventListener("click", () => uiManager.scrollToBottomDesired());
 
   elements.themeButton.addEventListener("click", uiManager.toggleTheme);
 
   // theme handling
-  if (
-    localStorage.theme === "dark" ||
-    (!("theme" in localStorage) &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) {
+  if (localStorage.theme === "dark" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
     document.documentElement.classList.add("dark");
   } else {
     document.documentElement.classList.remove("dark");

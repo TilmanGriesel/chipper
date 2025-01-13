@@ -25,39 +25,23 @@ export class MessageRenderer {
     });
   }
 
-  createMessageElement(
-    content,
-    type = "assistant",
-    assistantIsBusy = false,
-    includeHeader = false,
-  ) {
+  createMessageElement(content, type = "assistant", assistantIsBusy = false, includeHeader = false) {
     const messageContainer = document.createElement("div");
-    messageContainer.className = `flex ${
-      type === "user" ? "justify-end" : "justify-start"
-    } mb-4`;
+    messageContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-4`;
 
     const messageDiv = document.createElement("div");
     messageDiv.className = "message p-4 rounded-3xl min-w-48";
 
     const typeClasses = {
       user: "bg-brand-b-900 selection:bg-brand-b-700 text-white user-message",
-      assistant:
-        "bg-brand-a-100 dark:bg-brand-b-700 assistant-message font-serif dark:font-sans",
-      error:
-        "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
-      system:
-        "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
+      assistant: "bg-brand-a-100 dark:bg-brand-b-700 assistant-message font-serif dark:font-sans",
+      error: "bg-red-600 dark:bg-red-500 selection:bg-red-200 text-white error-message",
+      system: "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
-    messageDiv.classList.add(
-      ...(typeClasses[type]?.split(" ") || ["bg-brand-a-600"]),
-    );
+    messageDiv.classList.add(...(typeClasses[type]?.split(" ") || ["bg-brand-a-600"]));
 
     const header = document.createElement("div");
-    header.className = `font-bold text-sm ${
-      type === "assistant"
-        ? "text-brand-b-800 dark:text-brand-b-300"
-        : "text-white"
-    } mb-2`;
+    header.className = `font-bold text-sm ${type === "assistant" ? "text-brand-b-800 dark:text-brand-b-300" : "text-white"} mb-2`;
     header.textContent =
       {
         user: "You",
@@ -69,8 +53,7 @@ export class MessageRenderer {
     const contentDiv = document.createElement("div");
 
     if (assistantIsBusy) {
-      contentDiv.className =
-        "message dots-animation ml-1 flex items-center space-x-2";
+      contentDiv.className = "message dots-animation ml-1 flex items-center space-x-2";
       const thinkingText = document.createElement("span");
       thinkingText.textContent = "Chipper is thinking";
       contentDiv.appendChild(thinkingText);
@@ -85,10 +68,7 @@ export class MessageRenderer {
       }
       contentDiv.appendChild(dotsContainer);
     } else {
-      contentDiv.innerHTML =
-        type === "system"
-          ? this.marked.parse(content)
-          : this.marked.parseInline(content);
+      contentDiv.innerHTML = type === "system" ? this.marked.parse(content) : this.marked.parseInline(content);
       contentDiv.className = "prose prose-sm max-w-none break-words";
     }
 
@@ -104,11 +84,7 @@ export class MessageRenderer {
     outputDiv.querySelectorAll("code").forEach((block) => {
       const lineCount = block.textContent.split("\n").length;
       if (lineCount > 1) {
-        if (
-          !Array.from(block.classList).some((cls) =>
-            cls.startsWith("language-"),
-          )
-        ) {
+        if (!Array.from(block.classList).some((cls) => cls.startsWith("language-"))) {
           block.classList.add("language-plaintext");
         }
         Prism.highlightElement(block);
