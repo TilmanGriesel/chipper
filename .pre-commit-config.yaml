@@ -23,6 +23,7 @@ repos:
     hooks:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, css, html, json, yaml, markdown]
+        exclude: ^services/web/src/static/vendor/
         additional_dependencies:
           - prettier@3.0.3
           - "@prettier/plugin-xml@3.1.1"
