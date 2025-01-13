@@ -41,7 +41,7 @@ export class TTSManager {
     this.log(
       "Queue status check",
       status,
-      status.queueLength > 0 ? "warn" : "info"
+      status.queueLength > 0 ? "warn" : "info",
     );
     return status;
   }
@@ -65,13 +65,13 @@ export class TTSManager {
 
   init() {
     this.log("TTSManager init called");
-    
+
     this.handleMessage = this.handleMessage.bind(this);
     window.addEventListener("message", this.handleMessage);
 
     if (this.initPromise) {
       this.log(
-        "Initialization already in progress, returning existing promise"
+        "Initialization already in progress, returning existing promise",
       );
       return this.initPromise;
     }
@@ -137,15 +137,16 @@ export class TTSManager {
             this.log("Failed to initialize TTS system", error, "error");
           });
       } else if (!this.isProcessing && this.isReady) {
-        this.log(
-          "System not processing, attempting to process queue"
-        );
+        this.log("System not processing, attempting to process queue");
         this.processMessageQueue();
       }
       return;
     }
 
-    if (!this.ttsIframeElement || event.source !== this.ttsIframeElement.contentWindow) {
+    if (
+      !this.ttsIframeElement ||
+      event.source !== this.ttsIframeElement.contentWindow
+    ) {
       this.log("Ignoring message from unknown source");
       return;
     }
@@ -155,7 +156,7 @@ export class TTSManager {
         this.log("TTS system is ready");
         this.isReady = true;
         this.processMessageQueue();
-        break
+        break;
       case "tts-error": {
         this.log("TTS system error", event.data.error, "error");
         if (this.isProcessing) {
@@ -176,7 +177,7 @@ export class TTSManager {
           this.log(
             "Warning: Received complete event while not processing",
             null,
-            "warn"
+            "warn",
           );
         }
         // TODO: tts-complete does not handle playback time; playback complete event yet, overlap will happen.
@@ -198,9 +199,9 @@ export class TTSManager {
       this.log(
         "Cannot generate TTS: system not ready",
         {
-          hasFrame: false
+          hasFrame: false,
         },
-        "error"
+        "error",
       );
       return;
     }
@@ -220,7 +221,7 @@ export class TTSManager {
           sid: message.sid,
           speed: message.speed,
         },
-        "*"
+        "*",
       );
       this.log("TTS generation request sent successfully");
     } catch (error) {
@@ -240,9 +241,7 @@ export class TTSManager {
 
     if (this.isProcessing || this.messageQueue.length === 0) {
       this.log("Skipping queue processing", {
-        reason: this.isProcessing
-          ? "currently processing"
-          : "queue empty",
+        reason: this.isProcessing ? "currently processing" : "queue empty",
       });
       return;
     }

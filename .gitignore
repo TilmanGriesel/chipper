@@ -31,4 +31,3 @@ output
 /node_modules
 /docs/.vitepress/cache
 *.bak
-

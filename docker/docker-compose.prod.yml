@@ -5,7 +5,7 @@ x-healthcheck: &default-healthcheck
 x-shared-deploy: &shared-deploy
   resources:
     limits:
-      memory: '2g'
+      memory: "2g"
 
 services:
   api:
@@ -40,7 +40,7 @@ services:
 
   nginx-proxy:
     # ref: https://nginxproxymanager.com/guide/#quick-setup
-    
+
     image: jc21/nginx-proxy-manager:latest
     ports:
       - 80:80

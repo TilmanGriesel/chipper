@@ -130,7 +130,7 @@ export class ChatService {
                   sid: 0,
                   speed: 1,
                 },
-                "*"
+                "*",
               );
               break;
             }

@@ -29,7 +29,7 @@ export class MessageRenderer {
     content,
     type = "assistant",
     assistantIsBusy = false,
-    includeHeader = false
+    includeHeader = false,
   ) {
     const messageContainer = document.createElement("div");
     messageContainer.className = `flex ${
@@ -49,7 +49,7 @@ export class MessageRenderer {
         "bg-purple-600 dark:bg-purple-500 selection:bg-purple-900 text-white system-message",
     };
     messageDiv.classList.add(
-      ...(typeClasses[type]?.split(" ") || ["bg-brand-a-600"])
+      ...(typeClasses[type]?.split(" ") || ["bg-brand-a-600"]),
     );
 
     const header = document.createElement("div");
@@ -106,7 +106,7 @@ export class MessageRenderer {
       if (lineCount > 1) {
         if (
           !Array.from(block.classList).some((cls) =>
-            cls.startsWith("language-")
+            cls.startsWith("language-"),
           )
         ) {
           block.classList.add("language-plaintext");

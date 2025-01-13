@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const handleTTSToggle = (enabled) => {
     if (enabled) {
-      ttsManager.init().catch(error => {
-        console.error('Failed to initialize TTS:', error);
+      ttsManager.init().catch((error) => {
+        console.error("Failed to initialize TTS:", error);
       });
     } else {
       ttsManager.destroy();
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     () => uiManager.toggleTheme(),
     () => uiManager.toggleWideMode(),
     null,
-    handleTTSToggle
+    handleTTSToggle,
   );
 
   urlParamsHandler = new URLParamsHandler(chatCommandHandler);
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "ArrowUp") {
       e.preventDefault();
       const previousMessage = historyManager.navigateBack(
-        elements.messageInput.value
+        elements.messageInput.value,
       );
       if (previousMessage !== null) {
         uiManager.updateMessageInput(previousMessage);
@@ -113,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
         elements.chatMessages.appendChild(
           messageRenderer.createMessageElement(
             commandResult.content,
-            commandResult.type
-          ).container
+            commandResult.type,
+          ).container,
         );
       }
       uiManager.updateMessageInput("");
@@ -157,11 +157,11 @@ document.addEventListener("DOMContentLoaded", () => {
           if (error !== "AbortError") {
             elements.chatMessages.appendChild(
               messageRenderer.createMessageElement(`${error}`, "error")
-                .container
+                .container,
             );
             uiManager.scrollToBottomDesired();
           }
-        }
+        },
       );
 
       if (responseContent) {
@@ -199,19 +199,19 @@ document.addEventListener("DOMContentLoaded", () => {
   elements.sendButton.addEventListener("click", sendMessage);
 
   elements.messageInput.addEventListener("input", () =>
-    uiManager.scrollToBottomDesired()
+    uiManager.scrollToBottomDesired(),
   );
   elements.messageInput.addEventListener("focus", () =>
-    uiManager.scrollToBottomDesired()
+    uiManager.scrollToBottomDesired(),
   );
   elements.messageInput.addEventListener("blur", () =>
-    uiManager.scrollToBottomDesired()
+    uiManager.scrollToBottomDesired(),
   );
   elements.messageInput.addEventListener("touchstart", () =>
-    uiManager.scrollToBottomDesired()
+    uiManager.scrollToBottomDesired(),
   );
   elements.messageInput.addEventListener("click", () =>
-    uiManager.scrollToBottomDesired()
+    uiManager.scrollToBottomDesired(),
   );
 
   elements.themeButton.addEventListener("click", uiManager.toggleTheme);

@@ -5,8 +5,8 @@ x-healthcheck: &default-healthcheck
 x-shared-deploy: &shared-deploy
   resources:
     limits:
-      memory: '2g'
-      
+      memory: "2g"
+
 services:
   elasticvue:
     image: cars10/elasticvue

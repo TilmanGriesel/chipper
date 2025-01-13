@@ -1,5 +1,5 @@
 #!/bin/bash
-# Recursively converts text files in a directory from Windows encodings (CP1252, Windows-1252) 
+# Recursively converts text files in a directory from Windows encodings (CP1252, Windows-1252)
 # or ISO-8859-1 to UTF-8. Skips already UTF-8 encoded and empty files.
 #
 # Usage: ./script.sh [input_dir] [debug]
@@ -29,7 +29,7 @@ try_convert() {
     local file=$1
     local from_enc=$2
     local temp=$3
-    
+
     debug "Trying $from_enc..."
     # translit replaces unmappable chars
     if LC_ALL=C iconv -f "$from_enc" -t UTF-8//TRANSLIT "$file" > "$temp" 2>/dev/null; then
@@ -41,17 +41,17 @@ try_convert() {
 
 while IFS= read -r -d $'\0' FILE; do
     printf "Converting %-50s" "${FILE:0:50}"
-    
+
     if [ ! -s "$FILE" ]; then
         echo "[EMPTY]"
         continue
     fi
-    
+
     if file -bi "$FILE" | grep -q "charset=utf-8"; then
         echo "[SKIPPED]"
         continue
     fi
-    
+
     # try common windows encodings first
     if try_convert "$FILE" "CP1252" "$TEMP_FILE" || \
        try_convert "$FILE" "WINDOWS-1252" "$TEMP_FILE" || \

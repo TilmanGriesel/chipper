@@ -5,7 +5,7 @@ Chipper started as a set of Python scripts designed to experiment with local RAG
 
 <p align="center">
 <div style="position: relative; padding-top: 56.25%">
-  <iframe 
+  <iframe
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 24px;"  src="https://www.youtube.com/embed/WFAGn9BjN9M" title="Chipper AI -  AI interface for tinkerers (Ollama, Haystack RAG, Python)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>
 </p>
@@ -129,7 +129,7 @@ You can set the index using the `--es-index <name>` parameter, specify the embed
 
 ## Step 5: Next Steps and Exploration 🔍
 
-First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to *chip* wood, just like we need to split and chip the data we want to embed. And as for *retriever*, - well ...
+First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to _chip_ wood, just like we need to split and chip the data we want to embed. And as for _retriever_, - well ...
 
 Jokes aside, this project offers plenty more tools to explore. You can transcribe audio files into text and embed it, scrape websites (only your own or with proper consent), or dive into the frontend, here you can write `/help` to see some options or backend to customize and change Chipper to suit your needs.
 

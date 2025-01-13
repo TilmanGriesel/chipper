@@ -4,19 +4,19 @@ x-healthcheck: &default-healthcheck
 
 # Base service configuration
 x-ollama: &ollama-base
-    hostname: ollama
-    image: ollama/ollama:latest
-    pull_policy: always
-    tty: true
-    restart: unless-stopped
-    ports:
-      - 21240:11434
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-    volumes:
-      - ollama-data:/root/.ollama
-    networks:
-      - default
+  hostname: ollama
+  image: ollama/ollama:latest
+  pull_policy: always
+  tty: true
+  restart: unless-stopped
+  ports:
+    - 21240:11434
+  environment:
+    - OLLAMA_KEEP_ALIVE=24h
+  volumes:
+    - ollama-data:/root/.ollama
+  networks:
+    - default
 
 services:
   # NVIDIA GPU configuration
@@ -72,7 +72,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9200/_cat/health"]
     deploy:
       resources:
-         limits:
+        limits:
           memory: 8g
 
 networks:

@@ -41,17 +41,17 @@ export class UIManager {
 
   scrollToBottomDesired(immediate = true, force = false) {
     if (this.userIsInspecting && !force) return;
-  
+
     const container = this.elements.chatMessages;
     if (!container) return;
-  
+
     const scroll = () => {
       container.scrollTo({
         top: container.scrollHeight,
-        behavior: immediate ? 'auto' : 'smooth'
+        behavior: immediate ? "auto" : "smooth",
       });
     };
-  
+
     scroll();
   }
 

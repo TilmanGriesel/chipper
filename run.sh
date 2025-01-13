@@ -219,7 +219,7 @@ function print_local_url() {
     local green="\033[0;32m"
     local reset="\033[0m"
     local bold="\033[1m"
-    
+
     echo
     echo -e "Open the Chipper Web-Interface at:"
     echo -e "${bold}${green}➜${reset} ${bold}$LOCAL_URL${reset}"
@@ -292,9 +292,9 @@ case "$1" in
     "rebuild")
         confirm_clean "containers and rebuild all images"
         compose_down
-    
+
         clean_project_images
-        
+
         echo "Ensure valid environment..."
         ensure_environment
 
@@ -303,7 +303,7 @@ case "$1" in
 
         echo "Starting containers..."
         compose_cmd -p "$PROJECT_NAME" up -d --force-recreate
-        
+
         echo "Clean and rebuild complete!"
         print_local_url
         ;;
@@ -328,11 +328,11 @@ case "$1" in
         ensure_environment
 
         compose_down_clean
-        
+
         echo "Cleaning up volume directories..."
         rm -rfv docker/volumes
         echo "Volume directories cleaned"
-        
+
         echo "Clean complete!"
         ;;
     "clean-env")
@@ -346,9 +346,9 @@ case "$1" in
     "embed"|"scrape")
         command="$1"
         shift
-        
+
         [ $# -eq 0 ] && error_exit "Error: ${command} command requires arguments"
-        
+
         run_in_directory "tools/${command}" ./run.sh "$@"
         ;;
     "dev-api"|"dev-web")

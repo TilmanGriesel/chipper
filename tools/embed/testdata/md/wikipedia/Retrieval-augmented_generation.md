@@ -5,7 +5,7 @@ Source: https://en.wikipedia.org/wiki/Retrieval-augmented_generation
 Retrieval Augmented Generation (RAG) is a technique that grants generative artificial intelligence models information
 retrieval capabilities. It modifies interactions with a large language model (LLM) so that the model responds to user
 queries with reference to a specified set of documents, using this information to augment information drawn from its own
-vast, static training data. This allows LLMs to use domain-specific and/or updated information.  
+vast, static training data. This allows LLMs to use domain-specific and/or updated information.
 Use cases include providing chatbot access to internal company data or giving factual information only from an
 authoritative source.
 
@@ -71,7 +71,7 @@ By redesigning the language model with the retriever in mind, a 25-time smaller 
 its much larger counterparts. Because it is trained from scratch, this method (Retro) incurs the high cost of training
 runs that the original RAG scheme avoided. The hypothesis is that by giving domain knowledge during training, Retro
 needs less focus on the domain and can devote its smaller weight resources only to language semantics. The redesigned
-language model is shown here.  
+language model is shown here.
 It has been reported that Retro is not reproducible, so modifications were made to make it so. The more reproducible
 version is called Retro++ and includes in-context RAG.
 
