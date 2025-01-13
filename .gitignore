@@ -32,7 +32,3 @@ output
 /docs/.vitepress/cache
 *.bak
 /services/web/src/static/vendor/tts-sherpa-onnx
-
-# binary
-*.wasm
-*.data
