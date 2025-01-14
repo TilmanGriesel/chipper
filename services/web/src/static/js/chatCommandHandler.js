@@ -74,9 +74,9 @@ export class ChatCommandHandler {
           type: "system",
           content: `Text-to-speech is \`${enabled ? "on" : "off"}\`\n${
             enabled
-              ? "> **Note:** A TTS model (90 MByte) will be downloaded and client side Wasm inference will be initialized. This may temporarily causes lags. " +
-                "There is also no indication on the TTS inference status in the UI, watch the logs for more information. " +
-                "The client side TTS is considered very experimental."
+              ? "> **Note:** A TTS model (90 MByte) is downloaded and the client-side Wasm inference is being initialised. This can lead to temporary hangs.  " +
+                "There is also no indication of the status of the TTS inference in the UI, watch the logs for more information. " +
+                "The client-side TTS is considered very experimental."
               : ""
           }`,
         };
