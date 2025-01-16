@@ -101,7 +101,7 @@ class WebScraper:
         if not path:
             path = "index"
 
-        return f"{path}.txt"
+        return f"{path}.md"
 
     async def handle_403(self, url: str, attempt: int) -> None:
         if not self._403_encountered:
