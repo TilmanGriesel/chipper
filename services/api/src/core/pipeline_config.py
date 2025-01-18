@@ -15,11 +15,15 @@ def _default_none() -> None:
 class QueryPipelineConfig:
     """Base configuration for all pipelines."""
 
-    # Required parameters
-    ollama_url: str
-    embedding_model: str
-    model_name: str
-    system_prompt: str
+    # Common provider parameters
+    provider: str = field(default=ModelProvider.OLLAMA)
+    ollama_url: Optional[str] = None
+    hf_api_key: Optional[str] = field(default_factory=_default_none)
+
+    embedding_model: Optional[str] = None
+    model_name: Optional[str] = None
+    system_prompt: Optional[str] = None
+    allow_model_pull: bool = field(default=True)
 
     # Elasticsearch parameters
     es_url: str
@@ -52,11 +56,6 @@ class QueryPipelineConfig:
     num_predict: Optional[int] = None
     tfs_z: Optional[float] = None
     stop_sequence: Optional[str] = None
-
-    # Common provider parameters
-    provider: str = field(default=ModelProvider.OLLAMA)
-    hf_api_key: Optional[str] = field(default_factory=_default_none)
-    allow_model_pull: bool = field(default=True)
 
     def __post_init__(self):
         """Validate configuration after initialization."""
