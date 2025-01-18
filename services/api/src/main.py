@@ -94,40 +94,111 @@ def load_systemprompt(base_path: str) -> str:
         logger.error(f"Error reading system prompt file: {e}")
         return default_prompt
 
-
 system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcwd()))
 
+def get_env_param(param_name, converter=None, default=None):
+    value = os.getenv(param_name)
+    if value is None:
+        return None
+
+    if converter is not None:
+        try:
+            if default is not None and value == "":
+                return converter(default)
+            return converter(value)
+        except (ValueError, TypeError):
+            return None
+    return value
 
 def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelineConfig:
-    provider_name = os.getenv("PROVIDER")
-    provider = ModelProvider.OLLAMA
-    if provider_name.lower() == "hf":
-        provider = ModelProvider.HUGGINGFACE
+    provider_name = os.getenv("PROVIDER", "ollama")
+    provider = ModelProvider.HUGGINGFACE if provider_name.lower() == "hf" else ModelProvider.OLLAMA
 
-    model_name = model or os.getenv("MODEL_NAME")
-    embedding_model = os.getenv("EMBEDDING_MODEL_NAME")
     if provider == ModelProvider.HUGGINGFACE:
         model_name = model or os.getenv("HF_MODEL_NAME")
         embedding_model = os.getenv("HF_EMBEDDING_MODEL_NAME")
+    else:
+        model_name = model or os.getenv("MODEL_NAME")
+        embedding_model = os.getenv("EMBEDDING_MODEL_NAME")
 
-    return QueryPipelineConfig(
-        provider=provider,
-        hf_api_key=os.getenv("HF_API_KEY"),
-        ollama_url=os.getenv("OLLAMA_URL"),
-        es_url=os.getenv("ES_URL"),
-        es_index=index or os.getenv("ES_INDEX"),
-        model_name=model_name,
-        embedding_model=embedding_model,
-        system_prompt=system_prompt_value,
-        context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
-        temperature=float(os.getenv("TEMPERATURE", 0.7)),
-        seed=int(os.getenv("SEED", 0)),
-        es_top_k=int(os.getenv("ES_TOP_K", 5)),
-        es_num_candidates=int(os.getenv("ES_NUM_CANDIDATES", -1)),
-        es_basic_auth_user=os.getenv("ES_BASIC_AUTH_USERNAME"),
-        es_basic_auth_password=os.getenv("ES_BASIC_AUTH_PASSWORD"),
-        allow_model_pull=os.getenv("ALLOW_MODEL_PULL", "True").lower() == "true",
-    )
+    config_params = {
+        "provider": provider,
+        "embedding_model": embedding_model,
+        "model_name": model_name,
+        "system_prompt": system_prompt_value
+    }
+
+    # Provider specific parameters
+    if provider == ModelProvider.HUGGINGFACE:
+        if (hf_key := os.getenv("HF_API_KEY")) is not None:
+            config_params["hf_api_key"] = hf_key
+    else:
+        if (ollama_url := os.getenv("OLLAMA_URL")) is not None:
+            config_params["ollama_url"] = ollama_url
+
+    # Model pull configuration
+    allow_pull = os.getenv("ALLOW_MODEL_PULL")
+    if allow_pull is not None:
+        config_params["allow_model_pull"] = allow_pull.lower() == "true"
+
+    # Core generation parameters
+    if (context_window := get_env_param("CONTEXT_WINDOW", int, "8192")) is not None:
+        config_params["context_window"] = context_window
+
+    for param in ["TEMPERATURE", "SEED", "TOP_K"]:
+        if (value := get_env_param(param, float if param == "TEMPERATURE" else int)) is not None:
+            config_params[param.lower()] = value
+
+    # Advanced sampling parameters
+    for param in ["TOP_P", "MIN_P"]:
+        if (value := get_env_param(param, float)) is not None:
+            config_params[param.lower()] = value
+
+    # Mirostat parameters
+    if (mirostat := get_env_param("MIROSTAT", int)) is not None:
+        config_params["mirostat"] = mirostat
+        # Only add eta and tau if mirostat is defined
+        for param in ["MIROSTAT_ETA", "MIROSTAT_TAU"]:
+            if (value := get_env_param(param, float)) is not None:
+                config_params[param.lower()] = value
+
+    # Repetition control parameters
+    for param in ["REPEAT_LAST_N", "REPEAT_PENALTY"]:
+        if (value := get_env_param(param, int if param == "REPEAT_LAST_N" else float)) is not None:
+            config_params[param.lower()] = value
+
+    # Generation control parameters
+    if (num_predict := get_env_param("NUM_PREDICT", int)) is not None:
+        config_params["num_predict"] = num_predict
+
+    if (tfs_z := get_env_param("TFS_Z", float)) is not None:
+        config_params["tfs_z"] = tfs_z
+
+    if (stop := os.getenv("STOP")) is not None:
+        config_params["stop_sequence"] = stop
+
+    # Elasticsearch parameters
+    if (es_url := os.getenv("ES_URL")) is not None:
+        config_params["es_url"] = es_url
+
+        if index is not None:
+            config_params["es_index"] = index
+        elif (es_index := os.getenv("ES_INDEX")) is not None:
+            config_params["es_index"] = es_index
+
+        if (es_top_k := get_env_param("ES_TOP_K", int, "5")) is not None:
+            config_params["es_top_k"] = es_top_k
+
+        if (es_num_candidates := get_env_param("ES_NUM_CANDIDATES", int, "-1")) is not None:
+            config_params["es_num_candidates"] = es_num_candidates
+
+        if (es_user := os.getenv("ES_BASIC_AUTH_USERNAME")) is not None:
+            config_params["es_basic_auth_user"] = es_user
+
+        if (es_pass := os.getenv("ES_BASIC_AUTH_PASSWORD")) is not None:
+            config_params["es_basic_auth_password"] = es_pass
+
+    return QueryPipelineConfig(**config_params)
 
 
 def require_api_key(f):

@@ -77,15 +77,51 @@ class PipelineComponentFactory:
         self.logger.info(f"Initializing Generator with model: {self.config.model_name}")
 
         if self.config.provider == ModelProvider.OLLAMA:
-            generation_kwargs = {
-                "temperature": self.config.temperature,
-                "context_length": self.config.context_window,
-            }
+            generation_kwargs = {}
 
-            if self.config.seed != 0:
+            # Core generation parameters
+            if self.config.temperature is not None:
+                generation_kwargs["temperature"] = self.config.temperature
+            if self.config.context_window is not None:
+                generation_kwargs["context_length"] = self.config.context_window
+            if self.config.seed is not None and self.config.seed > 0 :
                 generation_kwargs["seed"] = self.config.seed
-                self.logger.info(f"Using seed value: {self.config.seed}")
+            if self.config.top_k is not None:
+                generation_kwargs["top_k"] = self.config.top_k
 
+            # Advanced sampling parameters
+            if self.config.top_p is not None:
+                generation_kwargs["top_p"] = self.config.top_p
+            if self.config.min_p is not None:
+                generation_kwargs["min_p"] = self.config.min_p
+
+            # Mirostat parameters
+            if self.config.mirostat is not None:
+                generation_kwargs["mirostat"] = self.config.mirostat
+            if self.config.mirostat_eta is not None:
+                generation_kwargs["mirostat_eta"] = self.config.mirostat_eta
+            if self.config.mirostat_tau is not None:
+                generation_kwargs["mirostat_tau"] = self.config.mirostat_tau
+
+            # Repetition control
+            if self.config.repeat_last_n is not None:
+                generation_kwargs["repeat_last_n"] = self.config.repeat_last_n
+            if self.config.repeat_penalty is not None:
+                generation_kwargs["repeat_penalty"] = self.config.repeat_penalty
+
+            # Generation control
+            if self.config.num_predict is not None:
+                generation_kwargs["num_predict"] = self.config.num_predict
+            if self.config.tfs_z is not None:
+                generation_kwargs["tfs_z"] = self.config.tfs_z
+
+            # Optional stop sequence
+            if self.config.stop_sequence:
+                generation_kwargs["stop"] = self.config.stop_sequence
+
+            logging.info(f"Generation kwargs: {generation_kwargs}")
+
+            # Instantiate generator
             generator = OllamaGenerator(
                 model=self.config.model_name,
                 url=self.config.ollama_url,

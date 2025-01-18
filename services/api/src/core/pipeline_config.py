@@ -20,17 +20,40 @@ class QueryPipelineConfig:
     embedding_model: str
     model_name: str
     system_prompt: str
-    context_window: int
-    temperature: float
-    seed: int
 
+    # Elasticsearch parameters
     es_url: str
     es_index: str
-    es_top_k: int
-    es_num_candidates: int
-    es_basic_auth_user: str
-    es_basic_auth_password: str
+    es_top_k: Optional[int] = None
+    es_num_candidates: Optional[int] = None
+    es_basic_auth_user: Optional[str] = None
+    es_basic_auth_password: Optional[str] = None
 
+    # Core generation parameters
+    context_window: Optional[int] = None
+    temperature: Optional[float] = None
+    seed: Optional[int] = None
+    top_k: Optional[int] = None
+
+    # Advanced sampling parameters
+    top_p: Optional[float] = None
+    min_p: Optional[float] = None
+
+    # Mirostat parameters
+    mirostat: Optional[int] = None
+    mirostat_eta: Optional[float] = None
+    mirostat_tau: Optional[float] = None
+
+    # Repetition control
+    repeat_last_n: Optional[int] = None
+    repeat_penalty: Optional[float] = None
+
+    # Generation control
+    num_predict: Optional[int] = None
+    tfs_z: Optional[float] = None
+    stop_sequence: Optional[str] = None
+
+    # Common provider parameters
     provider: str = field(default=ModelProvider.OLLAMA)
     hf_api_key: Optional[str] = field(default_factory=_default_none)
     allow_model_pull: bool = field(default=True)
