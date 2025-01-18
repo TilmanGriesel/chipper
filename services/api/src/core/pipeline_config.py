@@ -25,7 +25,7 @@ class QueryPipelineConfig:
     context_window: int
     temperature: float
     seed: int
-    top_k: int
+    es_top_k: int
 
     # Optional parameters with field defaults
     provider: str = field(default=ModelProvider.OLLAMA)

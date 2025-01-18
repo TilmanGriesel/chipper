@@ -122,7 +122,7 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         context_window=int(os.getenv("CONTEXT_WINDOW", 4096)),
         temperature=float(os.getenv("TEMPERATURE", 0.7)),
         seed=int(os.getenv("SEED", 0)),
-        top_k=int(os.getenv("TOP_K", 5)),
+        es_top_k=int(os.getenv("ES_TOP_K", 5)),
         allow_model_pull=os.getenv("ALLOW_MODEL_PULL", "True").lower() == "true",
     )
 

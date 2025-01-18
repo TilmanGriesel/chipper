@@ -29,7 +29,6 @@ class PipelineComponentFactory:
         self.logger = logging.getLogger(__name__)
 
     def create_text_embedder(self):
-        """Create text embedder based on provider configuration."""
         self.logger.info(
             f"Initializing Text Embedder with model: {self.config.embedding_model}"
         )
@@ -58,11 +57,11 @@ class PipelineComponentFactory:
     def create_retriever(self) -> ElasticsearchEmbeddingRetriever:
         """Create Elasticsearch retriever."""
         self.logger.info(
-            f"Initializing Elasticsearch Retriever with top_k={self.config.top_k}"
+            f"Initializing Elasticsearch Retriever with top_k={self.config.es_top_k}"
         )
         retriever = ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
-            top_k=self.config.top_k,
+            top_k=self.config.es_top_k,
         )
         self.logger.info("Elasticsearch Retriever initialized successfully")
         return retriever
