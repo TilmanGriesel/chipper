@@ -94,7 +94,9 @@ def load_systemprompt(base_path: str) -> str:
         logger.error(f"Error reading system prompt file: {e}")
         return default_prompt
 
+
 system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcwd()))
+
 
 def get_env_param(param_name, converter=None, default=None):
     value = os.getenv(param_name)
@@ -110,9 +112,14 @@ def get_env_param(param_name, converter=None, default=None):
             return None
     return value
 
+
 def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelineConfig:
     provider_name = os.getenv("PROVIDER", "ollama")
-    provider = ModelProvider.HUGGINGFACE if provider_name.lower() == "hf" else ModelProvider.OLLAMA
+    provider = (
+        ModelProvider.HUGGINGFACE
+        if provider_name.lower() == "hf"
+        else ModelProvider.OLLAMA
+    )
 
     if provider == ModelProvider.HUGGINGFACE:
         model_name = model or os.getenv("HF_MODEL_NAME")
@@ -125,7 +132,7 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         "provider": provider,
         "embedding_model": embedding_model,
         "model_name": model_name,
-        "system_prompt": system_prompt_value
+        "system_prompt": system_prompt_value,
     }
 
     # Provider specific parameters
@@ -146,7 +153,9 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         config_params["context_window"] = context_window
 
     for param in ["TEMPERATURE", "SEED", "TOP_K"]:
-        if (value := get_env_param(param, float if param == "TEMPERATURE" else int)) is not None:
+        if (
+            value := get_env_param(param, float if param == "TEMPERATURE" else int)
+        ) is not None:
             config_params[param.lower()] = value
 
     # Advanced sampling parameters
@@ -164,7 +173,9 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
 
     # Repetition control parameters
     for param in ["REPEAT_LAST_N", "REPEAT_PENALTY"]:
-        if (value := get_env_param(param, int if param == "REPEAT_LAST_N" else float)) is not None:
+        if (
+            value := get_env_param(param, int if param == "REPEAT_LAST_N" else float)
+        ) is not None:
             config_params[param.lower()] = value
 
     # Generation control parameters
@@ -189,7 +200,9 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         if (es_top_k := get_env_param("ES_TOP_K", int, "5")) is not None:
             config_params["es_top_k"] = es_top_k
 
-        if (es_num_candidates := get_env_param("ES_NUM_CANDIDATES", int, "-1")) is not None:
+        if (
+            es_num_candidates := get_env_param("ES_NUM_CANDIDATES", int, "-1")
+        ) is not None:
             config_params["es_num_candidates"] = es_num_candidates
 
         if (es_user := os.getenv("ES_BASIC_AUTH_USERNAME")) is not None:

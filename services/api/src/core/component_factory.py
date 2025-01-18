@@ -62,7 +62,9 @@ class PipelineComponentFactory:
         retriever = ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
             top_k=self.config.es_top_k,
-            num_candidates=self.config.es_num_candidates if self.config.es_num_candidates > -1  else None
+            num_candidates=self.config.es_num_candidates
+            if self.config.es_num_candidates > -1
+            else None,
         )
         self.logger.info("Elasticsearch Retriever initialized successfully")
         return retriever
@@ -84,7 +86,7 @@ class PipelineComponentFactory:
                 generation_kwargs["temperature"] = self.config.temperature
             if self.config.context_window is not None:
                 generation_kwargs["context_length"] = self.config.context_window
-            if self.config.seed is not None and self.config.seed > 0 :
+            if self.config.seed is not None and self.config.seed > 0:
                 generation_kwargs["seed"] = self.config.seed
             if self.config.top_k is not None:
                 generation_kwargs["top_k"] = self.config.top_k
