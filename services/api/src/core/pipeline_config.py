@@ -26,8 +26,8 @@ class QueryPipelineConfig:
     temperature: float
     seed: int
     es_top_k: int
+    es_num_candidates: int
 
-    # Optional parameters with field defaults
     provider: str = field(default=ModelProvider.OLLAMA)
     hf_api_key: Optional[str] = field(default_factory=_default_none)
     allow_model_pull: bool = field(default=True)

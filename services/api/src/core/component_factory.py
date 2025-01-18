@@ -57,11 +57,12 @@ class PipelineComponentFactory:
     def create_retriever(self) -> ElasticsearchEmbeddingRetriever:
         """Create Elasticsearch retriever."""
         self.logger.info(
-            f"Initializing Elasticsearch Retriever with top_k={self.config.es_top_k}"
+            f"Initializing Elasticsearch Retriever with top_k={self.config.es_top_k} and num_candidates={self.config.es_num_candidates}"
         )
         retriever = ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
             top_k=self.config.es_top_k,
+            num_candidates=self.config.es_num_candidates if self.config.es_num_candidates > -1  else None
         )
         self.logger.info("Elasticsearch Retriever initialized successfully")
         return retriever
