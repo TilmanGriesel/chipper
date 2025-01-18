@@ -35,6 +35,9 @@ class QueryPipelineConfig:
     es_basic_auth_user: Optional[str] = None
     es_basic_auth_password: Optional[str] = None
 
+    # Conversation analysis and logging
+    enable_conversation_logs: Optional[bool] = True
+
     # Core generation parameters
     context_window: Optional[int] = None
     temperature: Optional[float] = None

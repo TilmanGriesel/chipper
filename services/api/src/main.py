@@ -211,6 +211,10 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         if (es_pass := os.getenv("ES_BASIC_AUTH_PASSWORD")) is not None:
             config_params["es_basic_auth_password"] = es_pass
 
+    # Conversation analysis and logging
+    if (enable_conversation_logs := os.getenv("ENABLE_CONVERSATION_LOGS")) is not None:
+        config_params["enable_conversation_logs"] = enable_conversation_logs
+
     return QueryPipelineConfig(**config_params)
 
 

@@ -1,4 +1,7 @@
+import json
 import logging
+from datetime import datetime
+from pathlib import Path
 from typing import Generator, List, Optional
 
 import elasticsearch
@@ -7,6 +10,30 @@ from core.document_manager import DocumentStoreManager
 from core.model_manager import OllamaModelManager
 from core.pipeline_config import QueryPipelineConfig
 from haystack import Pipeline
+
+
+class ConversationLogger:
+    def __init__(self, system_info: dict, log_dir: str = "conversation_logs"):
+        self.log_dir = Path(log_dir)
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.system_info = system_info
+
+    def log_conversation(
+        self, query: str, response: dict, conversation: List[dict] = None
+    ):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        log_file = self.log_dir / f"conversation_{timestamp}.json"
+
+        log_entry = {
+            "timestamp": timestamp,
+            "query": query,
+            "system_info": self.system_info,
+            "response": response.get("llm", {}).get("replies", []),
+            "previous_conversation": conversation or [],
+        }
+
+        with open(log_file, "w", encoding="utf-8") as f:
+            json.dump(log_entry, f, indent=2, ensure_ascii=False)
 
 
 class RAGQueryPipeline:
@@ -34,6 +61,26 @@ class RAGQueryPipeline:
         self.logger.info("Initializing RAGQueryPipeline")
         self.config = config
         self._streaming_callback = streaming_callback
+
+        # Initialize conversation logger
+        if self.config.enable_conversation_logs:
+            self.conversation_logger = ConversationLogger(
+                system_info={
+                    "provider": self.config.provider,
+                    "elasticsearch": {
+                        "index": self.config.es_index,
+                        "top_k": self.config.es_top_k,
+                        "num_candidates": self.config.es_num_candidates,
+                    },
+                    "model_params": {
+                        "temperature": self.config.temperature,
+                        "top_k": self.config.top_k,
+                        "top_p": self.config.top_p,
+                        "min_p": self.config.min_p,
+                        "seed": self.config.seed,
+                    },
+                }
+            )
 
         # Initialize document store manager
         self.doc_store_manager = DocumentStoreManager(
@@ -156,6 +203,9 @@ class RAGQueryPipeline:
 
             response = self.query_pipeline.run(pipeline_inputs)
             self.logger.info("Query pipeline execution completed successfully")
+
+            if self.config.enable_conversation_logs:
+                self.conversation_logger.log_conversation(query, response, conversation)
 
             if print_response and response["llm"]["replies"]:
                 print(response["llm"]["replies"][0])
