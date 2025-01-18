@@ -16,8 +16,6 @@ class QueryPipelineConfig:
     """Base configuration for all pipelines."""
 
     # Required parameters
-    es_url: str
-    es_index: str
     ollama_url: str
     embedding_model: str
     model_name: str
@@ -25,8 +23,13 @@ class QueryPipelineConfig:
     context_window: int
     temperature: float
     seed: int
+
+    es_url: str
+    es_index: str
     es_top_k: int
     es_num_candidates: int
+    es_basic_auth_user: str
+    es_basic_auth_password: str
 
     provider: str = field(default=ModelProvider.OLLAMA)
     hf_api_key: Optional[str] = field(default_factory=_default_none)

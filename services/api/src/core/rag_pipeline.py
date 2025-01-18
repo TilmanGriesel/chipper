@@ -36,7 +36,7 @@ class RAGQueryPipeline:
         self._streaming_callback = streaming_callback
 
         # Initialize document store manager
-        self.doc_store_manager = DocumentStoreManager(config.es_url, config.es_index)
+        self.doc_store_manager = DocumentStoreManager(config.es_url, config.es_index, config.es_basic_auth_user, config.es_basic_auth_password)
         self.document_store = self.doc_store_manager.initialize_store()
 
         # Only initialize Ollama model manager if using Ollama provider
