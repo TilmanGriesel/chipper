@@ -63,12 +63,13 @@ class PipelineComponentFactory:
             document_store=self.document_store,
             top_k=(
                 self.config.es_top_k
-                if self.config.es_top_k and self.config.es_top_k > 0
+                if self.config.es_top_k is not None and self.config.es_top_k > 0
                 else None
             ),
             num_candidates=(
                 self.config.es_num_candidates
-                if self.config.es_num_candidates and self.config.es_num_candidates > 0
+                if self.config.es_num_candidates is not None
+                and self.config.es_num_candidates > 0
                 else None
             ),
         )
