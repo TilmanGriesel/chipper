@@ -61,10 +61,16 @@ class PipelineComponentFactory:
         )
         retriever = ElasticsearchEmbeddingRetriever(
             document_store=self.document_store,
-            top_k=self.config.es_top_k,
-            num_candidates=self.config.es_num_candidates
-            if self.config.es_num_candidates > -1
-            else None,
+            top_k=(
+                self.config.es_top_k
+                if self.config.es_top_k and self.config.es_top_k > 0
+                else None
+            ),
+            num_candidates=(
+                self.config.es_num_candidates
+                if self.config.es_num_candidates and self.config.es_num_candidates > 0
+                else None
+            ),
         )
         self.logger.info("Elasticsearch Retriever initialized successfully")
         return retriever
