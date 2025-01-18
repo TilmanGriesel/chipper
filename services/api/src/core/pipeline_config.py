@@ -15,6 +15,9 @@ def _default_none() -> None:
 class QueryPipelineConfig:
     """Base configuration for all pipelines."""
 
+    # Required parameters
+    es_url: str
+
     # Common provider parameters
     provider: str = field(default=ModelProvider.OLLAMA)
     ollama_url: Optional[str] = None
@@ -26,8 +29,7 @@ class QueryPipelineConfig:
     allow_model_pull: bool = field(default=True)
 
     # Elasticsearch parameters
-    es_url: str
-    es_index: str
+    es_index: Optional[str] = None
     es_top_k: Optional[int] = None
     es_num_candidates: Optional[int] = None
     es_basic_auth_user: Optional[str] = None
