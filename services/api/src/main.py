@@ -70,8 +70,20 @@ if not API_KEY:
 
 
 def load_systemprompt(base_path: str) -> str:
-    file = Path(base_path) / ".systemprompt"
     default_prompt = ""
+
+    # Use environment variable if available
+    env_var_name = "SYSTEM_PROMPT"
+    env_prompt = os.getenv(env_var_name)
+    if env_prompt is not None:
+        content = env_prompt.strip()
+        logger.info(
+            f"Using system prompt from '{env_var_name}' environment variable; content: '{content}'"
+        )
+        return content
+
+    # Try reading from file
+    file = Path(base_path) / ".systemprompt"
 
     if not file.exists():
         logger.info("No .systemprompt file found. Using default prompt.")
