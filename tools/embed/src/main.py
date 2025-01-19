@@ -83,9 +83,11 @@ def main():
         logger.info("Initializing RAG Embedder")
         embedder = RAGEmbedder(
             provider_name=args.provider,
+            ollama_url=args.ollama_url,
             es_url=args.es_url,
             es_index=args.es_index,
-            ollama_url=args.ollama_url,
+            es_basic_auth_user=args.es_basic_auth_user,
+            es_basic_auth_password=args.es_basic_auth_password,
             embedding_model=args.embedding_model,
         )
         logger.debug("RAG Embedder initialized successfully")

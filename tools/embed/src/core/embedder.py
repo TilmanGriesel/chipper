@@ -14,10 +14,12 @@ from haystack_integrations.document_stores.elasticsearch import (
 
 @dataclass
 class PipelineConfig:
-    es_url: str
-    es_index: str
     provider: str
     embedding_model: str
+    es_url: str
+    es_index: str
+    es_basic_auth_user: Optional[str] = None
+    es_basic_auth_password: Optional[str] = None
     ollama_url: Optional[str] = None
     hf_api_key: Optional[str] = None
 
@@ -67,10 +69,12 @@ class MetricsTracker:
 class RAGEmbedder:
     def __init__(
         self,
-        es_url: str = None,
-        es_index: str = None,
         provider_name: str = None,
         embedding_model: str = None,
+        es_url: str = None,
+        es_index: str = None,
+        es_basic_auth_user: str = None,
+        es_basic_auth_password: str = None,
         ollama_url: str = None,
         hf_api_key: str = None,
     ):
@@ -95,10 +99,14 @@ class RAGEmbedder:
         self.logger.info(f"EMBEDDING MODEL:{embedding_model}")
 
         self.config = PipelineConfig(
-            es_url=es_url or os.getenv("ES_URL"),
-            es_index=es_index or os.getenv("ES_INDEX"),
             provider=provider,
             embedding_model=embedding_model,
+            es_url=es_url or os.getenv("ES_URL"),
+            es_index=es_index or os.getenv("ES_INDEX"),
+            es_basic_auth_user=es_basic_auth_user
+            or os.getenv("ES_BASIC_AUTH_USERNAME"),
+            es_basic_auth_password=es_basic_auth_password
+            or os.getenv("ES_BASIC_AUTH_PASSWORD"),
             ollama_url=ollama_url or os.getenv("OLLAMA_URL"),
             hf_api_key=hf_api_key or os.getenv("HF_API_KEY"),
         )
@@ -183,10 +191,25 @@ class RAGEmbedder:
 
     def _initialize_document_store(self) -> ElasticsearchDocumentStore:
         try:
-            document_store = ElasticsearchDocumentStore(
-                hosts=self.config.es_url,
-                index=self.config.es_index,
-            )
+            params = {
+                "hosts": self.config.es_url,
+                "index": self.config.es_index,
+                "embedding_similarity_function": "cosine",
+            }
+
+            # Add basic auth if non-empty
+            if (
+                self.config.es_basic_auth_user
+                and self.config.es_basic_auth_password
+                and self.config.es_basic_auth_user.strip()
+                and self.config.es_basic_auth_password.strip()
+            ):
+                params["basic_auth"] = (
+                    self.config.es_basic_auth_user,
+                    self.config.es_basic_auth_password,
+                )
+
+            document_store = ElasticsearchDocumentStore(**params)
             doc_count = document_store.count_documents()
             self.logger.info(
                 f"Document store initialized successfully with {doc_count} documents"

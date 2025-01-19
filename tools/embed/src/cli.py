@@ -134,6 +134,20 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--es-basic-auth-user",
+        type=str,
+        default=os.getenv("ES_BASIC_AUTH_USERNAME", ""),
+        help="Username for the Elasticsearch service authentication",
+    )
+
+    parser.add_argument(
+        "--es-basic-auth-password",
+        type=str,
+        default=os.getenv("ES_BASIC_AUTH_PASSWORD", ""),
+        help="Password for the Elasticsearch service authentication",
+    )
+
+    parser.add_argument(
         "--ollama-url",
         type=str,
         default=os.getenv("OLLAMA_URL", "http://localhost:11434"),

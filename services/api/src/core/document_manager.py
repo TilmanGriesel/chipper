@@ -36,8 +36,6 @@ class DocumentStoreManager:
             if (
                 self.es_basic_auth_user
                 and self.es_basic_auth_password
-                and isinstance(self.es_basic_auth_user, str)
-                and isinstance(self.es_basic_auth_password, str)
                 and self.es_basic_auth_user.strip()
                 and self.es_basic_auth_password.strip()
             ):
