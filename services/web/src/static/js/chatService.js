@@ -86,6 +86,8 @@ export class ChatService {
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
     let isFirstChunk = true;
+    let isInThinkBlock = false;
+    let thinkBuffer = "";
 
     try {
       while (true) {
@@ -112,14 +114,40 @@ export class ChatService {
               return;
             }
             if (data.chunk) {
-              // trim the first chunk to remove potential leading whitespace
+              // process chunk
               const chunk = isFirstChunk ? data.chunk.trimLeft() : data.chunk;
               if (chunk.length > 0) {
-                onChunk(chunk);
+                // handle think tags
+                for (let i = 0; i < chunk.length; i++) {
+                  if (chunk.slice(i).startsWith("<think>")) {
+                    isInThinkBlock = true;
+                    i += "<think>".length - 1;
+                    continue;
+                  }
+                  if (chunk.slice(i).startsWith("</think>")) {
+                    isInThinkBlock = false;
+                    // process think content
+                    console.log("Think block content:", thinkBuffer);
+                    thinkBuffer = ""; // clear buffer
+                    i += "</think>".length - 1;
+                    continue;
+                  }
+
+                  if (isInThinkBlock) {
+                    thinkBuffer += chunk[i];
+                  } else {
+                    onChunk(chunk[i]);
+                  }
+                }
                 isFirstChunk = false;
               }
             }
             if (data.done) {
+              if (thinkBuffer) {
+                console.log("Final think block content:", thinkBuffer);
+                thinkBuffer = "";
+              }
+
               const ttsText = data.full_response.llm.replies[0];
               console.log(ttsText);
               window.postMessage(

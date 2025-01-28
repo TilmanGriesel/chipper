@@ -48,7 +48,6 @@ class DocumentEmbedder:
         self.embedding_pipeline = None
         self.embedding_dimension = None
 
-        # Validate HuggingFace configuration if selected
         if self.provider == ModelProvider.HUGGINGFACE and not self.hf_api_key:
             raise ValueError(
                 "HuggingFace API key is required when using HuggingFace provider"
