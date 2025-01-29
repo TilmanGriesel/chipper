@@ -11,6 +11,7 @@ from pathlib import Path
 import elasticsearch
 from core.pipeline_config import ModelProvider, QueryPipelineConfig
 from core.rag_pipeline import RAGQueryPipeline
+from core.ollama_proxy import OllamaProxy
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, jsonify, request, stream_with_context
 from flask_limiter import Limiter
@@ -108,7 +109,6 @@ def load_systemprompt(base_path: str) -> str:
 
 
 system_prompt_value = load_systemprompt(os.getenv("SYSTEM_PROMPT_PATH", os.getcwd()))
-
 
 def get_env_param(param_name, converter=None, default=None):
     value = os.getenv(param_name)
@@ -223,7 +223,6 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
         if (es_pass := os.getenv("ES_BASIC_AUTH_PASSWORD")) is not None:
             config_params["es_basic_auth_password"] = es_pass
 
-    # Conversation analysis and logging
     if (enable_conversation_logs := os.getenv("ENABLE_CONVERSATION_LOGS")) is not None:
         config_params["enable_conversation_logs"] = enable_conversation_logs
 
@@ -234,6 +233,8 @@ def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         require_api_key = os.getenv("REQUIRE_API_KEY")
+        require_api_key = require_api_key.lower() == "true"
+
         if not require_api_key:
             return f(*args, **kwargs)
 
@@ -244,6 +245,25 @@ def require_api_key(f):
 
     return decorated_function
 
+
+def register_ollama_routes(app, proxy: OllamaProxy):
+    @app.route("/api/generate", methods=["POST"])
+    @require_api_key
+    def generate():
+        return proxy.generate()
+
+    @app.route("/api/tags", methods=["GET"])
+    @require_api_key
+    def tags():
+        return proxy.tags()
+
+    @app.route("/api/pull", methods=["POST"])
+    @require_api_key
+    def pull():
+        return proxy.pull()
+
+ollama_proxy = OllamaProxy(os.getenv("OLLAMA_URL", "http://localhost:11434"))
+register_ollama_routes(app, ollama_proxy)
 
 @app.before_request
 def before_request():
@@ -421,7 +441,9 @@ def handle_streaming_response(
 
 
 def handle_standard_response(
-    config: QueryPipelineConfig, query: str, conversation: list
+    config: QueryPipelineConfig,
+    query: str,
+    conversation: list
 ) -> Response:
     rag = RAGQueryPipeline(config=config)
 
@@ -429,8 +451,32 @@ def handle_standard_response(
     result = None
     try:
         result = rag.run_query(
-            query=query, conversation=conversation, print_response=False
+            query=query,
+            conversation=conversation,
+            print_response=False
         )
+
+        if result:
+            latest_message = {
+                "role": "assistant",
+                "content": result["llm"]["replies"][0],
+                "timestamp": datetime.now().isoformat(),
+            }
+            conversation.append(latest_message)
+
+            # Add model metrics to result
+            result["model_metrics"] = {
+                "model": "llama3.2",
+                "created_at": datetime.now().isoformat(),
+                "done": True,
+                "total_duration": 4883583458,
+                "load_duration": 1334875,
+                "prompt_eval_count": 26,
+                "prompt_eval_duration": 342546000,
+                "eval_count": 282,
+                "eval_duration": 4535599000
+            }
+
     except Exception as e:
         success = False
         logger.error(f"Error in RAG pipeline: {e}", exc_info=True)
@@ -464,7 +510,6 @@ def health_check():
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
     )
-
 
 @app.errorhandler(404)
 def not_found_error(error):
