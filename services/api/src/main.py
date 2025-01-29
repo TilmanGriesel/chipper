@@ -233,6 +233,10 @@ def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelin
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        require_api_key = os.getenv("REQUIRE_API_KEY")
+        if not require_api_key:
+            return f(*args, **kwargs)
+
         api_key = request.headers.get("X-API-Key")
         if not api_key or api_key != API_KEY:
             abort(401)
@@ -448,7 +452,7 @@ def handle_standard_response(
         }
     )
 
-
+@app.route("/", methods=["GET"])
 @app.route("/health", methods=["GET"])
 def health_check():
     return jsonify(
