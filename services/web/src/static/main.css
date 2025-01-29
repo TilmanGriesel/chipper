@@ -203,7 +203,7 @@ pre[class*="language-"] {
 }
 
 code:not([class*="language-"]) {
-  @apply bg-brand-a-300 dark:bg-brand-b-800 rounded-md p-1;
+  @apply bg-brand-a-300 dark:bg-brand-b-800 rounded-md px-1 py-0.5;
 }
 
 /* -----------------------------------------------------------------------------

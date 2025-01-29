@@ -34,7 +34,7 @@ run-dev:
 		--hostname api \
 		--env-file .env \
 		-v "$(CURDIR)/src:/app/src:z" \
-		-p 21210:8000 \
+		-p 21434:8000 \
 		--name $(CONTAINER_NAME) \
 		--network=$(NETWORK) \
 		$(IMAGE_NAME)

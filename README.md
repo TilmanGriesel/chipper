@@ -44,17 +44,25 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 
 ## Roadmap
 
-- [x] Basic functionality
-- [x] CLI
-- [x] Web UI
-- [x] Docker
-- [x] Improved Web UI with better mobile support
-- [x] Improve linting and formatting
-- [x] Docker Hub registry images
-- [x] Edge inference TTS
-- [ ] Automated unit-tests
-- [ ] React based web app
-- [ ] Smart document chunking and embedding
+#### Done
+
+- [x] **Basic Functionality**
+- [x] **CLI**
+- [x] **Web UI**
+- [x] **Docker**
+- [x] **Enhanced Web UI** (better mobile support)
+- [x] **Improved Linting and Formatting**
+- [x] **Docker Hub Registry Images**
+- [x] **Edge Inference TTS**
+- [x] **Mirror Ollama Chat API** to enable Chipper as a drop-in middleware
+
+#### Todo
+
+- [ ] **Support server side `think` Tag Filtering (DeepSeek R1)**
+- [ ] **Support Ollama Generate API**
+- [ ] **Automated Unit Tests**
+- [ ] **React-Based Web Application**
+- [ ] **Smart Document Chunking and Embedding**
 
 ---
 

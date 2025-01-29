@@ -1,11 +1,12 @@
 import argparse
 import asyncio
+import json
 import logging
 import os
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Deque, Dict, List, Optional
+from typing import Any, AsyncGenerator, Deque, Dict, List, Optional
 from urllib.parse import urljoin
 
 import aiohttp
@@ -22,7 +23,7 @@ BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 class MessageType(Enum):
     USER = "user"
-    ASSISTANT = "chipper"
+    ASSISTANT = "assistant"
     SYSTEM = "system"
     ERROR = "error"
 
@@ -51,6 +52,7 @@ class Config:
         retry_delay=1.0,
         model=None,
         index=None,
+        streaming=False,
     ):
         self.base_url = base_url
         self.api_key = api_key
@@ -62,6 +64,7 @@ class Config:
         self.retry_delay = retry_delay
         self.model = model
         self.index = index
+        self.streaming = streaming
         if not self.api_key:
             raise ValueError("API key must be provided.")
 
@@ -109,6 +112,8 @@ class AsyncAPIClient:
         try:
             async with self.session.request(method, url, **kwargs) as response:
                 response.raise_for_status()
+                if method.upper() == "HEAD":
+                    return {}
                 return await response.json()
 
         except asyncio.TimeoutError:
@@ -135,14 +140,45 @@ class AsyncAPIClient:
                 return await self._make_request(method, endpoint, attempt + 1, **kwargs)
             raise APIError(f"API request failed: {str(e)}")
 
+    async def _stream_response(
+        self, response: aiohttp.ClientResponse
+    ) -> AsyncGenerator[str, None]:
+        try:
+            buffer = ""
+            async for chunk in response.content.iter_chunks():
+                chunk_data = chunk[0].decode("utf-8")
+                buffer += chunk_data
+
+                while "\n\n" in buffer:
+                    message, buffer = buffer.split("\n\n", 1)
+                    if message.startswith("data: "):
+                        data = json.loads(message[6:])
+
+                        if "chunk" in data:
+                            yield data["chunk"]
+                        elif "message" in data and "content" in data["message"]:
+                            yield data["message"]["content"]
+                        elif "error" in data:
+                            raise APIError(data["error"])
+
+                        if data.get("done", False):
+                            return
+
+        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            raise APIError(f"Failed to decode stream: {str(e)}")
+
     async def query(
         self, query_text: str, conversation_context: List[Dict[str, str]]
     ) -> Dict[str, Any]:
-        messages = [
-            {"role": ctx["role"], "content": ctx["content"]}
-            for ctx in conversation_context
-        ]
-        messages.append({"role": "user", "content": query_text})
+        messages = []
+        for ctx in conversation_context:
+            clean_content = (
+                ctx["content"].encode("utf-8", errors="ignore").decode("utf-8")
+            )
+            messages.append({"role": ctx["role"], "content": clean_content})
+
+        clean_query = query_text.encode("utf-8", errors="ignore").decode("utf-8")
+        messages.append({"role": "user", "content": clean_query})
 
         options = {
             k: v
@@ -151,11 +187,22 @@ class AsyncAPIClient:
         }
 
         try:
-            return await self._make_request(
+            response = await self._make_request(
                 "POST",
                 "/api/chat",
                 json={"messages": messages, "stream": False, "options": options},
             )
+
+            if "message" in response:
+                return {
+                    "success": True,
+                    "result": {"llm": {"replies": [response["message"]["content"]]}},
+                }
+            elif "error" in response:
+                raise APIError(response["error"])
+            else:
+                return response
+
         except APIError as e:
             self.logger.error(f"Query failed: {str(e)}")
             raise
@@ -174,7 +221,7 @@ class ChatInterface:
         self.theme = Theme(
             {
                 "user": "green",
-                "chipper": "blue",
+                "assistant": "blue",
                 "system": "yellow",
                 "error": "red",
             }
@@ -194,28 +241,87 @@ class ChatInterface:
             "/index": self._cmd_index,
             "/settings": self._cmd_settings,
             "/retry": self._cmd_retry,
+            "/stream": self._cmd_stream,
         }
         self.last_query = None
         self.last_context = None
 
+    async def _handle_query(self, user_input: str, context: list = None):
+        if context is None:
+            context = list(self.conversation_context)
+
+        try:
+            if self.config.streaming:
+                self.display_message(
+                    Message("Steaming is not implemented!", MessageType.ERROR)
+                )
+            else:
+                await self._handle_non_streaming_query(user_input, context)
+        except APIError as e:
+            self.display_message(
+                Message(f"Error: {str(e)}\nUse /retry to try again.", MessageType.ERROR)
+            )
+
+    async def _handle_non_streaming_query(self, user_input: str, context: list):
+        try:
+            with self.console.status("[bold blue]Thinking...", spinner="dots"):
+                response = await self.client.query(user_input, context)
+
+                if "error" in response:
+                    raise APIError(response["error"])
+
+                if response.get("success"):
+                    result = response.get("result", {})
+                    replies = result.get("llm", {}).get("replies", [])
+
+                    if not replies:
+                        self.display_message(
+                            Message("No response received", MessageType.ERROR)
+                        )
+                    else:
+                        for reply in replies:
+                            self.display_message(Message(reply, MessageType.ASSISTANT))
+                else:
+                    self.display_message(
+                        Message("Failed to get response", MessageType.ERROR)
+                    )
+
+        except APIError as e:
+            raise e
+
     def display_welcome(self):
         welcome_text = """
-Available commands:
-* /help     - Show this help message
-* /quit     - Exit the application
-* /clear    - Clear the screen
-* /history  - Show message history
-* /context  - Adjust context size
-* /model    - Set the model name
-* /index    - Set the index name
-* /settings - Show current settings
-* /retry    - Retry last query
+    Available commands:
+    * /help     - Show this help message
+    * /quit     - Exit the application
+    * /clear    - Clear the screen
+    * /history  - Show message history
+    * /context  - Adjust context size
+    * /model    - Set the model name
+    * /index    - Set the index name
+    * /settings - Show current settings
+    * /retry    - Retry last query
+    * /stream   - Toggle streaming mode
 
-Type your message and press Enter to chat.
-"""
+    Type your message and press Enter to chat.
+    """
         self.console.print(
-            Panel(Markdown(welcome_text), title="Chipper Chat CLI", border_style="blue")
+            Panel(
+                Markdown(welcome_text),
+                title=f"Chat CLI {APP_VERSION}.{BUILD_NUMBER}",
+                border_style="blue",
+            )
         )
+
+    def get_user_input(self) -> str:
+        """Get input from the user with proper formatting."""
+        try:
+            return Prompt.ask("\n[bold green]You[/bold green]")
+        except (KeyboardInterrupt, EOFError):
+            self.console.print(
+                "\n[yellow]Input interrupted. Type /quit to exit.[/yellow]"
+            )
+            return ""
 
     def display_message(self, message: Message):
         panel = Panel(
@@ -231,8 +337,45 @@ Type your message and press Enter to chat.
                 {"role": message.type.value, "content": message.content}
             )
 
-    def get_user_input(self) -> str:
-        return Prompt.ask("\n[bold green]You[/bold green]")
+    async def run(self):
+        try:
+            async with AsyncAPIClient(self.config) as client:
+                self.client = client
+                health_status = await client.health_check()
+                if health_status.get("status") != "healthy":
+                    raise APIError("API is not healthy")
+
+                self.display_welcome()
+
+                while True:
+                    try:
+                        user_input = self.get_user_input()
+
+                        if user_input.startswith("/"):
+                            should_continue = await self.process_command(user_input)
+                            if not should_continue:
+                                break
+                            continue
+
+                        user_message = Message(user_input, MessageType.USER)
+                        self.display_message(user_message)
+
+                        self.last_query = user_input
+                        self.last_context = list(self.conversation_context)
+
+                        await self._handle_query(user_input)
+
+                    except asyncio.CancelledError:
+                        self.console.print("[red]Operation cancelled[/red]")
+                    except Exception as e:
+                        self.console.print(f"Error processing message: {e}")
+                        error_message = Message(
+                            f"Internal error: {str(e)}", MessageType.ERROR
+                        )
+                        self.display_message(error_message)
+
+        except Exception as e:
+            self.console.print(f"[red]Fatal error: {str(e)}[/red]")
 
     async def _cmd_quit(self) -> bool:
         self.console.print("[blue]Goodbye![/blue]")
@@ -288,6 +431,12 @@ Type your message and press Enter to chat.
             self.console.print(f"[blue]Index updated to {new_index}[/blue]")
         return True
 
+    async def _cmd_stream(self) -> bool:
+        self.config.streaming = not self.config.streaming
+        status = "enabled" if self.config.streaming else "disabled"
+        self.console.print(f"[blue]Streaming mode {status}[/blue]")
+        return True
+
     async def _cmd_settings(self) -> bool:
         self.console.print(
             Panel(
@@ -298,6 +447,7 @@ Type your message and press Enter to chat.
 - Base URL: {self.config.base_url}
 - Max Retries: {self.config.max_retries}
 - Retry Delay: {self.config.retry_delay}s
+- Streaming: {'enabled' if self.config.streaming else 'disabled'}
             """,
                 title="Settings",
                 border_style="blue",
@@ -321,67 +471,6 @@ Type your message and press Enter to chat.
         self.console.print(f"[blue]Unknown command: {command}[/blue]")
         return True
 
-    async def _handle_query(self, user_input: str, context: list = None):
-        if context is None:
-            context = list(self.conversation_context)
-
-        try:
-            with self.console.status("[bold blue]Thinking...", spinner="dots"):
-                response = await self.client.query(user_input, context)
-                result = response.get("result", {}) if response.get("success") else {}
-                replies = result.get("llm", {}).get("replies") or [
-                    "No response received"
-                ]
-
-                for reply in replies:
-                    self.display_message(Message(reply, MessageType.ASSISTANT))
-
-        except APIError as e:
-            self.display_message(
-                Message(f"Error: {str(e)}\nUse /retry to try again.", MessageType.ERROR)
-            )
-
-    async def run(self):
-        try:
-            async with AsyncAPIClient(self.config) as client:
-                self.client = client
-                health_status = await client.health_check()
-                if health_status.get("status") != "healthy":
-                    raise APIError("API is not healthy")
-
-                self.display_welcome()
-
-                while True:
-                    try:
-                        user_input = self.get_user_input()
-
-                        if user_input.startswith("/"):
-                            should_continue = await self.process_command(user_input)
-                            if not should_continue:
-                                break
-                            continue
-
-                        user_message = Message(user_input, MessageType.USER)
-                        self.display_message(user_message)
-
-                        self.last_query = user_input
-                        self.last_context = list(self.conversation_context)
-
-                        await self._handle_query(user_input)
-
-                    except asyncio.CancelledError:
-                        self.console.print("[red]Operation cancelled[/red]")
-                    except Exception as e:
-                        self.console.print(f"Error processing message: {e}")
-                        error_message = Message(
-                            f"Internal error: {str(e)}", MessageType.ERROR
-                        )
-                        self.display_message(error_message)
-                        raise e
-
-        except Exception as e:
-            self.console.print(f"[red]Fatal error: {str(e)}[/red]")
-
 
 def setup_logging(log_level):
     logging.basicConfig(
@@ -393,33 +482,27 @@ def setup_logging(log_level):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=f"Chipper Chat CLI {APP_VERSION}.{BUILD_NUMBER}"
+        description=f"Chat CLI {APP_VERSION}.{BUILD_NUMBER}"
     )
-
     parser.add_argument(
         "--host", default=os.getenv("API_HOST", "0.0.0.0"), help="API Host"
     )
-
     parser.add_argument(
         "--port", default=os.getenv("API_PORT", "8000"), help="API Port"
     )
-
     parser.add_argument("--api_key", default=os.getenv("API_KEY"), help="API Key")
-
     parser.add_argument(
         "--timeout",
         type=int,
         default=int(os.getenv("API_TIMEOUT", "120")),
         help="API Timeout",
     )
-
     parser.add_argument(
         "--verify_ssl",
         action="store_true",
         default=os.getenv("REQUIRE_SECURE", "False").lower() == "true",
         help="Verify SSL",
     )
-
     parser.add_argument(
         "--log_level", default=os.getenv("LOG_LEVEL", "INFO"), help="Log Level"
     )
@@ -429,17 +512,15 @@ def main():
         default=int(os.getenv("MAX_CONTEXT_SIZE", "10")),
         help="Maximum Context Size",
     )
-
     parser.add_argument(
         "--model",
         default=os.getenv("MODEL_NAME"),
         help="Model name to use",
     )
-
     parser.add_argument(
         "--index",
         default=os.getenv("ES_INDEX"),
-        help="Elasticsearch index to use",
+        help="Index to use",
     )
 
     args = parser.parse_args()
@@ -456,6 +537,7 @@ def main():
         retry_delay=1.0,
         model=args.model,
         index=args.index,
+        streaming=False,
     )
 
     setup_logging(config.log_level)

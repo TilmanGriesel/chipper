@@ -234,7 +234,7 @@ class ApiMirrorTester:
 
 async def main():
     tester = ApiMirrorTester(
-        Chipper_api_base="http://localhost:21210/",
+        Chipper_api_base="http://localhost:21434/",
         ollama_api_base="http://localhost:11434",
         verify_ssl=False,
     )

@@ -27,7 +27,7 @@ services:
       args:
         BUILD_ENV: development
     ports:
-      - 21210:8000
+      - 21434:8000
     env_file: ../services/api/.env
     depends_on:
       elasticsearch:

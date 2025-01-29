@@ -1,5 +1,6 @@
 import argparse
 import hashlib
+import json
 import logging
 import os
 import secrets
@@ -232,7 +233,16 @@ def create_app():
         try:
             data = request.get_json()
             if not data:
-                return jsonify({"error": "Invalid JSON payload"}), 400
+                return (
+                    jsonify(
+                        {
+                            "error": "Invalid JSON payload",
+                            "done": True,
+                            "done_reason": "error",
+                        }
+                    ),
+                    400,
+                )
 
             session_id = session.get("session_id")
             abort_flag = session_manager.get_abort_flag(session_id)
@@ -253,14 +263,26 @@ def create_app():
                                 yield 'data: {"type": "abort", "content": "Request aborted"}\n\n'
                                 break
                             if chunk:
-                                yield chunk.decode() + "\n\n"
+                                try:
+                                    chunk_data = json.loads(chunk.decode())
+                                    formatted_chunk = {
+                                        "chunk": chunk_data.get("message", {}).get(
+                                            "content", ""
+                                        ),
+                                        "done": chunk_data.get("done", False),
+                                    }
+                                    if chunk_data.get("done"):
+                                        formatted_chunk["full_response"] = chunk_data
+                                    yield f"data: {json.dumps(formatted_chunk)}\n\n"
+                                except json.JSONDecodeError:
+                                    yield f'data: {{"chunk": {json.dumps(chunk.decode())}, "done": false}}\n\n'
                     except Exception as e:
                         logger.error(f"Stream error: {str(e)}")
-                        yield f'data: {{"type": "error", "content": "{str(e)}"}}\n\n'
+                        yield f'data: {{"error": "{str(e)}", "done": true, "done_reason": "error"}}\n\n'
 
                 return Response(
                     stream_with_context(generate()),
-                    mimetype="text/event-stream",
+                    mimetype="application/x-ndjson",
                     headers={
                         "Cache-Control": "no-cache",
                         "X-Accel-Buffering": "no",
@@ -270,17 +292,33 @@ def create_app():
             else:
                 # non-streaming response
                 response = make_api_request("/api/chat", data)
-                return jsonify(response.json())
+                response_data = response.json()
+                formatted_response = {
+                    "message": {
+                        "role": "assistant",
+                        "content": response_data.get("text", ""),
+                    },
+                    "done": True,
+                }
+                return jsonify(formatted_response)
 
         except (ConnectionError, Timeout):
-            return jsonify({"error": "Connection error"}), 503
+            return (
+                jsonify(
+                    {"error": "Connection error", "done": True, "done_reason": "error"}
+                ),
+                503,
+            )
         except RequestException as e:
             status_code = (
                 e.response.status_code
                 if hasattr(e, "response") and e.response is not None
                 else 500
             )
-            return jsonify({"error": str(e)}), status_code
+            return (
+                jsonify({"error": str(e), "done": True, "done_reason": "error"}),
+                status_code,
+            )
 
     @app.route("/api/chat/abort", methods=["POST"])
     def abort_chat():

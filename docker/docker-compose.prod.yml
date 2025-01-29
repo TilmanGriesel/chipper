@@ -11,7 +11,7 @@ services:
   api:
     image: griesel/chipper:api-latest
     ports:
-      - 127.0.0.1:21210:8000
+      - 127.0.0.1:21434:8000
     env_file: ../services/api/.env
     depends_on:
       elasticsearch:

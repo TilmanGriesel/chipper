@@ -208,8 +208,7 @@ class RAGQueryPipeline:
                 self.conversation_logger.log_conversation(query, response, conversation)
 
             if print_response and response["llm"]["replies"]:
-                print(response["llm"]["replies"][0])
-                print("\n")
+                logging.info("Response: " + response["llm"]["replies"][0])
 
             return response
 

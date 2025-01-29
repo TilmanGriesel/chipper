@@ -1,4 +1,4 @@
-curl -X POST http://localhost:21210/api/chat \
+curl -X POST http://localhost:21434/api/chat \
   -H "Content-Type: application/json" \
   -H "X-API-Key: EXAMPLE_API_KEY" \
   -d '{
