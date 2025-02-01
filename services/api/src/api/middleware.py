@@ -78,7 +78,7 @@ def setup_security_middleware(app):
 def setup_request_logging_middleware(app):
     @app.before_request
     def log_request_info():
-        if request.path == "/health":
+        if request.path == "/" or request.path == "/health":
             return
 
         log_data = {
@@ -89,7 +89,7 @@ def setup_request_logging_middleware(app):
             "request_id": request.headers.get("X-Request-ID"),
         }
 
-        logger.info("Incoming request", extra=log_data)
+        logger.debug("Incoming request", extra=log_data)
 
 
 def init_middleware(app):
