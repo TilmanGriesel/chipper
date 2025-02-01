@@ -38,6 +38,10 @@ def format_stream_response(
     else:
         if done_reason:
             response["done_reason"] = done_reason
+
+        if done_reason is "error":
+            response["message"] = {"role": "assistant", "content": content}
+
         response.update(
             {
                 "total_duration": metrics.get("total_duration", 0),
@@ -164,7 +168,7 @@ def handle_streaming_response(
         except elasticsearch.BadRequestError as e:
             error_data = format_stream_response(
                 config,
-                f"Error: Embedding retriever error - {str(e)}",
+                content=f"Error: Embedding retriever error - {str(e)}",
                 done=True,
                 done_reason="error",
             )
@@ -172,7 +176,7 @@ def handle_streaming_response(
 
         except Exception as e:
             error_data = format_stream_response(
-                config, f"Error: {str(e)}", done=True, done_reason="error"
+                config, content=f"Error: {str(e)}", done=True, done_reason="error"
             )
             logger.error(f"Error in RAG pipeline: {e}", exc_info=True)
             q.put(json.dumps(error_data) + "\n")

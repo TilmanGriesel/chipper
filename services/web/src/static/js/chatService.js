@@ -110,11 +110,11 @@ export class ChatService {
 
           try {
             const data = JSON.parse(messageChunk.slice(6).trim());
-            console.info("--->", data);
 
             // Handle error responses
             if (data.error || (data.done && data.done_reason === "error")) {
-              onError(data.error || "Unknown error occurred");
+              console.error(data)
+              onError(data.message.content || "Unknown error occurred");
               return;
             }
 
