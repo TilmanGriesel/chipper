@@ -1,4 +1,4 @@
-from api.config import PROVIDER_IS_OLLAMA, logger
+from api.config import PROVIDER_IS_OLLAMA, ENABLE_OLLAMA_PROXY, logger
 from api.ollama_routes import setup_ollama_routes
 from api.routes import register_chat_routes, register_health_routes
 from flask import Flask
@@ -6,7 +6,7 @@ from flask import Flask
 
 def setup_all_routes(app: Flask):
     try:
-        if PROVIDER_IS_OLLAMA:
+        if PROVIDER_IS_OLLAMA and ENABLE_OLLAMA_PROXY:
             # Setup Ollama-specific routes
             setup_ollama_routes(app)
             logger.info("Ollama routes registered successfully")

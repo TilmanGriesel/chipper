@@ -34,6 +34,8 @@ ALLOW_MODEL_PARAMETER_CHANGE = (
     os.getenv("ALLOW_MODEL_PARAMETER_CHANGE", "true").lower() == "true"
 )
 IGNORE_MODEL_REQUEST = os.getenv("IGNORE_MODEL_REQUEST", "true").lower() == "true"
+ENABLE_OLLAMA_PROXY = os.getenv("ENABLE_OLLAMA_PROXY", "true").lower() == "true"
+
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 # Rate limiting configuration
