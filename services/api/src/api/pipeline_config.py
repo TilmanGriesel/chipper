@@ -1,10 +1,33 @@
 import os
+from enum import Enum
+from typing import Any, Optional, TypeVar, Callable
 
 from api.config import system_prompt_value
 from core.pipeline_config import ModelProvider, QueryPipelineConfig
 
 
-def get_env_param(param_name, converter=None, default=None):
+class EnvKeys(str, Enum):
+    PROVIDER = "PROVIDER"
+    MODEL_NAME = "MODEL_NAME"
+    HF_MODEL_NAME = "HF_MODEL_NAME"
+    EMBEDDING_MODEL = "EMBEDDING_MODEL_NAME"
+    HF_EMBEDDING_MODEL = "HF_EMBEDDING_MODEL_NAME"
+    HF_API_KEY = "HF_API_KEY"
+    OLLAMA_URL = "OLLAMA_URL"
+    ALLOW_MODEL_PULL = "ALLOW_MODEL_PULL"
+    ES_URL = "ES_URL"
+    ES_INDEX = "ES_INDEX"
+    ES_TOP_K = "ES_TOP_K"
+    ES_NUM_CANDIDATES = "ES_NUM_CANDIDATES"
+    ES_BASIC_AUTH_USER = "ES_BASIC_AUTH_USERNAME"
+    ES_BASIC_AUTH_PASSWORD = "ES_BASIC_AUTH_PASSWORD"
+    ENABLE_CONVERSATION_LOGS = "ENABLE_CONVERSATION_LOGS"
+    FILTER_THINK_TAG_CONTENT = "FILTER_THINK_TAG_CONTENT"
+
+
+T = TypeVar('T')
+
+def get_env_param(param_name: str, converter: Optional[Callable[[str], T]] = None, default: Optional[str] = None) -> Optional[T]:
     value = os.getenv(param_name)
     if value is None:
         return None
@@ -19,87 +42,92 @@ def get_env_param(param_name, converter=None, default=None):
     return value
 
 
-def create_pipeline_config(model: str = None, index: str = None) -> QueryPipelineConfig:
-    provider_name = os.getenv("PROVIDER", "ollama")
+def create_pipeline_config(model: Optional[str] = None, index: Optional[str] = None) -> QueryPipelineConfig:
+    # Determine provider
     provider = (
         ModelProvider.HUGGINGFACE
-        if provider_name.lower() == "hf"
+        if os.getenv(EnvKeys.PROVIDER, "ollama").lower() == "hf"
         else ModelProvider.OLLAMA
     )
 
-    if provider == ModelProvider.HUGGINGFACE:
-        model_name = model or os.getenv("HF_MODEL_NAME")
-        embedding_model = os.getenv("HF_EMBEDDING_MODEL_NAME")
-    else:
-        model_name = model or os.getenv("MODEL_NAME")
-        embedding_model = os.getenv("EMBEDDING_MODEL_NAME")
+    # Get model names based on provider
+    model_name = model or os.getenv(
+        EnvKeys.HF_MODEL_NAME if provider == ModelProvider.HUGGINGFACE else EnvKeys.MODEL_NAME
+    )
+    embedding_model = os.getenv(
+        EnvKeys.HF_EMBEDDING_MODEL if provider == ModelProvider.HUGGINGFACE else EnvKeys.EMBEDDING_MODEL
+    )
 
-    config_params = {
+    # Initialize base configuration
+    config: dict[str, Any] = {
         "provider": provider,
-        "embedding_model": embedding_model,
         "model_name": model_name,
+        "embedding_model": embedding_model,
         "system_prompt": system_prompt_value,
     }
 
-    # Provider specific parameters
+    # Provider-specific authentication
     if provider == ModelProvider.HUGGINGFACE:
-        if (hf_key := os.getenv("HF_API_KEY")) is not None:
-            config_params["hf_api_key"] = hf_key
-    else:
-        if (ollama_url := os.getenv("OLLAMA_URL")) is not None:
-            config_params["ollama_url"] = ollama_url
+        config["hf_api_key"] = os.getenv(EnvKeys.HF_API_KEY)
+    elif (ollama_url := os.getenv(EnvKeys.OLLAMA_URL)):
+        config["ollama_url"] = ollama_url
 
     # Model pull configuration
-    allow_pull = os.getenv("ALLOW_MODEL_PULL")
-    if allow_pull is not None:
-        config_params["allow_model_pull"] = allow_pull.lower() == "true"
+    if (allow_pull := os.getenv(EnvKeys.ALLOW_MODEL_PULL)):
+        config["allow_model_pull"] = allow_pull.lower() == "true"
 
-    # Core generation parameters
-    if (context_window := get_env_param("CONTEXT_WINDOW", int, "8192")) is not None:
-        config_params["context_window"] = context_window
+    # Generation parameters with types
+    generation_params = {
+        "CONTEXT_WINDOW": ("context_window", int, "8192"),
+        "TEMPERATURE": ("temperature", float, None),
+        "SEED": ("seed", int, None),
+        "TOP_K": ("top_k", int, None),
+        "TOP_P": ("top_p", float, None),
+        "MIN_P": ("min_p", float, None),
+        "REPEAT_LAST_N": ("repeat_last_n", int, None),
+        "REPEAT_PENALTY": ("repeat_penalty", float, None),
+        "NUM_PREDICT": ("num_predict", int, None),
+        "TFS_Z": ("tfs_z", float, None)
+    }
 
-    for param in ["TEMPERATURE", "SEED", "TOP_K"]:
-        if (
-            value := get_env_param(param, float if param == "TEMPERATURE" else int)
-        ) is not None:
-            config_params[param.lower()] = value
-
-    # Advanced sampling parameters
-    for param in ["TOP_P", "MIN_P"]:
-        if (value := get_env_param(param, float)) is not None:
-            config_params[param.lower()] = value
+    for env_key, (config_key, param_type, default) in generation_params.items():
+        if (value := get_env_param(env_key, param_type, default)) is not None:
+            config[config_key] = value
 
     # Mirostat parameters
     if (mirostat := get_env_param("MIROSTAT", int)) is not None:
-        config_params["mirostat"] = mirostat
+        config["mirostat"] = mirostat
         for param in ["MIROSTAT_ETA", "MIROSTAT_TAU"]:
             if (value := get_env_param(param, float)) is not None:
-                config_params[param.lower()] = value
+                config[param.lower()] = value
 
-    # Elasticsearch parameters
-    if (es_url := os.getenv("ES_URL")) is not None:
-        config_params["es_url"] = es_url
+    # Elasticsearch configuration
+    if (es_url := os.getenv(EnvKeys.ES_URL)):
+        config.update({
+            "es_url": es_url,
+            "es_index": index or os.getenv(EnvKeys.ES_INDEX),
+            "es_basic_auth_user": os.getenv(EnvKeys.ES_BASIC_AUTH_USER),
+            "es_basic_auth_password": os.getenv(EnvKeys.ES_BASIC_AUTH_PASSWORD)
+        })
 
-        if index is not None:
-            config_params["es_index"] = index
-        elif (es_index := os.getenv("ES_INDEX")) is not None:
-            config_params["es_index"] = es_index
+        es_params = {
+            EnvKeys.ES_TOP_K: ("es_top_k", "5"),
+            EnvKeys.ES_NUM_CANDIDATES: ("es_num_candidates", "-1")
+        }
+        for env_key, (config_key, default) in es_params.items():
+            if (value := get_env_param(env_key, int, default)) is not None:
+                config[config_key] = value
 
-        if (es_top_k := get_env_param("ES_TOP_K", int, "5")) is not None:
-            config_params["es_top_k"] = es_top_k
+    # Boolean settings
+    bool_settings = {
+        EnvKeys.ENABLE_CONVERSATION_LOGS: "enable_conversation_logs",
+    }
+    for env_key, config_key in bool_settings.items():
+        if (value := os.getenv(env_key)) is not None:
+            config[config_key] = value.lower() == "true"
 
-        if (
-            es_num_candidates := get_env_param("ES_NUM_CANDIDATES", int, "-1")
-        ) is not None:
-            config_params["es_num_candidates"] = es_num_candidates
+    # Stop sequence
+    if (stop_sequence := os.getenv("STOP_SEQUENCE")):
+        config["stop_sequence"] = stop_sequence
 
-        if (es_user := os.getenv("ES_BASIC_AUTH_USERNAME")) is not None:
-            config_params["es_basic_auth_user"] = es_user
-
-        if (es_pass := os.getenv("ES_BASIC_AUTH_PASSWORD")) is not None:
-            config_params["es_basic_auth_password"] = es_pass
-
-    if (enable_conversation_logs := os.getenv("ENABLE_CONVERSATION_LOGS")) is not None:
-        config_params["enable_conversation_logs"] = enable_conversation_logs
-
-    return QueryPipelineConfig(**config_params)
+    return QueryPipelineConfig(**config)
