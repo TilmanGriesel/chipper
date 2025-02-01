@@ -24,6 +24,9 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
 BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
+# Provider settings
+PROVIDER_IS_OLLAMA = os.getenv("PROVIDER", "ollama") == "ollama"
+
 # Feature flags
 ALLOW_MODEL_CHANGE = os.getenv("ALLOW_MODEL_CHANGE", "true").lower() == "true"
 ALLOW_INDEX_CHANGE = os.getenv("ALLOW_INDEX_CHANGE", "true").lower() == "true"
