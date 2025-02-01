@@ -101,7 +101,7 @@ def register_chat_routes(app: Flask):
                 temperature = data.get("temperature", None)
                 top_k = data.get("top_k", None)
                 top_p = data.get("top_p", None)
-                seed = data.get("top_p", None)
+                seed = data.get("seed", None)
 
             # Handle index parameter
             index = options.get("index")
