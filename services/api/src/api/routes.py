@@ -82,8 +82,8 @@ def register_chat_routes(app: Flask):
                     or "content" not in message
                 ):
                     abort(400, description="Invalid message format")
-                if message["role"] not in ["system", "user", "assistant", "tool"]:
                     abort(400, description="Invalid message role")
+                if message["role"] != "" and message["role"] not in ["system", "user", "assistant", "tool"]:
 
             # Optional parameters
             # tools = data.get("tools", [])
