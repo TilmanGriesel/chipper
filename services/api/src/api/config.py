@@ -35,6 +35,7 @@ ALLOW_MODEL_PARAMETER_CHANGE = (
 )
 IGNORE_MODEL_REQUEST = os.getenv("IGNORE_MODEL_REQUEST", "true").lower() == "true"
 ENABLE_OLLAMA_PROXY = os.getenv("ENABLE_OLLAMA_PROXY", "true").lower() == "true"
+BYPASS_OLLAMA_RAG = os.getenv("BYPASS_OLLAMA_RAG", "false").lower() == "true"
 
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 

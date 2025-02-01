@@ -15,6 +15,7 @@ class OllamaProxy:
 
     This class provides methods for all Ollama API endpoints, handling both streaming
     and non-streaming responses, and managing various model operations.
+    Ref: https://github.com/ollama/ollama/blob/main/docs/api.md
     """
 
     def __init__(self, base_url: Optional[str] = None):
@@ -101,6 +102,10 @@ class OllamaProxy:
     def generate(self) -> Response:
         """Generate a completion for a given prompt."""
         return self._proxy_request("/api/generate", "POST", stream=True)
+
+    def chat(self) -> Response:
+        """Generate the next message in a chat conversation."""
+        return self._proxy_request("/api/chat", "POST", stream=True)
 
     def embeddings(self) -> Response:
         """Generate embeddings (legacy endpoint)."""

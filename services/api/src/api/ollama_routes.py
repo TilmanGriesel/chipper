@@ -1,6 +1,6 @@
 import os
 
-from api.config import logger
+from api.config import BYPASS_OLLAMA_RAG, logger
 from api.middleware import require_api_key
 from api.ollama_proxy import OllamaProxy
 
@@ -10,6 +10,19 @@ class OllamaRoutes:
         self.app = app
         self.proxy = proxy
         self.register_routes()
+
+        if BYPASS_OLLAMA_RAG:
+            self.register_bypass_routes()
+
+    def register_bypass_routes(self):
+        @self.app.route("/api/chat", methods=["POST"])
+        @require_api_key
+        def chat():
+            try:
+                return self.proxy.chat()
+            except Exception as e:
+                logger.error(f"Error in chat endpoint: {e}")
+                return {"error": str(e)}, 500
 
     def register_routes(self):
         # Generation endpoints
