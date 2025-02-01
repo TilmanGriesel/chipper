@@ -62,7 +62,7 @@ services:
       - xpack.security.enabled=false
       - "http.cors.enabled=true"
       - "http.cors.allow-origin=http://localhost:21230"
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     networks:
