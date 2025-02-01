@@ -6,23 +6,28 @@
     <a href="https://github.com/tilmangriesel/chipper/issues"><img src="https://img.shields.io/github/issues/tilmangriesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a><a href="https://hub.docker.com/repository/docker/griesel/chipper"><img src="https://img.shields.io/docker/pulls/griesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a>
 </p>
 
-**Chipper** gives you a web interface, CLI, and a hackable, simple architecture for embedding pipelines, document chunking, web scraping, and query workflows. Built with **Haystack**, **Ollama**, **Hugging Face**, **Docker**, **Tailwind**, and **ElasticSearch**, it runs locally or scales as a Dockerized service.
+**Chipper** provides a web interface, CLI, and a modular, hackable architecture for embedding pipelines, document chunking, web scraping, and query workflows. Built with **Haystack**, **Ollama**, **Hugging Face**, **Docker**, **TailwindCSS**, and **ElasticSearch**, it runs locally or scales seamlessly as a Dockerized service.
 
-This project started as a way to help my girlfriend with her new book. The idea was to use local RAG and LLMs to ask questions about characters and explore creative possibilities, all without sharing proprietary details or your own book with cloud services like ChatGPT. What began as a bunch of scripts is now growing into a fully dockerized service architecture.
+This project started as a personal tool to help my girlfriend with her book, using local RAG and LLMs to explore characters and creative ideas without exposing proprietary content to cloud services like ChatGPT. What began as a collection of scripts has evolved into a fully dockerized, extensible service architecture I wanted to share with the world.
 
-If you **like what you see, leaving a star would be sweet** and will help more people discover Chipper!
+If you find Chipper useful, **dropping a star would be lovely** and will help others discover Chipper too.
 
-Check out the **live demo**: https://demo.chipper.tilmangriesel.com/
+**Live Demo:** [https://demo.chipper.tilmangriesel.com/](https://demo.chipper.tilmangriesel.com/)
 
 ## Features
 
-- Local [Ollama](https://ollama.com/) and [hosted Hugging Face API](https://huggingface.co/)
-- Build a powerful knowledge base using ElasticSearch embeddings.
-- Automatically split documents via Haystack.
-- Scrape content from web sources.
-- Transcribe audio files into text.
-- Access via a user-friendly CLI or web client interface.
-- Deploy effortlessly using Docker.
+- **Local & Cloud Model Support** – Run models locally with [Ollama](https://ollama.com/) or access hosted models via the [Hugging Face API](https://huggingface.co/).
+- **ElasticSearch Embeddings** – Store and retrieve vectorized data efficiently for building a scalable knowledge base.
+- **Document Processing** – Automatically split documents into manageable chunks using Haystack for optimized retrieval.
+- **Web Scraping** – Extract and index content from web sources for enhanced data ingestion.
+- **Audio Transcription** – Convert audio files to text for further processing and indexing.
+- **CLI & Web Client** – Access via a command-line interface or a lightweight, framework-free web UI.
+- **Docker Deployment** – Run in a containerized environment with minimal setup.
+- **Customizable RAG Pipelines** – Override model selection, query parameters, system prompts and more.
+- **Full Ollama API Reflection** – Use Chipper as a drop-in service to extend Ollama with RAG capabilities, enabling enhanced retrieval and contextual responses for all Ollama clients.
+- **API Proxy & Security** – Reflect and proxy the Ollama API with API key route protection.
+- **Offline-Capable Web UI** – Built with vanilla JavaScript and TailwindCSS, including all resources for offline use.
+- **Daisy-Chaining** – Connect multiple Chipper instances for extended processing and distributed workloads.
 
 ## Installation and Setup
 
@@ -38,9 +43,37 @@ This project wants to be more than just a technical foundation, for educators, i
 
 Feel free to improve, fork, copy, share or expand this project. Contributions are always very welcome!
 
-## Demo
+## Demos
 
-<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/chipper_demo_01.gif"alt="Chipper RAG Util Demo Browser"/></p>
+### Web Interface
+
+Leverage the built-in Chipper web interface for an easy entry into customizable RAG pipelines and tailored output. Written in vanilla JavaScript, it requires no specific framework experience. The interface is built with TailwindCSS and includes all resources offline. Use the `/help` command learn how to switch models, update the embeddings index and more.
+
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat.gif" alt="chipper_demo_chat"/></p>
+
+### Code Output
+
+Automatic syntax highlighting for popular programming languages in the web interface.
+
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_code.gif" alt="chipper_demo_code_gen"/></p>
+
+### Reasoning
+
+For models like DeepSeek-R1, Chipper suppresses the "think" output in the UI while preserving the reasoning steps in the console output.
+
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_ds.gif" alt="chipper_demo_deepseek"/></p>
+
+### CLI Interface
+
+Full support for the Ollama CLI and API, including reflection and proxy capabilities, with API key route decorations.
+
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_cli.gif" alt="chipper_demo_ollama_cli"/></p>
+
+### Third-Party Client And More
+
+Enhance every third-party Ollama client with server-side knowledge base embeddings, allowing server side model selection, query parameters, and system prompt overrides. Enable RAG for any Ollama client or use Chipper as a centralized knowledge base. Chipper also supports daisy chaining.
+
+<p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_ollamac.gif" alt="chipper_demo_ollamac"/></p>
 
 ## Roadmap
 
@@ -58,11 +91,9 @@ Feel free to improve, fork, copy, share or expand this project. Contributions ar
 
 #### Todo
 
-- [ ] **Support server side `think` Tag Filtering (DeepSeek R1)**
-- [ ] **Support Ollama Generate API**
 - [ ] **Automated Unit Tests**
-- [ ] **React-Based Web Application**
 - [ ] **Smart Document Chunking and Embedding**
+- [ ] **React-Based Web Application**
 
 ---
 
