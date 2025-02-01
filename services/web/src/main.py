@@ -263,7 +263,6 @@ def create_app():
                                 break
 
                             if chunk:
-                                # Just proxy the chunk directly with minimal processing
                                 yield f"data: {chunk.decode()}\n\n"
 
                     except Exception as e:
