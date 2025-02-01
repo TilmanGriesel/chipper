@@ -15,12 +15,20 @@ class OllamaProxy:
 
     def _proxy_request(self, path: str, method: str = "GET", stream: bool = False):
         url = f"{self.base_url}{path}"
-        headers = {k: v for k, v in request.headers if k != "Host"}
+        headers = {
+            k: v for k, v in request.headers.items()
+            if k.lower() not in ['host', 'transfer-encoding']
+        }
+
         data = request.get_data() if method != "GET" else None
 
         try:
             response = requests.request(
-                method=method, url=url, headers=headers, data=data, stream=stream
+                method=method,
+                url=url,
+                headers=headers,
+                data=data,
+                stream=stream
             )
 
             if stream:
@@ -30,23 +38,29 @@ class OllamaProxy:
         except Exception as e:
             logger.error(f"Error proxying request to Ollama: {str(e)}")
             return Response(
-                json.dumps({"error": str(e)}), status=500, mimetype="application/json"
+                json.dumps({"error": str(e)}),
+                status=500,
+                mimetype="application/json"
             )
 
     def _handle_streaming_response(self, response):
         def generate():
-            for chunk in response.iter_content(chunk_size=None):
-                yield chunk
+            try:
+                for chunk in response.iter_content(chunk_size=None):
+                    if chunk:
+                        yield chunk
+            except Exception as e:
+                logger.error(f"Error streaming response: {str(e)}")
+                yield json.dumps({"error": str(e)}).encode()
+
+        response_headers = {
+            "Content-Type": response.headers.get("Content-Type", "application/json")
+        }
 
         return Response(
             stream_with_context(generate()),
             status=response.status_code,
-            headers={
-                "Content-Type": response.headers.get(
-                    "Content-Type", "application/json"
-                ),
-                "Transfer-Encoding": "chunked",
-            },
+            headers=response_headers
         )
 
     def _handle_standard_response(self, response):
@@ -55,7 +69,7 @@ class OllamaProxy:
             status=response.status_code,
             headers={
                 "Content-Type": response.headers.get("Content-Type", "application/json")
-            },
+            }
         )
 
     def generate(self):
