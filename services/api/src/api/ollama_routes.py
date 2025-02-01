@@ -156,9 +156,9 @@ class OllamaRoutes:
                 return {"error": str(e)}, 500
 
 
-def setup_ollama_routes(app):
+def setup_ollama_proxy_routes(app):
     ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
     proxy = OllamaProxy(ollama_url)
     OllamaRoutes(app, proxy)
-    logger.info(f"Initialized Ollama routes with URL: {ollama_url}")
+    logger.info(f"Initialized Ollama proxy routes with Ollama URL: {ollama_url}")
     return proxy

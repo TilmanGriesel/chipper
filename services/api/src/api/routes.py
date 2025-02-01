@@ -50,7 +50,7 @@ def log_request_info(request):
     logger.info("Request: %s", json.dumps(request_info, indent=None, sort_keys=True))
 
 
-def register_chat_routes(app: Flask):
+def register_rag_chat_route(app: Flask):
     @app.route("/api/chat", methods=["POST"])
     @require_api_key
     def chat():
