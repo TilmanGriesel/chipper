@@ -1,6 +1,6 @@
-haystack-ai
-ollama-haystack
-elasticsearch-haystack
-python-dotenv
-huggingface_hub
-nltk
+haystack-ai==v2.8.1
+ollama-haystack==2.1.2
+elasticsearch-haystack==1.0.1
+huggingface_hub==v0.27.0
+python-dotenv==1.0.1
+nltk==3.9.1
