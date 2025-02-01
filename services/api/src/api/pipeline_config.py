@@ -2,7 +2,7 @@ import os
 from enum import Enum
 from typing import Any, Optional, TypeVar, Callable
 
-from api.config import system_prompt_value
+from api.config import SYSTEM_PROMPT_VALUE
 from core.pipeline_config import ModelProvider, QueryPipelineConfig
 
 
@@ -63,7 +63,7 @@ def create_pipeline_config(model: Optional[str] = None, index: Optional[str] = N
         "provider": provider,
         "model_name": model_name,
         "embedding_model": embedding_model,
-        "system_prompt": system_prompt_value,
+        "system_prompt": SYSTEM_PROMPT_VALUE,
     }
 
     # Provider-specific authentication
