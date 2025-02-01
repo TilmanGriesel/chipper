@@ -6,6 +6,7 @@ from api.config import (
     ALLOW_MODEL_CHANGE,
     APP_VERSION,
     BUILD_NUMBER,
+    IGNORE_MODEL_REQUEST,
     DEBUG,
     logger,
 )
@@ -66,9 +67,11 @@ def register_chat_routes(app: Flask):
             if not messages:
                 abort(400, description="No messages provided")
 
-            model = data.get("model")
-            if model and not ALLOW_MODEL_CHANGE:
-                abort(403, description="Model changes are not allowed")
+            model = None
+            if not IGNORE_MODEL_REQUEST:
+                model = data.get("model")
+                if model and not ALLOW_MODEL_CHANGE:
+                    abort(403, description="Model changes are not allowed")
 
             # Validate message format
             for message in messages:

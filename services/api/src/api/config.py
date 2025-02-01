@@ -30,6 +30,7 @@ PROVIDER_IS_OLLAMA = os.getenv("PROVIDER", "ollama") == "ollama"
 # Feature flags
 ALLOW_MODEL_CHANGE = os.getenv("ALLOW_MODEL_CHANGE", "true").lower() == "true"
 ALLOW_INDEX_CHANGE = os.getenv("ALLOW_INDEX_CHANGE", "true").lower() == "true"
+IGNORE_MODEL_REQUEST = os.getenv("IGNORE_MODEL_REQUEST", "true").lower() == "true"
 DEBUG = os.getenv("DEBUG", "true").lower() == "true"
 
 # Rate limiting configuration
