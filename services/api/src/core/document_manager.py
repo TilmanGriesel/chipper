@@ -29,7 +29,6 @@ class DocumentStoreManager:
             params = {
                 "hosts": self.es_url,
                 "index": self.es_index,
-                "embedding_similarity_function": "cosine",
             }
 
             # Add basic auth if non-empty

@@ -194,7 +194,6 @@ class RAGEmbedder:
             params = {
                 "hosts": self.config.es_url,
                 "index": self.config.es_index,
-                "embedding_similarity_function": "cosine",
             }
 
             # Add basic auth if non-empty
