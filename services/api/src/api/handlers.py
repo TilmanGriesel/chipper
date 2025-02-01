@@ -39,7 +39,7 @@ def format_stream_response(
         if done_reason:
             response["done_reason"] = done_reason
 
-        if done_reason is "error":
+        if done_reason == "error":
             response["message"] = {"role": "assistant", "content": content}
 
         response.update(

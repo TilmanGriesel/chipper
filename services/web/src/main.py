@@ -1,6 +1,5 @@
 import argparse
 import hashlib
-import json
 import logging
 import os
 import secrets
@@ -256,7 +255,9 @@ def create_app():
                     try:
                         for chunk in api_response.iter_lines():
                             if abort_flag.is_set():
-                                logger.info(f"Aborting stream for session {session_id[:8]}...")
+                                logger.info(
+                                    f"Aborting stream for session {session_id[:8]}..."
+                                )
                                 api_response.close()
                                 yield 'data: {"type": "abort", "content": "Request aborted"}\n\n'
                                 break

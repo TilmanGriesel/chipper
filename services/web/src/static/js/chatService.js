@@ -113,7 +113,7 @@ export class ChatService {
 
             // Handle error responses
             if (data.error || (data.done && data.done_reason === "error")) {
-              console.error(data)
+              console.error(data);
               onError(data.message.content || "Unknown error occurred");
               return;
             }
