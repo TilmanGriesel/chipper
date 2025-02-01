@@ -180,8 +180,10 @@ class RAGQueryPipeline:
         print_response: bool = False,
         use_embeddings: bool = True,
     ) -> Optional[dict]:
-        self.logger.info(f"\nProcessing Query: {query}")
-        self.logger.info(f"Conversation history present: {bool(conversation)}")
+        self.logger.info("Processing Query...")
+        self.logger.info(
+            f"Conversation history present: {bool(conversation)}; history length: {len(conversation)}"
+        )
 
         if not self.query_pipeline:
             self.logger.info("Query pipeline not initialized. Creating new pipeline...")
@@ -208,7 +210,8 @@ class RAGQueryPipeline:
                 self.conversation_logger.log_conversation(query, response, conversation)
 
             if print_response and response["llm"]["replies"]:
-                logging.info("Response: " + response["llm"]["replies"][0])
+                self.logger.info("Query: " + query)
+                self.logger.info("Response: " + response["llm"]["replies"][0])
 
             return response
 
