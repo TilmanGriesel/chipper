@@ -4,10 +4,11 @@ from datetime import datetime, timezone
 from api.config import (
     ALLOW_INDEX_CHANGE,
     ALLOW_MODEL_CHANGE,
+    ALLOW_MODEL_PARAMETER_CHANGE,
     APP_VERSION,
     BUILD_NUMBER,
-    IGNORE_MODEL_REQUEST,
     DEBUG,
+    IGNORE_MODEL_REQUEST,
     logger,
 )
 from api.handlers import handle_standard_response, handle_streaming_response
@@ -91,6 +92,17 @@ def register_chat_routes(app: Flask):
             options = data.get("options", {})
             stream = data.get("stream", True)
 
+            temperature = None
+            top_k = None
+            top_p = None
+            seed = None
+
+            if ALLOW_MODEL_PARAMETER_CHANGE:
+                temperature = data.get("temperature", None)
+                top_k = data.get("top_k", None)
+                top_p = data.get("top_p", None)
+                seed = data.get("top_p", None)
+
             # Handle index parameter
             index = options.get("index")
             if index and not ALLOW_INDEX_CHANGE:
@@ -102,7 +114,14 @@ def register_chat_routes(app: Flask):
                     abort(400, description="Images must be provided as a list")
 
             # Create configuration
-            config = create_pipeline_config(model, index)
+            config = create_pipeline_config(
+                model=model,
+                index=index,
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                seed=seed,
+            )
 
             # Get the latest message with content
             query = None

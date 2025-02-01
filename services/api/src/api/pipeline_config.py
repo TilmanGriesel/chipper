@@ -1,8 +1,9 @@
 import os
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional, TypeVar, Callable
+from typing import Any, Callable, Dict, Optional
 
-from api.config import SYSTEM_PROMPT_VALUE
+from api.config import SYSTEM_PROMPT_VALUE, logger
 from core.pipeline_config import ModelProvider, QueryPipelineConfig
 
 
@@ -22,112 +23,165 @@ class EnvKeys(str, Enum):
     ES_BASIC_AUTH_USER = "ES_BASIC_AUTH_USERNAME"
     ES_BASIC_AUTH_PASSWORD = "ES_BASIC_AUTH_PASSWORD"
     ENABLE_CONVERSATION_LOGS = "ENABLE_CONVERSATION_LOGS"
-    FILTER_THINK_TAG_CONTENT = "FILTER_THINK_TAG_CONTENT"
 
 
-T = TypeVar('T')
+@dataclass
+class GenerationParams:
+    context_window: tuple[str, type, str] = ("CONTEXT_WINDOW", int, "8192")
+    temperature: tuple[str, type, None] = ("TEMPERATURE", float, None)
+    seed: tuple[str, type, None] = ("SEED", int, None)
+    top_k: tuple[str, type, None] = ("TOP_K", int, None)
+    top_p: tuple[str, type, None] = ("TOP_P", float, None)
+    min_p: tuple[str, type, None] = ("MIN_P", float, None)
+    repeat_last_n: tuple[str, type, None] = ("REPEAT_LAST_N", int, None)
+    repeat_penalty: tuple[str, type, None] = ("REPEAT_PENALTY", float, None)
+    num_predict: tuple[str, type, None] = ("NUM_PREDICT", int, None)
+    tfs_z: tuple[str, type, None] = ("TFS_Z", float, None)
 
-def get_env_param(param_name: str, converter: Optional[Callable[[str], T]] = None, default: Optional[str] = None) -> Optional[T]:
-    value = os.getenv(param_name)
+
+def get_env_value(
+    key: str, converter: Optional[Callable] = None, default: Optional[str] = None
+) -> Any:
+    """Get and convert environment variable value with optional default."""
+    value = os.getenv(key)
     if value is None:
         return None
 
-    if converter is not None:
+    if converter:
         try:
-            if default is not None and value == "":
-                return converter(default)
-            return converter(value)
+            return converter(default if value == "" else value)
         except (ValueError, TypeError):
             return None
     return value
 
 
-def create_pipeline_config(model: Optional[str] = None, index: Optional[str] = None) -> QueryPipelineConfig:
-    # Determine provider
+def get_provider_specific_config() -> dict[str, Any]:
+    """Get provider-specific configuration."""
     provider = (
         ModelProvider.HUGGINGFACE
         if os.getenv(EnvKeys.PROVIDER, "ollama").lower() == "hf"
         else ModelProvider.OLLAMA
     )
 
-    # Get model names based on provider
-    model_name = model or os.getenv(
-        EnvKeys.HF_MODEL_NAME if provider == ModelProvider.HUGGINGFACE else EnvKeys.MODEL_NAME
-    )
-    embedding_model = os.getenv(
-        EnvKeys.HF_EMBEDDING_MODEL if provider == ModelProvider.HUGGINGFACE else EnvKeys.EMBEDDING_MODEL
-    )
-
-    # Initialize base configuration
-    config: dict[str, Any] = {
+    config = {
         "provider": provider,
-        "model_name": model_name,
-        "embedding_model": embedding_model,
+        "model_name": os.getenv(
+            EnvKeys.HF_MODEL_NAME
+            if provider == ModelProvider.HUGGINGFACE
+            else EnvKeys.MODEL_NAME
+        ),
+        "embedding_model": os.getenv(
+            EnvKeys.HF_EMBEDDING_MODEL
+            if provider == ModelProvider.HUGGINGFACE
+            else EnvKeys.EMBEDDING_MODEL
+        ),
         "system_prompt": SYSTEM_PROMPT_VALUE,
     }
 
-    # Provider-specific authentication
     if provider == ModelProvider.HUGGINGFACE:
         config["hf_api_key"] = os.getenv(EnvKeys.HF_API_KEY)
-    elif (ollama_url := os.getenv(EnvKeys.OLLAMA_URL)):
+    elif ollama_url := os.getenv(EnvKeys.OLLAMA_URL):
         config["ollama_url"] = ollama_url
 
-    # Model pull configuration
-    if (allow_pull := os.getenv(EnvKeys.ALLOW_MODEL_PULL)):
-        config["allow_model_pull"] = allow_pull.lower() == "true"
+    return config
 
-    # Generation parameters with types
-    generation_params = {
-        "CONTEXT_WINDOW": ("context_window", int, "8192"),
-        "TEMPERATURE": ("temperature", float, None),
-        "SEED": ("seed", int, None),
-        "TOP_K": ("top_k", int, None),
-        "TOP_P": ("top_p", float, None),
-        "MIN_P": ("min_p", float, None),
-        "REPEAT_LAST_N": ("repeat_last_n", int, None),
-        "REPEAT_PENALTY": ("repeat_penalty", float, None),
-        "NUM_PREDICT": ("num_predict", int, None),
-        "TFS_Z": ("tfs_z", float, None)
+
+def get_elasticsearch_config(index: Optional[str] = None) -> dict[str, Any]:
+    """Get Elasticsearch configuration if enabled."""
+    if not (es_url := os.getenv(EnvKeys.ES_URL)):
+        return {}
+
+    config = {
+        "es_url": es_url,
+        "es_index": index or os.getenv(EnvKeys.ES_INDEX),
+        "es_basic_auth_user": os.getenv(EnvKeys.ES_BASIC_AUTH_USER),
+        "es_basic_auth_password": os.getenv(EnvKeys.ES_BASIC_AUTH_PASSWORD),
     }
 
-    for env_key, (config_key, param_type, default) in generation_params.items():
-        if (value := get_env_param(env_key, param_type, default)) is not None:
-            config[config_key] = value
+    for env_key, default in [
+        (EnvKeys.ES_TOP_K, "5"),
+        (EnvKeys.ES_NUM_CANDIDATES, "-1"),
+    ]:
+        if value := get_env_value(env_key, int, default):
+            config[env_key.lower()] = value
 
-    # Mirostat parameters
-    if (mirostat := get_env_param("MIROSTAT", int)) is not None:
+    return config
+
+
+def create_pipeline_config(
+    model: Optional[str] = None,
+    index: Optional[str] = None,
+    temperature: Optional[float] = None,
+    top_k: Optional[int] = None,
+    top_p: Optional[float] = None,
+    min_p: Optional[float] = None,
+    repeat_last_n: Optional[int] = None,
+    repeat_penalty: Optional[float] = None,
+    num_predict: Optional[int] = None,
+    tfs_z: Optional[float] = None,
+    context_window: Optional[int] = None,
+    seed: Optional[int] = None,
+    **additional_params: Dict[str, Any],
+) -> QueryPipelineConfig:
+    """Create pipeline configuration from environment variables with optional parameter overrides."""
+    config = get_provider_specific_config()
+    if model:
+        config["model_name"] = model
+
+    # Add generation parameters from environment first
+    params = GenerationParams()
+    for param in params.__annotations__:
+        env_key, converter, default = getattr(params, param)
+        if value := get_env_value(env_key, converter, default):
+            config[param] = value
+
+    # Override with any provided parameters
+    generation_params = {
+        "temperature": temperature,
+        "top_k": top_k,
+        "top_p": top_p,
+        "min_p": min_p,
+        "repeat_last_n": repeat_last_n,
+        "repeat_penalty": repeat_penalty,
+        "num_predict": num_predict,
+        "tfs_z": tfs_z,
+        "context_window": context_window,
+        "seed": seed,
+    }
+
+    # Update config with provided non-None parameters
+    config.update({k: v for k, v in generation_params.items() if v is not None})
+
+    # Add any additional parameters passed
+    config.update(additional_params)
+
+    # Add mirostat parameters
+    if mirostat := get_env_value("MIROSTAT", int):
         config["mirostat"] = mirostat
         for param in ["MIROSTAT_ETA", "MIROSTAT_TAU"]:
-            if (value := get_env_param(param, float)) is not None:
+            if value := get_env_value(param, float):
                 config[param.lower()] = value
 
-    # Elasticsearch configuration
-    if (es_url := os.getenv(EnvKeys.ES_URL)):
-        config.update({
-            "es_url": es_url,
-            "es_index": index or os.getenv(EnvKeys.ES_INDEX),
-            "es_basic_auth_user": os.getenv(EnvKeys.ES_BASIC_AUTH_USER),
-            "es_basic_auth_password": os.getenv(EnvKeys.ES_BASIC_AUTH_PASSWORD)
-        })
+    # Add model pull configuration
+    if allow_pull := os.getenv(EnvKeys.ALLOW_MODEL_PULL):
+        config["allow_model_pull"] = allow_pull.lower() == "true"
 
-        es_params = {
-            EnvKeys.ES_TOP_K: ("es_top_k", "5"),
-            EnvKeys.ES_NUM_CANDIDATES: ("es_num_candidates", "-1")
-        }
-        for env_key, (config_key, default) in es_params.items():
-            if (value := get_env_param(env_key, int, default)) is not None:
-                config[config_key] = value
+    # Add conversation logs setting
+    if value := os.getenv(EnvKeys.ENABLE_CONVERSATION_LOGS):
+        config["enable_conversation_logs"] = value.lower() == "true"
 
-    # Boolean settings
-    bool_settings = {
-        EnvKeys.ENABLE_CONVERSATION_LOGS: "enable_conversation_logs",
-    }
-    for env_key, config_key in bool_settings.items():
-        if (value := os.getenv(env_key)) is not None:
-            config[config_key] = value.lower() == "true"
-
-    # Stop sequence
-    if (stop_sequence := os.getenv("STOP_SEQUENCE")):
+    # Add stop sequence
+    if stop_sequence := os.getenv("STOP_SEQUENCE"):
         config["stop_sequence"] = stop_sequence
+
+    # Add Elasticsearch config
+    config.update(get_elasticsearch_config(index))
+
+    logger.info("\nPipeline Configuration:")
+    for key, value in sorted(config.items()):
+        if any(sensitive in key.lower() for sensitive in ["password", "key", "auth"]):
+            logger.info(f"  {key}: ****")
+        else:
+            logger.info(f"  {key}: {value}")
 
     return QueryPipelineConfig(**config)
