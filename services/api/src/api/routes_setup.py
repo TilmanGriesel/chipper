@@ -1,4 +1,4 @@
-from api.config import PROVIDER_IS_OLLAMA, ENABLE_OLLAMA_PROXY, logger
+from api.config import ENABLE_OLLAMA_PROXY, PROVIDER_IS_OLLAMA, logger
 from api.ollama_routes import setup_ollama_routes
 from api.routes import register_chat_routes, register_health_routes
 from flask import Flask
