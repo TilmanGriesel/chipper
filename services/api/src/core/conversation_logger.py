@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+
 class ConversationLogger:
     def __init__(self, system_info: dict, log_dir: str = "conversation_logs"):
         self.log_dir = Path(log_dir)

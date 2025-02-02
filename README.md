@@ -90,8 +90,9 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [x] **Baerer token support**
 
 #### Todo
+
 - [ ] **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
-    - [ ] Requires `ChatPromptBuilder` and `OllamaChatGenerator` implementation
+  - [ ] Requires `ChatPromptBuilder` and `OllamaChatGenerator` implementation
 - [ ] **Automated Unit Tests**
 - [ ] **Smart Document Chunking and Embedding**
 - [ ] **React-Based Web Application**
