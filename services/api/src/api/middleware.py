@@ -5,6 +5,18 @@ from api.config import API_KEY, app, logger
 from flask import abort, request
 
 
+def get_token_from_header():
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return None
+
+    parts = auth_header.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return None
+
+    return parts[1]
+
+
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -15,9 +27,15 @@ def require_api_key(f):
             return f(*args, **kwargs)
 
         api_key = request.headers.get("X-API-Key")
-        if not api_key or api_key != API_KEY:
-            logger.warning(f"Invalid API key attempt from {request.remote_addr}")
-            abort(401, description="Invalid or missing API key")
+        bearer_token = get_token_from_header()
+
+        if (
+            not (api_key or bearer_token)
+            or (api_key and api_key != API_KEY)
+            or (bearer_token and bearer_token != API_KEY)
+        ):
+            logger.warning(f"Invalid authentication attempt from {request.remote_addr}")
+            abort(401, description="Invalid or missing authentication")
 
         return f(*args, **kwargs)
 
@@ -54,13 +72,19 @@ def setup_security_middleware(app):
             allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
             response.headers["Access-Control-Allow-Origin"] = allowed_origins
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-API-Key"
+            response.headers[
+                "Access-Control-Allow-Headers"
+            ] = "Content-Type, X-API-Key, Authorization"
 
         return response
 
     @app.errorhandler(401)
     def unauthorized_error(error):
-        return {"error": "Unauthorized", "message": str(error.description)}, 401
+        return (
+            {"error": "Unauthorized", "message": str(error.description)},
+            401,
+            {"WWW-Authenticate": 'Bearer realm="API"'},
+        )
 
     @app.errorhandler(403)
     def forbidden_error(error):
