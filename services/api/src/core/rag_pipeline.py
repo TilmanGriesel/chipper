@@ -1,39 +1,13 @@
-import json
 import logging
-from datetime import datetime
-from pathlib import Path
 from typing import Generator, List, Optional
 
 import elasticsearch
 from core.component_factory import ModelProvider, PipelineComponentFactory
+from core.conversation_logger import ConversationLogger
 from core.document_manager import DocumentStoreManager
 from core.model_manager import OllamaModelManager
 from core.pipeline_config import QueryPipelineConfig
 from haystack import Pipeline
-
-
-class ConversationLogger:
-    def __init__(self, system_info: dict, log_dir: str = "conversation_logs"):
-        self.log_dir = Path(log_dir)
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-        self.system_info = system_info
-
-    def log_conversation(
-        self, query: str, response: dict, conversation: List[dict] = None
-    ):
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_file = self.log_dir / f"conversation_{timestamp}.json"
-
-        log_entry = {
-            "timestamp": timestamp,
-            "query": query,
-            "system_info": self.system_info,
-            "response": response.get("llm", {}).get("replies", []),
-            "previous_conversation": conversation or [],
-        }
-
-        with open(log_file, "w", encoding="utf-8") as f:
-            json.dump(log_entry, f, indent=2, ensure_ascii=False)
 
 
 class RAGQueryPipeline:
@@ -56,13 +30,49 @@ class RAGQueryPipeline:
         Question: {{ query }}?
     """
 
+    def initialize_and_check_models(self) -> Generator[dict, None, None]:
+        """Verify model availability and health, pulling models if needed."""
+        try:
+            if self.config.provider == ModelProvider.OLLAMA:
+                if not self.model_manager:
+                    raise ValueError(
+                        "Ollama model manager not initialized but provider is Ollama"
+                    )
+
+                # Check Ollama server health
+                self.model_manager.check_server_health()
+
+                # Verify and potentially pull required models
+                required_models = [self.config.model_name, self.config.embedding_model]
+                for model_name in required_models:
+                    yield from self.model_manager.verify_and_pull_model(model_name)
+            else:
+                yield {
+                    "type": "model_status",
+                    "status": "success",
+                    "message": "Using HuggingFace provider",
+                }
+        except Exception as e:
+            self.logger.error(f"Model initialization failed: {str(e)}", exc_info=True)
+            yield {"type": "model_status", "status": "error", "error": str(e)}
+            raise
+
     def __init__(self, config: QueryPipelineConfig, streaming_callback=None):
         self.logger = logging.getLogger(__name__)
-        self.logger.info("Initializing RAGQueryPipeline")
         self.config = config
         self._streaming_callback = streaming_callback
+        self.query_pipeline = None
 
-        # Initialize conversation logger
+        # Initialize core components
+        self._init_conversation_logger()
+        self._init_document_store()
+        self._init_model_manager()
+
+        self.component_factory = PipelineComponentFactory(
+            config, self.document_store, streaming_callback
+        )
+
+    def _init_conversation_logger(self):
         if self.config.enable_conversation_logs:
             self.conversation_logger = ConversationLogger(
                 system_info={
@@ -81,96 +91,53 @@ class RAGQueryPipeline:
                     },
                 }
             )
+        else:
+            self.conversation_logger = None
 
-        # Initialize document store manager
+    def _init_document_store(self):
         self.doc_store_manager = DocumentStoreManager(
-            config.es_url,
-            config.es_index,
-            config.es_basic_auth_user,
-            config.es_basic_auth_password,
+            self.config.es_url,
+            self.config.es_index,
+            self.config.es_basic_auth_user,
+            self.config.es_basic_auth_password,
         )
         self.document_store = self.doc_store_manager.initialize_store()
 
-        # Only initialize Ollama model manager if using Ollama provider
+    def _init_model_manager(self):
         self.model_manager = None
-        if config.provider == ModelProvider.OLLAMA:
+        if self.config.provider == ModelProvider.OLLAMA:
             self.model_manager = OllamaModelManager(
-                config.ollama_url, config.allow_model_pull
+                self.config.ollama_url, self.config.allow_model_pull
             )
 
-        self.component_factory = PipelineComponentFactory(
-            config, self.document_store, streaming_callback
-        )
-        self.query_pipeline = None
-
-    def initialize_and_check_models(self) -> Generator[dict, None, None]:
+    def create_query_pipeline(self) -> Pipeline:
+        """Initialize and configure the query pipeline components."""
         try:
-            # Only perform Ollama-specific model checks if using Ollama
-            if self.config.provider == ModelProvider.OLLAMA:
-                if not self.model_manager:
-                    raise ValueError(
-                        "Ollama model manager not initialized but provider is set to Ollama"
-                    )
-                self.model_manager.check_server_health()
-                yield from self._check_required_models()
-            else:
-                # For HuggingFace, we just yield a success status
-                yield {
-                    "type": "model_status",
-                    "status": "success",
-                    "message": "Using HuggingFace provider",
-                }
-        except Exception as e:
-            self.logger.error(f"Failed to initialize models: {str(e)}", exc_info=True)
-            yield {"type": "model_status", "status": "error", "error": str(e)}
-            raise
+            pipeline = Pipeline()
 
-    def _check_required_models(self) -> Generator[dict, None, None]:
-        if self.model_manager:
-            for model_name in [self.config.model_name, self.config.embedding_model]:
-                yield from self.model_manager.verify_and_pull_model(model_name)
-
-    def create_query_pipeline(self, use_embeddings: bool = True) -> Pipeline:
-        self.logger.info("\nInitializing Query Pipeline Components:")
-
-        try:
-            query_pipeline = Pipeline()
-            self.logger.info("Created new Pipeline instance")
-
+            # Create and add components
             prompt_builder = self.component_factory.create_prompt_builder(
                 self.QUERY_TEMPLATE
             )
-            query_pipeline.add_component("prompt_builder", prompt_builder)
-
-            if use_embeddings:
-                text_embedder = self.component_factory.create_text_embedder()
-                query_pipeline.add_component("text_embedder", text_embedder)
-
-                retriever = self.component_factory.create_retriever()
-                query_pipeline.add_component("retriever", retriever)
-
-                query_pipeline.connect(
-                    "text_embedder.embedding", "retriever.query_embedding"
-                )
-                query_pipeline.connect(
-                    "retriever.documents", "prompt_builder.documents"
-                )
-
+            text_embedder = self.component_factory.create_text_embedder()
+            retriever = self.component_factory.create_retriever()
             llm_generator = self.component_factory.create_generator()
-            query_pipeline.add_component("llm", llm_generator)
 
-            query_pipeline.connect("prompt_builder.prompt", "llm.prompt")
+            pipeline.add_component("prompt_builder", prompt_builder)
+            pipeline.add_component("text_embedder", text_embedder)
+            pipeline.add_component("retriever", retriever)
+            pipeline.add_component("llm", llm_generator)
 
-            self.query_pipeline = query_pipeline
-            self.logger.info(
-                f"Query Pipeline creation completed successfully (embeddings {'enabled' if use_embeddings else 'disabled'})"
-            )
-            return query_pipeline
+            # Connect components
+            pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
+            pipeline.connect("retriever.documents", "prompt_builder.documents")
+            pipeline.connect("prompt_builder.prompt", "llm.prompt")
+
+            self.query_pipeline = pipeline
+            return pipeline
 
         except Exception as e:
-            self.logger.error(
-                f"Failed to create query pipeline: {str(e)}", exc_info=True
-            )
+            self.logger.error(f"Pipeline creation failed: {str(e)}", exc_info=True)
             raise
 
     def run_query(
@@ -178,46 +145,39 @@ class RAGQueryPipeline:
         query: str,
         conversation: List[dict] = None,
         print_response: bool = False,
-        use_embeddings: bool = True,
     ) -> Optional[dict]:
-        self.logger.info("Processing Query...")
-        self.logger.info(
-            f"Conversation history present: {bool(conversation)}; history length: {len(conversation)}"
-        )
-
+        """Execute a query through the RAG pipeline."""
         if not self.query_pipeline:
-            self.logger.info("Query pipeline not initialized. Creating new pipeline...")
-            self.create_query_pipeline(use_embeddings=use_embeddings)
+            self.create_query_pipeline()
 
         try:
-            self.logger.info("Executing query pipeline...")
-
+            # Prepare pipeline inputs
             pipeline_inputs = {
                 "prompt_builder": {
                     "query": query,
                     "system_prompt": self.config.system_prompt,
                     "conversation": conversation or [],
                 },
+                "text_embedder": {"text": query},
             }
 
-            if use_embeddings:
-                pipeline_inputs["text_embedder"] = {"text": query}
-
+            # Execute pipeline
             response = self.query_pipeline.run(pipeline_inputs)
-            self.logger.info("Query pipeline execution completed successfully")
 
-            if self.config.enable_conversation_logs:
+            # Log conversation if enabled
+            if self.conversation_logger:
                 self.conversation_logger.log_conversation(query, response, conversation)
 
+            # Print response if requested
             if print_response and response["llm"]["replies"]:
-                self.logger.info("Query: " + query)
-                self.logger.info("Response: " + response["llm"]["replies"][0])
+                self.logger.info(f"Query: {query}")
+                self.logger.info(f"Response: {response['llm']['replies'][0]}")
 
             return response
 
         except elasticsearch.BadRequestError as e:
-            self.logger.error(f"Elasticsearch bad request error: {e}")
+            self.logger.error(f"Elasticsearch error: {str(e)}")
             raise
         except Exception as e:
-            self.logger.error(f"Unexpected error in query pipeline: {e}")
+            self.logger.error(f"Query execution failed: {str(e)}")
             raise

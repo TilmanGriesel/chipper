@@ -143,7 +143,6 @@ def handle_streaming_response(
 
             load_duration = time.time_ns() - load_start
 
-            rag.create_query_pipeline()
             result = rag.run_query(
                 query=query, conversation=conversation, print_response=DEBUG
             )
@@ -235,8 +234,6 @@ def handle_standard_response(
             if status.get("status") == "error":
                 raise Exception(f"Model initialization failed: {status.get('error')}")
         load_duration = time.time_ns() - load_start
-
-        rag.create_query_pipeline()
 
         # Track query execution time
         prompt_start = time.time_ns()

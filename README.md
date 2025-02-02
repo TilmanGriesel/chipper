@@ -27,7 +27,6 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
 - **Ollama API Proxy** — Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
 - **API Security** — Proxy the Ollama API with API key-based and Baerer token service authentication.
 - **Offline Web UI** — Works without an internet connection using vanilla JavaScript and TailwindCSS.
-- **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
 
 ## Installation and Setup
 
@@ -71,7 +70,7 @@ Full support for the Ollama CLI and API, including reflection and proxy capabili
 
 ### Third-Party Clients
 
-Enhance every third-party Ollama client with server-side knowledge base embeddings, allowing server side model selection, query parameters, and system prompt overrides. Enable RAG for any Ollama client or use Chipper as a centralized knowledge base. Chipper also supports daisy chaining.
+Enhance every third-party Ollama client with server-side knowledge base embeddings, allowing server side model selection, query parameters, and system prompt overrides. Enable RAG for any Ollama client or use Chipper as a centralized knowledge base.
 
 <p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_ollamac.gif" alt="chipper_demo_ollamac"/></p>
 
@@ -91,7 +90,8 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [x] **Baerer token support**
 
 #### Todo
-
+- [ ] **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
+    - [ ] Requires `ChatPromptBuilder` and `OllamaChatGenerator` implementation
 - [ ] **Automated Unit Tests**
 - [ ] **Smart Document Chunking and Embedding**
 - [ ] **React-Based Web Application**

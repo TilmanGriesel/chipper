@@ -57,7 +57,7 @@ Full support for the Ollama CLI and API, including reflection and proxy capabili
 
 ### Third-Party Client
 
-Enhance every third-party Ollama client with server-side knowledge base embeddings, allowing server side model selection, query parameters, and system prompt overrides. Enable RAG for any Ollama client or use Chipper as a centralized knowledge base. Chipper also supports daisy chaining.
+Enhance every third-party Ollama client with server-side knowledge base embeddings, allowing server side model selection, query parameters, and system prompt overrides. Enable RAG for any Ollama client or use Chipper as a centralized knowledge base.
 
 ![chipper_demo_ollamac](/assets/demos/demo_rag_chat_ollamac.gif)
 
