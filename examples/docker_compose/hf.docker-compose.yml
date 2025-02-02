@@ -1,0 +1,110 @@
+x-healthcheck: &a1
+  interval: 30s
+  retries: 10
+x-shared-deploy: &a3
+  resources:
+    limits:
+      memory: 2g
+x-logging: &a2
+  logging:
+    driver: json-file
+    options:
+      max-size: 100m
+      max-file: "5"
+      compress: "true"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-chipper-cluster
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:21230
+      - ES_JAVA_OPTS=-Xms128m -Xmx128m
+      - bootstrap.memory_lock=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - backend
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9200/_cluster/health
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+    restart: unless-stopped
+    <<: *a2
+  api:
+    pull_policy: always
+    image: griesel/chipper:api-latest
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 21434:8000
+    environment:
+      - PROVIDER=hf
+      - HF_API_KEY=your-api-key
+      - HF_EMBEDDING_MODEL_NAME=sentence-transformers/all-mpnet-base-v2
+      - HF_MODEL_NAME=meta-llama/Meta-Llama-3-8B-Instruct
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8000/health
+    deploy: *a3
+    restart: unless-stopped
+    <<: *a2
+  web:
+    pull_policy: always
+    image: griesel/chipper:web-latest
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - frontend
+    ports:
+      - 21200:5000
+    healthcheck:
+      <<: *a1
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:5000/health
+    deploy: *a3
+    restart: unless-stopped
+    <<: *a2
+networks:
+  frontend:
+    name: frontend_network
+    driver: bridge
+  backend:
+    name: backend_network
+    driver: bridge
+    internal: true
+volumes:
+  ollama-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  nginx-proxy-data:
+    driver: local
+  nginx-proxy-letsencrypt:
+    driver: local
