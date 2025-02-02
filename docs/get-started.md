@@ -24,6 +24,21 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 - https://www.youtube.com/watch?v=T-D1OfcDW1M is an amazing video about it by IBM.
 </details>
 
+## Features
+
+- **Local & Cloud Model Support** — Run models locally with [Ollama](https://ollama.com/) or connect to remote models via the [Hugging Face API](https://huggingface.co/).
+- **ElasticSearch Integration** — Store and retrieve vectorized data efficiently with scalable indexing.
+- **Document Chunking** — Process and split documents into structured segments.
+- **Web Scraping** — Extract and index content from web pages.
+- **Audio Transcription** — Convert audio files to text.
+- **CLI & Web UI** — Access Chipper via a command-line tool or a lightweight, self-contained web interface.
+- **Dockerized Deployment** — Run in a fully containerized setup with minimal configuration.
+- **Customizable RAG Pipelines** — Adjust model selection, query parameters, and system prompts as needed.
+- **Ollama API Proxy** — Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
+- **API Security** — Proxy the Ollama API with API key-based and Baerer token service authentication.
+- **Offline Web UI** — Works without an internet connection using vanilla JavaScript and TailwindCSS.
+- **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
+
 ## Step 1: Setting Up Chipper 🛠️
 
 ::: info

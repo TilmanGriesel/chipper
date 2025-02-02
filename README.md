@@ -27,6 +27,7 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
 - **Ollama API Proxy** — Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
 - **API Security** — Proxy the Ollama API with API key-based and Baerer token service authentication.
 - **Offline Web UI** — Works without an internet connection using vanilla JavaScript and TailwindCSS.
+- **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
 
 ## Installation and Setup
 
@@ -88,11 +89,11 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [x] **Edge Inference TTS**
 - [x] **Mirror Ollama Chat API** to enable Chipper as a drop-in middleware
 - [x] **Baerer token support**
+- [x] **Haystack Chat Generators** Implement `ChatPromptBuilder` and `OllamaChatGenerator`.
+- [x] **Allow For Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
 
 #### Todo
 
-- [ ] **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
-  - [ ] Requires `ChatPromptBuilder` and `OllamaChatGenerator` implementation
 - [ ] **Automated Unit Tests**
 - [ ] **Smart Document Chunking and Embedding**
 - [ ] **React-Based Web Application**

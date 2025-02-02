@@ -143,7 +143,7 @@ def handle_streaming_response(
 
             load_duration = time.time_ns() - load_start
 
-            result = rag.run_query(
+            response_text = rag.run_query(
                 query=query, conversation=conversation, print_response=DEBUG
             )
 
@@ -157,8 +157,8 @@ def handle_streaming_response(
                 load_duration=load_duration,
                 prompt_eval_count=len(conversation) + 1,
                 prompt_eval_duration=end_time - (prompt_start or start_time),
-                eval_count=len(result["llm"]["replies"][0].split())
-                if result and "llm" in result and "replies" in result["llm"]
+                eval_count=len(response_text.split())
+                if response_text is not None
                 else 0,
                 eval_duration=end_time - (prompt_start or start_time),
             )

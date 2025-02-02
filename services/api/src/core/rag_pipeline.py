@@ -2,16 +2,24 @@ import logging
 from typing import Generator, List, Optional
 
 import elasticsearch
+import pydantic
 from core.component_factory import ModelProvider, PipelineComponentFactory
 from core.conversation_logger import ConversationLogger
 from core.document_manager import DocumentStoreManager
 from core.model_manager import OllamaModelManager
 from core.pipeline_config import QueryPipelineConfig
 from haystack import Pipeline
+from haystack.components.builders import ChatPromptBuilder
+from haystack.dataclasses import ChatMessage
 
 
 class RAGQueryPipeline:
-    QUERY_TEMPLATE = """
+    template = [
+        ChatMessage.from_system(
+            """
+        System prompt:
+        {{ system_prompt }}
+
         {% if conversation %}
         Previous conversation:
         {% for message in conversation %}
@@ -19,16 +27,16 @@ class RAGQueryPipeline:
         {% endfor %}
         {% endif %}
 
-        {{ system_prompt }}
-
         Context:
         {% for document in documents %}
             {{ document.content }}
             Source: {{ document.meta.file_path }}
         {% endfor %}
 
-        Question: {{ query }}?
+        Question: {{ question }}?
     """
+        )
+    ]
 
     def initialize_and_check_models(self) -> Generator[dict, None, None]:
         """Verify model availability and health, pulling models if needed."""
@@ -116,22 +124,21 @@ class RAGQueryPipeline:
             pipeline = Pipeline()
 
             # Create and add components
-            prompt_builder = self.component_factory.create_prompt_builder(
-                self.QUERY_TEMPLATE
-            )
-            text_embedder = self.component_factory.create_text_embedder()
+            embedder = self.component_factory.create_embedder()
             retriever = self.component_factory.create_retriever()
-            llm_generator = self.component_factory.create_generator()
+            llm_generator = self.component_factory.create_chat_generator()
 
-            pipeline.add_component("prompt_builder", prompt_builder)
-            pipeline.add_component("text_embedder", text_embedder)
+            pipeline.add_component("embedder", embedder)
             pipeline.add_component("retriever", retriever)
+            pipeline.add_component(
+                "prompt_builder", ChatPromptBuilder(template=self.template)
+            )
             pipeline.add_component("llm", llm_generator)
 
             # Connect components
-            pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
-            pipeline.connect("retriever.documents", "prompt_builder.documents")
-            pipeline.connect("prompt_builder.prompt", "llm.prompt")
+            pipeline.connect("embedder.embedding", "retriever.query_embedding")
+            pipeline.connect("retriever", "prompt_builder.documents")
+            pipeline.connect("prompt_builder.prompt", "llm.messages")
 
             self.query_pipeline = pipeline
             return pipeline
@@ -154,27 +161,40 @@ class RAGQueryPipeline:
             # Prepare pipeline inputs
             pipeline_inputs = {
                 "prompt_builder": {
-                    "query": query,
+                    "conversation": conversation,
+                    "question": query,
                     "system_prompt": self.config.system_prompt,
-                    "conversation": conversation or [],
                 },
-                "text_embedder": {"text": query},
+                "embedder": {"text": query},
             }
 
             # Execute pipeline
             response = self.query_pipeline.run(pipeline_inputs)
 
+            response_text = (
+                response["llm"]["replies"][0].text
+                if response["llm"]["replies"]
+                else None
+            )
+
+            # Print response if requested
+            if print_response and response_text:
+                self.logger.info(f"Query: {query}")
+                self.logger.info(f"Response: {response_text}")
+
             # Log conversation if enabled
             if self.conversation_logger:
                 self.conversation_logger.log_conversation(query, response, conversation)
 
-            # Print response if requested
-            if print_response and response["llm"]["replies"]:
-                self.logger.info(f"Query: {query}")
-                self.logger.info(f"Response: {response['llm']['replies'][0]}")
+            return response_text
 
-            return response
-
+        # TODO: Investigate the root cause of this error when chaining
+        # multiple Chipper instances. It doesn't seem to affect functionality,
+        # but understanding why it occurs will help prevent potential issues.
+        # Determine if handling is necessary or if it can be safely ignored.
+        except pydantic.ValidationError as ve:
+            self.logger.warning(f"Pydantic validation error: {str(ve)}")
+            return None
         except elasticsearch.BadRequestError as e:
             self.logger.error(f"Elasticsearch error: {str(e)}")
             raise

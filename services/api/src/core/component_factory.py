@@ -2,12 +2,11 @@ import logging
 from typing import Callable, Optional
 
 from core.pipeline_config import ModelProvider, QueryPipelineConfig
-from haystack.components.builders.prompt_builder import PromptBuilder
 from haystack.components.embedders import HuggingFaceAPITextEmbedder
-from haystack.components.generators import HuggingFaceAPIGenerator
+from haystack.components.generators.chat import HuggingFaceAPIChatGenerator
 from haystack.utils import Secret
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
-from haystack_integrations.components.generators.ollama import OllamaGenerator
+from haystack_integrations.components.generators.ollama import OllamaChatGenerator
 from haystack_integrations.components.retrievers.elasticsearch import (
     ElasticsearchEmbeddingRetriever,
 )
@@ -28,7 +27,7 @@ class PipelineComponentFactory:
         self.streaming_callback = streaming_callback
         self.logger = logging.getLogger(__name__)
 
-    def create_text_embedder(self):
+    def create_embedder(self):
         self.logger.info(
             f"Initializing Text Embedder with model: {self.config.embedding_model}"
         )
@@ -76,13 +75,8 @@ class PipelineComponentFactory:
         self.logger.info("Elasticsearch Retriever initialized successfully")
         return retriever
 
-    def create_prompt_builder(self, template: str) -> PromptBuilder:
-        """Create prompt builder with specified template."""
-        self.logger.info("Initializing Prompt Builder")
-        return PromptBuilder(template=template)
-
-    def create_generator(self):
-        """Create text generator based on provider configuration."""
+    def create_chat_generator(self):
+        """Create chat generator based on provider configuration."""
         self.logger.info(f"Initializing Generator with model: {self.config.model_name}")
 
         if self.config.provider == ModelProvider.OLLAMA:
@@ -131,7 +125,7 @@ class PipelineComponentFactory:
             logging.info(f"Generation kwargs: {generation_kwargs}")
 
             # Instantiate generator
-            generator = OllamaGenerator(
+            generator = OllamaChatGenerator(
                 model=self.config.model_name,
                 url=self.config.ollama_url,
                 generation_kwargs=generation_kwargs,
@@ -144,7 +138,7 @@ class PipelineComponentFactory:
                     "HuggingFace API key is required for HuggingFace provider"
                 )
 
-            generator = HuggingFaceAPIGenerator(
+            generator = HuggingFaceAPIChatGenerator(
                 api_type="serverless_inference_api",
                 api_params={
                     "model": self.config.model_name,
