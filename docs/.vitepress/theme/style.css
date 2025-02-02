@@ -109,6 +109,7 @@
 }
 
 h1.name,
+h1.heading,
 .title span {
   font-family: var(--vp-font-family-brand);
   letter-spacing: 2.2px !important;
