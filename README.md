@@ -6,7 +6,7 @@
     <a href="https://github.com/tilmangriesel/chipper/issues"><img src="https://img.shields.io/github/issues/tilmangriesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a><a href="https://hub.docker.com/repository/docker/griesel/chipper"><img src="https://img.shields.io/docker/pulls/griesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a>
 </p>
 
-**Chipper** provides a web interface, CLI, and a modular, hackable, and lightweight architecture for RAG pipelines, document chunking, web scraping, and query workflows, enhancing generative AI models with advanced information retrieval capabilities. It can also function as a proxy between an **Ollama** client, such as **Enchanted** or **Open WebUI**, and an **Ollama** instance. Built with **Haystack**, **Ollama**, **Hugging Face**, **Docker**, **TailwindCSS**, and **ElasticSearch**, it runs as a fully containerized service.
+**Chipper** provides a web interface, CLI, and a modular, hackable, and lightweight architecture for RAG pipelines, document splitting, web scraping, and query workflows, enhancing generative AI models with advanced information retrieval capabilities. It can also function as a proxy between an **Ollama** client, such as **Enchanted** or **Open WebUI**, and an **Ollama** instance. Built with **Haystack**, **Ollama**, **Hugging Face**, **Docker**, **TailwindCSS**, and **ElasticSearch**, it runs as a fully containerized service.
 
 This project started as a personal tool to help my girlfriend with her book, using local RAG and LLMs to explore characters and creative ideas while keeping her work private and off cloud services like ChatGPT. What began as a few handy scripts soon grew into a fully dockerized, extensible service and along the way, it became a labor of love. Now, I'm excited to share it with the world.
 
@@ -95,7 +95,7 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 #### Todo
 
 - [ ] **Automated Unit Tests**
-- [ ] **Smart Document Chunking and Embedding**
+- [ ] **Smart Document Splitting and Embedding**
 - [ ] **React-Based Web Application**
 
 ---
@@ -111,6 +111,19 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [VitePress](https://vitepress.dev/)
 - [Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx)
 - [Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main)
+
+## Friends of Chipper
+
+Check out these Chipper-compatible projects! Want to add yours? Open an issue to let me know!
+
+- **page-assist** https://github.com/n4ze3m/page-assist
+  - Use your locally running AI models to assist you in your web browsing
+- **open-webui** https://github.com/open-webui/open-webui
+  - User-friendly AI Interface
+- **enchanted** https://github.com/gluonfield/enchanted
+  - Enchanted is iOS and macOS app for chatting with private self hosted language models such as Llama2, Mistral or Vicuna using Ollama.
+- **Ollamac** https://github.com/kevinhermawan/Ollamac
+  - Mac app for Ollama
 
 ## Star History
 
