@@ -26,50 +26,55 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 
 ## Features
 
-- **Local & Cloud Model Support** — Run models locally with [Ollama](https://ollama.com/) or connect to remote models via the [Hugging Face API](https://huggingface.co/).
-- **ElasticSearch Integration** — Store and retrieve vectorized data efficiently with scalable indexing.
-- **Document Chunking** — Process and split documents into structured segments.
-- **Web Scraping** — Extract and index content from web pages.
-- **Audio Transcription** — Convert audio files to text.
-- **CLI & Web UI** — Access Chipper via a command-line tool or a lightweight, self-contained web interface.
-- **Dockerized Deployment** — Run in a fully containerized setup with minimal configuration.
-- **Customizable RAG Pipelines** — Adjust model selection, query parameters, and system prompts as needed.
-- **Ollama API Proxy** — Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
-- **API Security** — Proxy the Ollama API with API key-based and Baerer token service authentication.
-- **Offline Web UI** — Works without an internet connection using vanilla JavaScript and TailwindCSS.
-- **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
+- **Local & Cloud Model Support** - Run models locally with [Ollama](https://ollama.com/) or connect to remote models via the [Hugging Face API](https://huggingface.co/).
+- **ElasticSearch Integration** - Store and retrieve vectorized data efficiently with scalable indexing.
+- **Document Chunking** - Process and split documents into structured segments.
+- **Web Scraping** - Extract and index content from web pages.
+- **Audio Transcription** - Convert audio files to text.
+- **CLI & Web UI** - Access Chipper via a command-line tool or a lightweight, self-contained web interface.
+- **Dockerized Deployment** - Run in a fully containerized setup with minimal configuration.
+- **Customizable RAG Pipelines** - Adjust model selection, query parameters, and system prompts as needed.
+- **Ollama API Proxy** - Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
+- **API Security** - Proxy the Ollama API with API key-based and Baerer token service authentication.
+- **Offline Web UI** - Works without an internet connection using vanilla JavaScript and TailwindCSS.
+- **Distributed Processing** - Chain multiple Chipper instances together for workload distribution and extended processing.
 
 ## Step 1: Setting Up Chipper 🛠️
 
 ::: info
-Everything mentioned here assumes some familiarity with the command line on your system. If you’re using Windows, consider using [MSYS](https://www.msys2.org/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/about) to make things easier.
+Everything mentioned here assumes some familiarity with the command line on your system. If you're using Windows, consider using [MSYS](https://www.msys2.org/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/about) to make things easier.
 :::
 
 ### 1.1 Install Docker
 
-Alright, let’s get you set up! There’s one key requirement: [Docker](https://www.docker.com/). Chipper uses Docker to simplify the process and eliminate the need for a complex local setup on your machine.
+Alright, let's get you set up! There's one key requirement: [Docker](https://www.docker.com/). Chipper uses Docker to simplify the process and eliminate the need for a complex local setup on your machine.
 
 - [If you're new to Docker, this will get you started](https://docs.docker.com/get-started/)
 
-### 1.2 Install Git
+### 1.2 Install Git and Git LFS
 
-Secondly, you’ll need Git, a version control tool that’s also the inspiration behind GitHub’s name. If you don’t already have Git installed, no worries:
+Secondly, you'll need Git and Git LFS, a version control tool that's also the inspiration behind GitHub's name. If you don't already have Git installed, no worries:
 
-- [This guide will help you get started](https://docs.github.com/en/get-started/getting-started-with-git)
+- [This guide will help you get started with Git](https://docs.github.com/en/get-started/getting-started-with-git)
+- [and this will get started with Git LFS](https://git-lfs.com)
 
 ## Step 2: Getting Started 🚀
 
 ### 2.1 Clone the Repository
 
-To get the latest version of Chipper on your system, you’ll need to clone it locally. Simply run the following command:
+To get the latest version of Chipper on your system, you'll need to clone it locally. Simply run the following command:
 
 ```bash
 git clone git@github.com:TilmanGriesel/chipper.git
 ```
 
+#### Are you using Linux and an AMD GPU?
+
+Checkout the [AMD GPU ROCm docker documentation](https://github.com/ROCm/ROCm-docker/blob/master/quick-start.md). If you run into any issues, consider [removing](https://github.com/TilmanGriesel/chipper/blob/main/docker/docker-compose.base.yml#L52) and [adjust your `.env` file](https://github.com/TilmanGriesel/chipper/blob/746fb0e8052493badbc777acfdb09de70920352d/services/api/.env.example#L7) to use your local Ollama instance at `http://localhost:11434`.
+
 ### 2.2 Launch Chipper
 
-Now we’re getting somewhere! Chipper uses [Docker Compose](https://docs.docker.com/compose/) to orchestrate the various components we need to work together, such as ElasticSearch and Chipper services. The best part? You don’t have to do much to get started, Chipper comes with a default configuration ready for experimentation.
+Now we're getting somewhere! Chipper uses [Docker Compose](https://docs.docker.com/compose/) to orchestrate the various components we need to work together, such as ElasticSearch and Chipper services. The best part? You don't have to do much to get started, Chipper comes with a default configuration ready for experimentation.
 
 #### 2.2.1 Navigate to your cloned Chipper directory
 
@@ -87,7 +92,7 @@ cd chipper
 
 ## Step 3: Testing Your Setup ✅
 
-Let’s verify that everything is working as expected by importing some test data included with Chipper. During this process, we’ll also pull the embedding model from Ollama if it hasn’t been downloaded yet.
+Let's verify that everything is working as expected by importing some test data included with Chipper. During this process, we'll also pull the embedding model from Ollama if it hasn't been downloaded yet.
 
 ### 3.1 Embed Test Data
 
@@ -109,15 +114,15 @@ or open: `http://localhost:21200`
 Tell me a story about Chipper, the brilliant golden retriever.
 ```
 
-Chipper will now respond using the test data embeddings we set up in the previous step. Essentially, we embedded a few fun stories about Chipper’s adventures, so you’ll likely hear all about them now!
+Chipper will now respond using the test data embeddings we set up in the previous step. Essentially, we embedded a few fun stories about Chipper's adventures, so you'll likely hear all about them now!
 
 ::: info
-You’ll likely see a message like `Starting to download model xy.z...`. Don’t worry, this only happens once for the default model. In the future, I plan to enhance this process with a progress bar or something similar. Once the download is complete, you can reload the page for a smoother experience.
+You'll likely see a message like `Starting to download model xy.z...`. Don't worry, this only happens once for the default model. In the future, I plan to enhance this process with a progress bar or something similar. Once the download is complete, you can reload the page for a smoother experience.
 :::
 
 ## Step 4: Embedding Your Own Data 📊
 
-Congratulations! Now we’re diving into the details. Embeddings are organized into what’s called an `index`, which is essentially a label for a "drawer" where data or embeddings are stored. By default, Chipper uses an index named `default`. While embeddings and the web UI will automatically use this default, you can specify a different one if needed. Just remember, if you switch to another index, you’ll also need to select it in the web UI using the `/index myindex` command.
+Congratulations! Now we're diving into the details. Embeddings are organized into what's called an `index`, which is essentially a label for a "drawer" where data or embeddings are stored. By default, Chipper uses an index named `default`. While embeddings and the web UI will automatically use this default, you can specify a different one if needed. Just remember, if you switch to another index, you'll also need to select it in the web UI using the `/index myindex` command.
 
 ### 4.1 Basic Embedding
 
@@ -132,7 +137,7 @@ We can only embed text data, by default Chipper accepts:
 
 ### 4.2 Advanced Embedding
 
-Now we’re ready to experiment! You can explore different splitting configurations to customize how text documents are divided. For example, you can use the `--split-by` argument to specify the method of splitting—options include "word," "sentence," "passage," "page," or "line." Adjust the `--split-length` to define the number of units per split, `--split-overlap` to set the number of units overlapping between splits, or `--split-threshold` to fine-tune the process further.
+Now we're ready to experiment! You can explore different splitting configurations to customize how text documents are divided. For example, you can use the `--split-by` argument to specify the method of splitting—options include "word," "sentence," "passage," "page," or "line." Adjust the `--split-length` to define the number of units per split, `--split-overlap` to set the number of units overlapping between splits, or `--split-threshold` to fine-tune the process further.
 
 For more details about the available options and how they work, check out the [Haystack DocumentSplitter documentation](https://docs.haystack.deepset.ai/docs/documentsplitter).
 
@@ -144,7 +149,7 @@ You can set the index using the `--es-index <name>` parameter, specify the embed
 
 ## Step 5: Next Steps and Exploration 🔍
 
-First off, if you’ve made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there’s more to it: they love to _chip_ wood, just like we need to split and chip the data we want to embed. And as for _retriever_, - well ...
+First off, if you've made it this far, let me unravel the mystery behind why Chipper is called Chipper the Golden Retriever. For starters, I adore golden retrievers! But there's more to it: they love to _chip_ wood, just like we need to split and chip the data we want to embed. And as for _retriever_, - well ...
 
 Jokes aside, this project offers plenty more tools to explore. You can transcribe audio files into text and embed it, scrape websites (only your own or with proper consent), or dive into the frontend, here you can write `/help` to see some options or backend to customize and change Chipper to suit your needs.
 

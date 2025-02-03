@@ -14,24 +14,25 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
 
 **Live Demo:** [https://demo.chipper.tilmangriesel.com/](https://demo.chipper.tilmangriesel.com/)
 
-## Features
-
-- **Local & Cloud Model Support** — Run models locally with [Ollama](https://ollama.com/) or connect to remote models via the [Hugging Face API](https://huggingface.co/).
-- **ElasticSearch Integration** — Store and retrieve vectorized data efficiently with scalable indexing.
-- **Document Chunking** — Process and split documents into structured segments.
-- **Web Scraping** — Extract and index content from web pages.
-- **Audio Transcription** — Convert audio files to text.
-- **CLI & Web UI** — Access Chipper via a command-line tool or a lightweight, self-contained web interface.
-- **Dockerized Deployment** — Run in a fully containerized setup with minimal configuration.
-- **Customizable RAG Pipelines** — Adjust model selection, query parameters, and system prompts as needed.
-- **Ollama API Proxy** — Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
-- **API Security** — Proxy the Ollama API with API key-based and Baerer token service authentication.
-- **Offline Web UI** — Works without an internet connection using vanilla JavaScript and TailwindCSS.
-- **Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
-
 ## Installation and Setup
 
-Visit the [Chipper project website](https://chipper.tilmangriesel.com/) for detailed setup instructions.
+- [Quickstart](https://chipper.tilmangriesel.com/get-started.html#welcome-to-chipper)
+- Or visit the [Chipper project website](https://chipper.tilmangriesel.com/)
+
+## Features
+
+- **Local & Cloud Model Support** - Run models locally with [Ollama](https://ollama.com/) or connect to remote models via the [Hugging Face API](https://huggingface.co/).
+- **ElasticSearch Integration** - Store and retrieve vectorized data efficiently with scalable indexing.
+- **Document Chunking** - Process and split documents into structured segments.
+- **Web Scraping** - Extract and index content from web pages.
+- **Audio Transcription** - Convert audio files to text.
+- **CLI & Web UI** - Access Chipper via a command-line tool or a lightweight, self-contained web interface.
+- **Dockerized Deployment** - Run in a fully containerized setup with minimal configuration.
+- **Customizable RAG Pipelines** - Adjust model selection, query parameters, and system prompts as needed.
+- **Ollama API Proxy** - Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
+- **API Security** - Proxy the Ollama API with API key-based and Baerer token service authentication.
+- **Offline Web UI** - Works without an internet connection using vanilla JavaScript and TailwindCSS.
+- **Distributed Processing** - Chain multiple Chipper instances together for workload distribution and extended processing.
 
 **Note:** This is just a research project, so it's not built for production.
 
@@ -90,7 +91,7 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [x] **Mirror Ollama Chat API** to enable Chipper as a drop-in middleware
 - [x] **Baerer token support**
 - [x] **Haystack Chat Generators** Implement `ChatPromptBuilder` and `OllamaChatGenerator`.
-- [x] **Allow For Distributed Processing** — Chain multiple Chipper instances together for workload distribution and extended processing.
+- [x] **Allow For Distributed Processing** - Chain multiple Chipper instances together for workload distribution and extended processing.
 
 #### Todo
 
