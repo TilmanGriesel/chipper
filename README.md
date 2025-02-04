@@ -119,7 +119,7 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 Check out these Chipper-compatible projects! Want to add yours? Open an issue to let me know!
 
 - [page-assist](https://github.com/n4ze3m/page-assist) Use your locally running AI models to assist you in your web browsing
-  [open-webui](https://github.com/open-webui/open-webui) User-friendly AI Interface
+- [open-webui](https://github.com/open-webui/open-webui) User-friendly AI Interface
 - [enchanted](https://github.com/gluonfield/enchanted) Enchanted is iOS and macOS app for chatting with private self hosted language models.
 - [Ollamac](https://github.com/kevinhermawan/Ollamac) Mac app for Ollama
 
