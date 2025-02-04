@@ -33,7 +33,7 @@ Additionally, the serverless inference API may sometimes queue your request, lea
 
 ### Web Interface
 
-Leverage the built-in Chipper web interface for an easy entry into customizable RAG pipelines and tailored output. Written in vanilla JavaScript, it requires no specific framework experience. The interface is built with TailwindCSS and includes all resources offline. Use the `/help` command learn how to switch models, update the embeddings index and more.
+Use Chipper's built-in web interface to set up and customize RAG pipelines with ease. Built with vanilla JavaScript and TailwindCSS, it works offline and doesn't require any framework-specific knowledge. Run the `/help` command to learn how to switch models, update the embeddings index, and more.
 
 ![chipper_demo_chat](/assets/demos/demo_rag_chat.gif)
 

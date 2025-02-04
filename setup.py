@@ -60,8 +60,10 @@ def check_external_ollama_requirement(gpu_profile: str) -> bool:
     log_info(f"Platform: {system}/{release}")
     log_info(f"GPU Profile: {gpu_profile}")
 
-    requires_external = system in ["Darwin"] or gpu_profile == "cpu"
-    is_wsl = "microsoft" in release.lower()
+    is_darwin = system in ["Darwin"]
+    is_cpu_profile = gpu_profile == "cpu"
+    is_amd_linux = gpu_profile == "amd-linux"
+    requires_external = is_darwin or is_cpu_profile or is_amd_linux
 
     if requires_external:
         log_info(f"Using external Ollama server at {DEFAULT_EXTERNAL_OLLAMA_URL}")
@@ -88,6 +90,7 @@ def check_external_ollama_requirement(gpu_profile: str) -> bool:
 
         return True
 
+    is_wsl = "microsoft" in release.lower()
     if is_wsl:
         log_info("WSL Linux detected")
 
@@ -121,7 +124,7 @@ def detect_gpu_profile():
     if system == "Linux":
         if Path("/dev/dri").exists() and Path("/dev/kfd").exists():
             log_info("Detected AMD GPU with ROCm support")
-            return "amd"
+            return "amd-linux"
     elif system == "Windows":
         try:
             wmic_output = subprocess.run(

@@ -42,7 +42,9 @@ Chipper essentially provides an end-to-end architecture for experimenting with e
 ## Step 1: Setting Up Chipper 🛠️
 
 ::: info
-Everything mentioned here assumes some familiarity with the command line on your system. If you're using Windows, consider using [MSYS](https://www.msys2.org/) or [WSL](https://learn.microsoft.com/en-us/windows/wsl/about) to make things easier.
+This documentation assumes you have some basic familiarity with the command line. If you're using Windows, it is recommended setting up [WSL](https://learn.microsoft.com/en-us/windows/wsl/about) or [MSYS](https://www.msys2.org/).
+
+Please note that Chipper is not your typical end-user product, it's a kit or toolbox for developers and tinkerers. Whether you're looking to extend your RAG setup or just need a starting point, think of it like an electronics kit: flexible, powerful, and meant to be customized. If you're looking for something simpler, check out [Ollama's amazing web and desktop options](https://github.com/ollama/ollama?tab=readme-ov-file#web--desktop).
 :::
 
 ### 1.1 Install Docker
@@ -56,7 +58,7 @@ Alright, let's get you set up! There's one key requirement: [Docker](https://www
 Secondly, you'll need Git and Git LFS, a version control tool that's also the inspiration behind GitHub's name. If you don't already have Git installed, no worries:
 
 - [This guide will help you get started with Git](https://docs.github.com/en/get-started/getting-started-with-git)
-- [and this will get started with Git LFS](https://git-lfs.com)
+- [and this will get you started with Git LFS](https://git-lfs.com)
 
 ## Step 2: Getting Started 🚀
 
@@ -68,9 +70,11 @@ To get the latest version of Chipper on your system, you'll need to clone it loc
 git clone git@github.com:TilmanGriesel/chipper.git
 ```
 
-#### Are you using Linux and an AMD GPU?
+#### Are you running Linux or macOS?
 
-Checkout the [AMD GPU ROCm docker documentation](https://github.com/ROCm/ROCm-docker/blob/master/quick-start.md). If you run into any issues, consider [removing](https://github.com/TilmanGriesel/chipper/blob/main/docker/docker-compose.base.yml#L52) and [adjust your `.env` file](https://github.com/TilmanGriesel/chipper/blob/746fb0e8052493badbc777acfdb09de70920352d/services/api/.env.example#L7) to use your local Ollama instance at `http://localhost:11434`.
+::: info
+Chipper aims to package everything into Docker containers, including Ollama. However, GPU support for Ollama in containers isn't universally supported across all platforms and hardware vendors. Currently, if you're using macOS or Linux with an AMD GPU, you'll need to [download Ollama separately](https://ollama.com/). During setup, Chipper should automatically detect your system and configure itself accordingly. If it doesn't, you can manually tweak your Docker setup by modifying `docker/docker-compose.base.yml` and adjusting the Ollama URL in `services/api/.env`.
+:::
 
 ### 2.2 Launch Chipper
 

@@ -32,9 +32,10 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
 - **Ollama API Proxy** - Extend Ollama with retrieval capabilities, enabling interoperability with clients like **Enchanted** and **Open WebUI**.
 - **API Security** - Proxy the Ollama API with API key-based and Baerer token service authentication.
 - **Offline Web UI** - Works without an internet connection using vanilla JavaScript and TailwindCSS.
+- **Edge TTS** – Listen to Chipper's output using a WebAssembly-based client-side TTS generator.
 - **Distributed Processing** - Chain multiple Chipper instances together for workload distribution and extended processing.
 
-**Note:** This is just a research project, so it's not built for production.
+**Note:** This is a personal project and not designed for commercial or production use. If you intend to use it in a production environment, make sure to conduct your own due diligence.
 
 ## Philosophy
 
@@ -103,13 +104,13 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 
 ## Acknowledgments
 
-- [Haystack](https://haystack.deepset.ai/)
-- [Ollama](https://ollama.com/)
+- [Haystack](https://github.com/deepset-ai/haystack)
+- [Ollama](https://github.com/ollama/ollama)
 - [Hugging Face](https://huggingface.co/)
 - [Elastic](https://www.elastic.co)
-- [Elasticvue](https://elasticvue.com/)
+- [Elasticvue](https://github.com/cars10/elasticvue)
 - [Docker](https://docker.com)
-- [VitePress](https://vitepress.dev/)
+- [VitePress](https://github.com/vuejs/vitepress)
 - [Sherpa ONNX](https://github.com/k2-fsa/sherpa-onnx)
 - [Sherpa ONNX Wasm](https://huggingface.co/spaces/k2-fsa/web-assembly-tts-sherpa-onnx-en/tree/main)
 
@@ -117,14 +118,10 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 
 Check out these Chipper-compatible projects! Want to add yours? Open an issue to let me know!
 
-- **page-assist** https://github.com/n4ze3m/page-assist
-  - Use your locally running AI models to assist you in your web browsing
-- **open-webui** https://github.com/open-webui/open-webui
-  - User-friendly AI Interface
-- **enchanted** https://github.com/gluonfield/enchanted
-  - Enchanted is iOS and macOS app for chatting with private self hosted language models such as Llama2, Mistral or Vicuna using Ollama.
-- **Ollamac** https://github.com/kevinhermawan/Ollamac
-  - Mac app for Ollama
+- [page-assist](https://github.com/n4ze3m/page-assist) Use your locally running AI models to assist you in your web browsing
+  [open-webui](https://github.com/open-webui/open-webui) User-friendly AI Interface
+- [enchanted](https://github.com/gluonfield/enchanted) Enchanted is iOS and macOS app for chatting with private self hosted language models.
+- [Ollamac](https://github.com/kevinhermawan/Ollamac) Mac app for Ollama
 
 ## Star History
 
