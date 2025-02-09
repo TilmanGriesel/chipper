@@ -9,9 +9,9 @@ readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
-readonly SCRIPT_VERSION="1.3.0"
+readonly SCRIPT_VERSION="1.4.0"
 
-# Container engine configuration
+# container engine configuration
 CONTAINER_ENGINE="${CONTAINER_ENGINE:-docker}"
 
 # common messages
@@ -48,6 +48,7 @@ Options:
   -e, --engine       - Specify container engine (docker|podman)
 
 Commands:
+  config              - Launch configuration utility
   up                  - Start containers in detached mode
   down                - Stop containers
   rebuild             - Clean, rebuild and recreate images and containers
@@ -280,6 +281,11 @@ esac
 
 # main command handling
 case "$1" in
+    "config")
+        echo "Launching configuration utility..."
+        ensure_environment
+        run_in_directory "tools/config" ./run.sh "$@"
+        ;;
     "up")
         ensure_environment
         compose_down

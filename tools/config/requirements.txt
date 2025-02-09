@@ -1,0 +1,3 @@
+rich
+aiohttp
+python-dotenv

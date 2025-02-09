@@ -7,10 +7,10 @@ CONTAINER_ENGINE=""
 NETWORK_NAME="chipper_network"
 
 detect_container_engine() {
-    if command -v docker &> /dev/null; then
-        CONTAINER_ENGINE="docker"
-    elif command -v podman &> /dev/null; then
+    if command -v podman &> /dev/null; then
         CONTAINER_ENGINE="podman"
+    elif command -v docker &> /dev/null; then
+        CONTAINER_ENGINE="docker"
     else
         echo "Error: No container engine (Docker or Podman) found."
         exit 1
