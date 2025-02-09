@@ -88,3 +88,7 @@ The demo operates on a **Scaleway Stardust 1** instance, utilizing the latest Ch
 ::: info
 This section is still under construction.
 :::
+
+---
+
+**Have a great day!** And don’t forget to [check out the Chipper Quickstart Guide](get-started)! 🚀

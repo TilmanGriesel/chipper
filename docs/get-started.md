@@ -161,4 +161,52 @@ While I plan to expand this documentation, I generally prefer to keep things doc
 
 If you enjoy what you see, [leaving a star on the GitHub repo](https://github.com/TilmanGriesel/chipper) would mean the world to me.
 
-**Have a nice day!**
+## Configuration ⚙️
+
+This guide outlines the essential steps for configuring Chipper.
+
+Chipper's configuration is managed through environment variables and `.env` files. On the first run, Chipper automatically generates these configuration files for your system. You can find the `.env` files within each service or tool's base directory. For example:
+
+```
+services/api/.env
+```
+
+### Editing Configuration Files
+
+You can modify the `.env` files manually using your preferred text editor or use Chipper's built-in configuration utility:
+
+```sh
+./run config
+```
+
+This utility scans all directories and presents available configuration options in a structured table for each service.
+
+![Configuration Utility Demo](/assets/demos/demo_config_util.gif)
+
+---
+
+### Changing the Inference Model
+
+To change the default inference model, update the following environment variables in `services/api/.env`:
+
+- `MODEL_NAME` – Specifies the default model.
+- `HF_MODEL_NAME` – (Optional) Set this if using a Hugging Face endpoint.
+
+---
+
+### Changing the Embedding Model
+
+To change the default embedding model, update:
+
+- `EMBEDDING_MODEL_NAME` – Specifies the default embedding model.
+- `HF_EMBEDDING_MODEL_NAME` – (Optional) Set this if using a Hugging Face endpoint.
+
+---
+
+### Exploring Configuration Options
+
+For a comprehensive view of all configuration options, browse the generated `.env` files within each service directory. These files contain various settings that allow you to customize Chipper according to your needs.
+
+---
+
+**Have a nice day!** and don't forget to [checkout the Chipper Demo section](demo)!
