@@ -1,4 +1,4 @@
-python-dotenv
-bs4
-trafilatura
-aiohttp
+python-dotenv==1.0.1
+bs4==0.0.2
+trafilatura==2.0.0
+aiohttp==3.11.12
