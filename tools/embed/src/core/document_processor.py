@@ -108,7 +108,9 @@ class DocumentProcessor:
 
         return tree
 
-    def _print_tree(self, tree: Dict, prefix: str = "", is_last: bool = True) -> List[str]:
+    def _print_tree(
+        self, tree: Dict, prefix: str = "", is_last: bool = True
+    ) -> List[str]:
         if tree is None:
             return []
 
@@ -140,7 +142,9 @@ class DocumentProcessor:
 
     def process_files(self):
         stats = ProcessingStats()
-        self.logger.info(f"Starting document processing from base path: {self.base_path}")
+        self.logger.info(
+            f"Starting document processing from base path: {self.base_path}"
+        )
         self.logger.info(f"File extensions to process: {self.file_extensions}")
         self.logger.info(f"Active blacklist patterns: {sorted(self.blacklist)}")
 
@@ -162,7 +166,9 @@ class DocumentProcessor:
                 found_files = list(self.base_path.rglob(f"*{ext}"))
                 current_found = len(found_files)
                 if current_found > 0:
-                    self.logger.info(f"└─ Found {current_found} files with extension {ext}")
+                    self.logger.info(
+                        f"└─ Found {current_found} files with extension {ext}"
+                    )
 
                 valid_files = []
                 blacklist_details = defaultdict(list)  # Track blacklist reasons
@@ -172,7 +178,9 @@ class DocumentProcessor:
                     file_dir = file.parent
                     if file_dir != current_directory:
                         current_directory = file_dir
-                        self.logger.debug(f"  Scanning: {file_dir.relative_to(self.base_path)}")
+                        self.logger.debug(
+                            f"  Scanning: {file_dir.relative_to(self.base_path)}"
+                        )
 
                     if self._is_blacklisted(file):
                         blacklist_reason = next(
@@ -190,12 +198,20 @@ class DocumentProcessor:
                 if blacklist_details:
                     self.logger.info("  Blacklisted files:")
                     for reason, blacklisted in blacklist_details.items():
-                        self.logger.info(f"  └─ {len(blacklisted)} files in '{reason}' directories")
+                        self.logger.info(
+                            f"  └─ {len(blacklisted)} files in '{reason}' directories"
+                        )
                         if self.logger.level <= logging.DEBUG:
-                            for bf in blacklisted[:5]:  # Show up to 5 examples in debug mode
-                                self.logger.debug(f"     - {bf.relative_to(self.base_path)}")
+                            for bf in blacklisted[
+                                :5
+                            ]:  # Show up to 5 examples in debug mode
+                                self.logger.debug(
+                                    f"     - {bf.relative_to(self.base_path)}"
+                                )
                             if len(blacklisted) > 5:
-                                self.logger.debug(f"     ... and {len(blacklisted)-5} more")
+                                self.logger.debug(
+                                    f"     ... and {len(blacklisted)-5} more"
+                                )
 
                 files.extend(valid_files)
 
@@ -204,11 +220,13 @@ class DocumentProcessor:
                 continue
 
         total_files = len(files)
-        self.logger.info(f"\nSummary:")
+        self.logger.info("\nSummary:")
         self.logger.info(f"└─ Found {total_files} files to process")
         if blacklist_stats:
             self.logger.info("\nBlacklist summary:")
-            for pattern, count in sorted(blacklist_stats.items(), key=lambda x: x[1], reverse=True):
+            for pattern, count in sorted(
+                blacklist_stats.items(), key=lambda x: x[1], reverse=True
+            ):
                 self.logger.info(f"└─ {count} files skipped due to '{pattern}'")
 
         if files:
