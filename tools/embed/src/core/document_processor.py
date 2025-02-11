@@ -140,6 +140,19 @@ class DocumentProcessor:
             )
         return is_blacklisted
 
+    def _log_processing_summary(self, stats: ProcessingStats):
+        """Log a summary of the processing results."""
+        self.logger.info("\nProcessing Summary:")
+        self.logger.info(f"└─ Files processed: {stats.processed_files}")
+        self.logger.info(f"└─ Total documents: {stats.total_documents}")
+        self.logger.info(f"└─ Split documents: {stats.split_documents}")
+        self.logger.info(f"└─ Failed files: {stats.failed_files}")
+        self.logger.info(f"└─ Skipped files: {stats.skipped_files}")
+        self.logger.info(f"└─ Blacklisted files: {stats.blacklisted_files}")
+        if stats.total_file_size > 0:
+            size_mb = stats.total_file_size / (1024 * 1024)
+            self.logger.info(f"└─ Total file size: {size_mb:.2f} MB")
+
     def process_files(self):
         stats = ProcessingStats()
         self.logger.info(
