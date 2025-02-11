@@ -43,10 +43,11 @@ class DocumentProcessor:
             ext.lower() if ext.startswith(".") else f".{ext.lower()}"
             for ext in file_extensions
         ]
-        self.blacklist = blacklist or {}
+        self.blacklist = blacklist or set()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.setLevel(log_level)
 
+        # Log initialization configuration
         config = {
             "base_path": str(self.base_path),
             "file_extensions": self.file_extensions,
@@ -56,12 +57,12 @@ class DocumentProcessor:
             "split_overlap": split_overlap,
             "split_threshold": split_threshold,
         }
-        self.logger.info(f"Initialized with config: {json.dumps(config, indent=2)}")
+        self.logger.info(
+            "Document processor configuration: %s", json.dumps(config, indent=None)
+        )
 
         self.document_store = InMemoryDocumentStore()
-        self.converter = TextFileToDocument(
-            store_full_path=False,
-        )
+        self.converter = TextFileToDocument(store_full_path=False)
         self.cleaner = DocumentCleaner(
             ascii_only=True,
             remove_empty_lines=True,
@@ -119,7 +120,8 @@ class DocumentProcessor:
 
         for i, (name, subtree) in enumerate(items):
             is_last_item = i == len(items) - 1
-            tree_lines.append(f"{prefix}{'└── ' if is_last_item else '├── '}{name}")
+            icon = "└── " if is_last_item else "├── "
+            tree_lines.append(f"{prefix}{icon}{name}")
 
             if isinstance(subtree, dict):
                 extension = "    " if is_last_item else "│   "
@@ -136,51 +138,57 @@ class DocumentProcessor:
 
         if is_blacklisted:
             self.logger.debug(
-                f"Blacklisted path: {path} (matched: {blacklisted_parts})"
+                "Blacklisted path: %s (matched: %s)", path, blacklisted_parts
             )
         return is_blacklisted
 
     def _log_processing_summary(self, stats: ProcessingStats):
         """Log a summary of the processing results."""
-        self.logger.info("\nProcessing Summary:")
-        self.logger.info(f"└─ Files processed: {stats.processed_files}")
-        self.logger.info(f"└─ Total documents: {stats.total_documents}")
-        self.logger.info(f"└─ Split documents: {stats.split_documents}")
-        self.logger.info(f"└─ Failed files: {stats.failed_files}")
-        self.logger.info(f"└─ Skipped files: {stats.skipped_files}")
-        self.logger.info(f"└─ Blacklisted files: {stats.blacklisted_files}")
+        summary_lines = [
+            "Processing Summary:",
+            f"Files Processed: {stats.processed_files}",
+            f"Total Documents: {stats.total_documents}",
+            f"Split Documents: {stats.split_documents}",
+            f"Failed Files: {stats.failed_files}",
+            f"Skipped Files: {stats.skipped_files}",
+            f"Blacklisted Files: {stats.blacklisted_files}",
+        ]
+
         if stats.total_file_size > 0:
             size_mb = stats.total_file_size / (1024 * 1024)
-            self.logger.info(f"└─ Total file size: {size_mb:.2f} MB")
+            summary_lines.append(f"Total File Size: {size_mb:.2f} MB")
+
+        for line in summary_lines:
+            self.logger.info(line)
 
     def process_files(self):
         stats = ProcessingStats()
         self.logger.info(
-            f"Starting document processing from base path: {self.base_path}"
+            "Starting document processing from base path: %s", self.base_path
         )
-        self.logger.info(f"File extensions to process: {self.file_extensions}")
-        self.logger.info(f"Active blacklist patterns: {sorted(self.blacklist)}")
+        self.logger.info("Active blacklist patterns: %s", sorted(self.blacklist))
 
         if not self.base_path.exists():
-            self.logger.error(f"Base path not found: {self.base_path}")
+            self.logger.error("Base path not found: %s", self.base_path)
             return []
 
-        self.logger.info("\nStarting file search...")
+        self.logger.info("Starting file search...")
 
         files = []
         blacklisted_files = []
         blacklist_stats = {}
         current_directory = None
 
-        total_extensions = len(self.file_extensions)
         for idx, ext in enumerate(self.file_extensions, 1):
-            self.logger.info(f"\nSearching [{idx}/{total_extensions}]: *{ext}")
+            self.logger.info(
+                "Searching [%d/%d]: *%s", idx, len(self.file_extensions), ext
+            )
             try:
                 found_files = list(self.base_path.rglob(f"*{ext}"))
                 current_found = len(found_files)
                 if current_found > 0:
                     self.logger.info(
-                        f"└─ Found {current_found} files with extension {ext}"
+                        "Found %d files with extension %s", current_found, ext
                     )
 
                 valid_files = []
@@ -191,9 +199,10 @@ class DocumentProcessor:
                     file_dir = file.parent
                     if file_dir != current_directory:
                         current_directory = file_dir
-                        self.logger.debug(
-                            f"  Scanning: {file_dir.relative_to(self.base_path)}"
-                        )
+                        if self.logger.level <= logging.DEBUG:
+                            self.logger.debug(
+                                "Scanning: %s", file_dir.relative_to(self.base_path)
+                            )
 
                     if self._is_blacklisted(file):
                         blacklist_reason = next(
@@ -209,41 +218,39 @@ class DocumentProcessor:
                         valid_files.append(file)
 
                 if blacklist_details:
-                    self.logger.info("  Blacklisted files:")
+                    self.logger.info("Blacklisted files:")
                     for reason, blacklisted in blacklist_details.items():
                         self.logger.info(
-                            f"  └─ {len(blacklisted)} files in '{reason}' directories"
+                            "  %d files in '%s' directories", len(blacklisted), reason
                         )
                         if self.logger.level <= logging.DEBUG:
-                            for bf in blacklisted[
-                                :5
-                            ]:  # Show up to 5 examples in debug mode
+                            for bf in blacklisted[:5]:
                                 self.logger.debug(
-                                    f"     - {bf.relative_to(self.base_path)}"
+                                    "    - %s", bf.relative_to(self.base_path)
                                 )
                             if len(blacklisted) > 5:
                                 self.logger.debug(
-                                    f"     ... and {len(blacklisted)-5} more"
+                                    "    ... and %d more", len(blacklisted) - 5
                                 )
 
                 files.extend(valid_files)
 
             except Exception as e:
-                self.logger.error(f"Error searching for {ext} files: {str(e)}")
+                self.logger.error("Error searching for %s files: %s", ext, str(e))
                 continue
 
         total_files = len(files)
-        self.logger.info("\nSummary:")
-        self.logger.info(f"└─ Found {total_files} files to process")
+        self.logger.info("Summary: Found %d files to process", total_files)
+
         if blacklist_stats:
-            self.logger.info("\nBlacklist summary:")
+            self.logger.info("Blacklist summary:")
             for pattern, count in sorted(
                 blacklist_stats.items(), key=lambda x: x[1], reverse=True
             ):
-                self.logger.info(f"└─ {count} files skipped due to '{pattern}'")
+                self.logger.info("  %d files skipped due to '%s'", count, pattern)
 
         if files:
-            self.logger.info("\nFiles to be processed:")
+            self.logger.info("Files to be processed:")
             tree = self._build_tree_structure(files)
             tree_output = self._print_tree(tree)
             self.logger.info(".")  # root
@@ -275,5 +282,5 @@ class DocumentProcessor:
 
             except Exception as e:
                 stats.failed_files += 1
-                self.logger.error(f"Error processing files: {str(e)}", exc_info=True)
+                self.logger.error("Error processing files: %s", str(e), exc_info=True)
                 return []
