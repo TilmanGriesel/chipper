@@ -14,6 +14,24 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
 
 **Live Demo:** [https://demo.chipper.tilmangriesel.com/](https://demo.chipper.tilmangriesel.com/)
 
+# Table of Contents
+
+- [Installation and Setup](#installation-and-setup)
+- [Features](#features)
+- [Philosophy](#philosophy)
+- [Demos](#demos)
+  - [Web Interface](#web-interface)
+  - [Code Output](#code-output)
+  - [Reasoning](#reasoning)
+  - [CLI Interface](#cli-interface)
+  - [Third-Party Clients](#third-party-clients)
+- [Roadmap](#roadmap)
+  - [Done](#done)
+  - [Todo](#todo)
+- [Acknowledgments](#acknowledgments)
+- [Friends of Chipper](#friends-of-chipper)
+- [Star History](#star-history)
+
 ## Installation and Setup
 
 - [Quickstart](https://chipper.tilmangriesel.com/get-started.html#welcome-to-chipper)
