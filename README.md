@@ -10,11 +10,12 @@
 
 This project started as a personal tool to help my girlfriend with her book, using local RAG and LLMs to explore characters and creative ideas while keeping her work private and off cloud services like ChatGPT. What began as a few handy scripts soon grew into a fully dockerized, extensible service and along the way, it became a labor of love. Now, I'm excited to share it with the world.
 
-If you find Chipper useful, **leaving a star would be lovely** and will help others discover Chipper too.
+If you **find Chipper useful**, **leaving a star ⭐ would be lovely** and will help others **discover Chipper too**.
 
-**Live Demo:** [https://demo.chipper.tilmangriesel.com/](https://demo.chipper.tilmangriesel.com/)
+- **Project Site:** [https://chipper.tilmangriesel.com/](https://chipper.tilmangriesel.com/)
+- **Live Demo:** [https://demo.chipper.tilmangriesel.com/](https://demo.chipper.tilmangriesel.com/)
 
-# Table of Contents
+## Overview
 
 - [Installation and Setup](#installation-and-setup)
 - [Features](#features)
