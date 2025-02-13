@@ -304,8 +304,15 @@ def create_app():
                 if hasattr(e, "response") and e.response is not None
                 else 500
             )
+            logger.error(f"RequestException: {str(e)}")
             return (
-                jsonify({"error": str(e), "done": True, "done_reason": "error"}),
+                jsonify(
+                    {
+                        "error": "An internal error has occurred",
+                        "done": True,
+                        "done_reason": "error",
+                    }
+                ),
                 status_code,
             )
 
