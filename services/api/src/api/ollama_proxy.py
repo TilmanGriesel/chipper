@@ -61,9 +61,11 @@ class OllamaProxy:
             return self._handle_standard_response(response)
 
         except Exception as e:
-            logger.error(f"Error proxying request to Ollama: {str(e)}")
+            logger.error(f"Error proxying request to Ollama: {str(e)}", exc_info=True)
             return Response(
-                json.dumps({"error": str(e)}), status=500, mimetype="application/json"
+                json.dumps({"error": "An internal error has occurred."}),
+                status=500,
+                mimetype="application/json",
             )
 
     def _handle_streaming_response(self, response: requests.Response) -> Response:
@@ -75,8 +77,8 @@ class OllamaProxy:
                     if chunk:
                         yield chunk
             except Exception as e:
-                logger.error(f"Error streaming response: {str(e)}")
-                yield json.dumps({"error": str(e)}).encode()
+                logger.error(f"Error streaming response: {str(e)}", exc_info=True)
+                yield json.dumps({"error": "An internal error has occurred."}).encode()
 
         response_headers = {
             "Content-Type": response.headers.get("Content-Type", "application/json")
