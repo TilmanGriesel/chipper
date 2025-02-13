@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
 
-ENV ENV_MANAGER_BLACKLIST=docker/.env
+ENV ENV_MANAGER_BLOCKLIST=docker/.env
 
 ENTRYPOINT ["python", "src/main.py"]
 CMD []

@@ -137,7 +137,7 @@ Congratulations! Now we're diving into the details. Embeddings are organized int
 We can only embed text data, by default Chipper accepts:
 
 > `.txt`, `.md`, `.py`, `.html`, `.js`, `.cpp`, `.hpp`, `.xml` extensions.
-> You can change this whitelist by passing your own `--extensions` list.
+> You can change this allowlist by passing your own `--extensions` list.
 
 ### 4.2 Advanced Embedding
 

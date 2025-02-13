@@ -15,28 +15,28 @@ APP_VERSION = os.getenv("APP_VERSION", "[DEV]")
 BUILD_NUMBER = os.getenv("APP_BUILD_NUM", "0")
 
 
-def load_blacklist(base_path: str) -> Set[str]:
-    blacklist_file = Path(base_path) / ".ragignore"
-    default_blacklist = set()
+def load_blocklist(base_path: str) -> Set[str]:
+    blocklist_file = Path(base_path) / ".ragignore"
+    default_blocklist = set()
 
-    if blacklist_file.exists():
+    if blocklist_file.exists():
         try:
-            with open(blacklist_file, "r") as f:
-                custom_blacklist = {
+            with open(blocklist_file, "r") as f:
+                custom_blocklist = {
                     line.strip()
                     for line in f
                     if line.strip() and not line.startswith("#")
                 }
-            logger.info(f"Loaded custom blacklist from .ragignore: {custom_blacklist}")
-            return default_blacklist.union(custom_blacklist)
+            logger.info(f"Loaded custom blocklist from .ragignore: {custom_blocklist}")
+            return default_blocklist.union(custom_blocklist)
         except Exception as e:
             logger.warning(
-                f"Error reading .ragignore file: {e}. Using default blacklist."
+                f"Error reading .ragignore file: {e}. Using default blocklist."
             )
-            return default_blacklist
+            return default_blocklist
     else:
-        logger.info("No .ragignore file found. Using default blacklist.")
-        return default_blacklist
+        logger.info("No .ragignore file found. Using default blocklist.")
+        return default_blocklist
 
 
 def log_args(args):
@@ -56,11 +56,11 @@ def log_args(args):
 
 def process_documents(args) -> List[Document]:
     logger.info("Starting document processing")
-    blacklist = load_blacklist("./")
+    blocklist = load_blocklist("./")
     processor = DocumentProcessor(
         base_path=args.path,
         file_extensions=args.extensions,
-        blacklist=blacklist,
+        blocklist=blocklist,
         split_by=args.split_by,
         split_length=args.split_length,
         split_overlap=args.split_overlap,

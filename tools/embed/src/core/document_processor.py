@@ -23,7 +23,7 @@ class ProcessingStats:
     skipped_files: int = 0
     total_file_size: int = 0
     split_documents: int = 0
-    blacklisted_files: int = 0
+    blocklisted_files: int = 0
 
 
 class DocumentProcessor:
@@ -31,7 +31,7 @@ class DocumentProcessor:
         self,
         base_path: str,
         file_extensions: List[str],
-        blacklist: Set[str] = None,
+        blocklist: Set[str] = None,
         split_by: str = "word",
         split_length: int = 200,
         split_overlap: int = 20,
@@ -43,7 +43,7 @@ class DocumentProcessor:
             ext.lower() if ext.startswith(".") else f".{ext.lower()}"
             for ext in file_extensions
         ]
-        self.blacklist = blacklist or set()
+        self.blocklist = blocklist or set()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.logger.setLevel(log_level)
 
@@ -51,7 +51,7 @@ class DocumentProcessor:
         config = {
             "base_path": str(self.base_path),
             "file_extensions": self.file_extensions,
-            "blacklist": sorted(self.blacklist),
+            "blocklist": sorted(self.blocklist),
             "split_by": split_by,
             "split_length": split_length,
             "split_overlap": split_overlap,
@@ -132,15 +132,15 @@ class DocumentProcessor:
 
         return tree_lines
 
-    def _is_blacklisted(self, path: Path) -> bool:
-        blacklisted_parts = [part for part in path.parts if part in self.blacklist]
-        is_blacklisted = len(blacklisted_parts) > 0
+    def _is_blocklisted(self, path: Path) -> bool:
+        blocklisted_parts = [part for part in path.parts if part in self.blocklist]
+        is_blocklisted = len(blocklisted_parts) > 0
 
-        if is_blacklisted:
+        if is_blocklisted:
             self.logger.debug(
-                "Blacklisted path: %s (matched: %s)", path, blacklisted_parts
+                "Blocklisted path: %s (matched: %s)", path, blocklisted_parts
             )
-        return is_blacklisted
+        return is_blocklisted
 
     def _log_processing_summary(self, stats: ProcessingStats):
         """Log a summary of the processing results."""
@@ -151,7 +151,7 @@ class DocumentProcessor:
             f"Split Documents: {stats.split_documents}",
             f"Failed Files: {stats.failed_files}",
             f"Skipped Files: {stats.skipped_files}",
-            f"Blacklisted Files: {stats.blacklisted_files}",
+            f"Blocklisted Files: {stats.blocklisted_files}",
         ]
 
         if stats.total_file_size > 0:
@@ -166,7 +166,7 @@ class DocumentProcessor:
         self.logger.info(
             "Starting document processing from base path: %s", self.base_path
         )
-        self.logger.info("Active blacklist patterns: %s", sorted(self.blacklist))
+        self.logger.info("Active blocklist patterns: %s", sorted(self.blocklist))
 
         if not self.base_path.exists():
             self.logger.error("Base path not found: %s", self.base_path)
@@ -175,8 +175,8 @@ class DocumentProcessor:
         self.logger.info("Starting file search...")
 
         files = []
-        blacklisted_files = []
-        blacklist_stats = {}
+        blocklisted_files = []
+        blocklist_stats = {}
         current_directory = None
 
         for idx, ext in enumerate(self.file_extensions, 1):
@@ -192,7 +192,7 @@ class DocumentProcessor:
                     )
 
                 valid_files = []
-                blacklist_details = defaultdict(list)  # Track blacklist reasons
+                blocklist_details = defaultdict(list)  # Track blocklist reasons
 
                 for file in found_files:
                     # Show directory changes for better context
@@ -204,33 +204,33 @@ class DocumentProcessor:
                                 "Scanning: %s", file_dir.relative_to(self.base_path)
                             )
 
-                    if self._is_blacklisted(file):
-                        blacklist_reason = next(
-                            part for part in file.parts if part in self.blacklist
+                    if self._is_blocklisted(file):
+                        blocklist_reason = next(
+                            part for part in file.parts if part in self.blocklist
                         )
-                        blacklist_details[blacklist_reason].append(file)
-                        blacklist_stats[blacklist_reason] = (
-                            blacklist_stats.get(blacklist_reason, 0) + 1
+                        blocklist_details[blocklist_reason].append(file)
+                        blocklist_stats[blocklist_reason] = (
+                            blocklist_stats.get(blocklist_reason, 0) + 1
                         )
-                        stats.blacklisted_files += 1
-                        blacklisted_files.append(file)
+                        stats.blocklisted_files += 1
+                        blocklisted_files.append(file)
                     else:
                         valid_files.append(file)
 
-                if blacklist_details:
-                    self.logger.info("Blacklisted files:")
-                    for reason, blacklisted in blacklist_details.items():
+                if blocklist_details:
+                    self.logger.info("Blocklisted files:")
+                    for reason, blocklisted in blocklist_details.items():
                         self.logger.info(
-                            "  %d files in '%s' directories", len(blacklisted), reason
+                            "  %d files in '%s' directories", len(blocklisted), reason
                         )
                         if self.logger.level <= logging.DEBUG:
-                            for bf in blacklisted[:5]:
+                            for bf in blocklisted[:5]:
                                 self.logger.debug(
                                     "    - %s", bf.relative_to(self.base_path)
                                 )
-                            if len(blacklisted) > 5:
+                            if len(blocklisted) > 5:
                                 self.logger.debug(
-                                    "    ... and %d more", len(blacklisted) - 5
+                                    "    ... and %d more", len(blocklisted) - 5
                                 )
 
                 files.extend(valid_files)
@@ -242,10 +242,10 @@ class DocumentProcessor:
         total_files = len(files)
         self.logger.info("Summary: Found %d files to process", total_files)
 
-        if blacklist_stats:
-            self.logger.info("Blacklist summary:")
+        if blocklist_stats:
+            self.logger.info("Blocklist summary:")
             for pattern, count in sorted(
-                blacklist_stats.items(), key=lambda x: x[1], reverse=True
+                blocklist_stats.items(), key=lambda x: x[1], reverse=True
             ):
                 self.logger.info("  %d files skipped due to '%s'", count, pattern)
 

@@ -46,7 +46,7 @@ class EnvManagerConfig:
     env_patterns: List[str] = field(default_factory=lambda: ["*.env*"])
     exclude_patterns: List[str] = field(default_factory=lambda: ["*.example"])
     show_full_path: bool = False
-    blacklist_paths: List[str] = field(default_factory=lambda: [])
+    blocklist_paths: List[str] = field(default_factory=lambda: [])
 
 
 class EnvManager:
@@ -113,13 +113,13 @@ class EnvManager:
 
         return env_vars
 
-    def is_blacklisted(self, path: Path) -> bool:
+    def is_blocklisted(self, path: Path) -> bool:
         try:
             relative_path = path.relative_to(self.config.start_path)
             path_str = str(relative_path).replace("\\", "/")
 
-            for blacklist_pattern in self.config.blacklist_paths:
-                pattern = blacklist_pattern.replace("\\", "/")
+            for blocklist_pattern in self.config.blocklist_paths:
+                pattern = blocklist_pattern.replace("\\", "/")
 
                 if (
                     path_str == pattern
@@ -138,7 +138,7 @@ class EnvManager:
                 if (
                     path.is_file()
                     and not any(path.match(exc) for exc in self.config.exclude_patterns)
-                    and not self.is_blacklisted(path)
+                    and not self.is_blocklisted(path)
                 ):
                     env_files.append(path)
         return sorted(env_files)
@@ -409,13 +409,13 @@ class EnvManager:
 
 
 def main():
-    blacklist = os.getenv("ENV_MANAGER_BLACKLIST", "").split(",")
+    blocklist = os.getenv("ENV_MANAGER_BLOCKLIST", "").split(",")
     config = EnvManagerConfig(
         debug=os.getenv("ENV_MANAGER_DEBUG", "").lower() == "true",
         show_full_path=os.getenv("ENV_MANAGER_SHOW_PATH", "").lower() == "true",
-        blacklist_paths=[p for p in blacklist if p]
-        if blacklist
-        else EnvManagerConfig.blacklist_paths.default_factory(),
+        blocklist_paths=[p for p in blocklist if p]
+        if blocklist
+        else EnvManagerConfig.blocklist_paths.default_factory(),
     )
 
     manager = EnvManager(config)
