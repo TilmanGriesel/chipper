@@ -79,7 +79,7 @@ class OllamaRoutes:
                 return self.proxy.copy()
             except Exception as e:
                 logger.error(f"Error in copy endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/delete", methods=["DELETE"])
         @require_api_key
@@ -88,7 +88,7 @@ class OllamaRoutes:
                 return self.proxy.delete()
             except Exception as e:
                 logger.error(f"Error in delete endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/pull", methods=["POST"])
         @require_api_key
@@ -97,7 +97,7 @@ class OllamaRoutes:
                 return self.proxy.pull()
             except Exception as e:
                 logger.error(f"Error in pull endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/push", methods=["POST"])
         @require_api_key
@@ -106,7 +106,7 @@ class OllamaRoutes:
                 return self.proxy.push()
             except Exception as e:
                 logger.error(f"Error in push endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         # Blob management endpoints
         @self.app.route("/api/blobs/<digest>", methods=["HEAD"])
