@@ -33,7 +33,7 @@ class OllamaRoutes:
                 return self.proxy.generate()
             except Exception as e:
                 logger.error(f"Error in generate endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/embeddings", methods=["POST"])
         @require_api_key
@@ -42,7 +42,7 @@ class OllamaRoutes:
                 return self.proxy.embeddings()
             except Exception as e:
                 logger.error(f"Error in embeddings endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/embed", methods=["POST"])
         @require_api_key
@@ -51,7 +51,7 @@ class OllamaRoutes:
                 return self.proxy.embed()
             except Exception as e:
                 logger.error(f"Error in embed endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         # Model management endpoints
         @self.app.route("/api/create", methods=["POST"])
@@ -61,7 +61,7 @@ class OllamaRoutes:
                 return self.proxy.create()
             except Exception as e:
                 logger.error(f"Error in create endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/show", methods=["POST"])
         @require_api_key
