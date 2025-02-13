@@ -97,7 +97,7 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 
 ### **Project Roadmap**
 
-#### ✅ **Completed Milestones**
+#### **Completed Milestones**
 
 ##### **Core Features**
 
@@ -120,7 +120,7 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 - [x] **Haystack Chat Generators** (`ChatPromptBuilder` & `OllamaChatGenerator`)
 - [x] **Distributed Processing** (Chain multiple Chipper instances for workload distribution)
 
-#### 🚀 **Upcoming Features**
+#### **Upcoming Features**
 
 ##### **Core Features**
 
