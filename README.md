@@ -25,9 +25,9 @@ If you find Chipper useful, **leaving a star would be lovely** and will help oth
   - [Reasoning](#reasoning)
   - [CLI Interface](#cli-interface)
   - [Third-Party Clients](#third-party-clients)
-- [Roadmap](#roadmap)
-  - [Done](#done)
-  - [Todo](#todo)
+- [Project Roadmap](#project-roadmap)
+  - [Completed Milestones](#completed-milestones)
+  - [Upcoming Features](#upcoming-features)
 - [Acknowledgments](#acknowledgments)
 - [Friends of Chipper](#friends-of-chipper)
 - [Star History](#star-history)
@@ -95,28 +95,52 @@ Enhance every third-party Ollama client with server-side knowledge base embeddin
 
 <p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/demos/demo_rag_chat_ollamac.gif" alt="chipper_demo_ollamac"/></p>
 
-## Roadmap
+### **Project Roadmap**
 
-#### Done
+#### ✅ **Completed Milestones**
+
+##### **Core Features**
 
 - [x] **Basic Functionality**
-- [x] **CLI**
-- [x] **Web UI**
-- [x] **Docker**
-- [x] **Enhanced Web UI** (better mobile support)
-- [x] **Improved Linting and Formatting**
-- [x] **Docker Hub Registry Images**
-- [x] **Edge Inference TTS**
-- [x] **Mirror Ollama Chat API** to enable Chipper as a drop-in middleware
-- [x] **Baerer token support**
-- [x] **Haystack Chat Generators** Implement `ChatPromptBuilder` and `OllamaChatGenerator`.
-- [x] **Allow For Distributed Processing** - Chain multiple Chipper instances together for workload distribution and extended processing.
+- [x] **Command-Line Interface (CLI)**
+- [x] **Web-Based User Interface (UI)**
+- [x] **Docker Containerization**
 
-#### Todo
+##### **Enhancements & Optimizations**
 
-- [ ] **Automated Unit Tests**
+- [x] **Improved Web UI** (Better mobile support)
+- [x] **Enhanced Linting and Code Formatting**
+- [x] **Docker Hub Registry Image Publishing**
+- [x] **Edge Inference for Text-to-Speech (TTS)**
+- [x] **Bearer Token Authentication Support**
+
+##### **Integrations & Extensibility**
+
+- [x] **Mirror Ollama Chat API** (Enable Chipper as a drop-in middleware)
+- [x] **Haystack Chat Generators** (`ChatPromptBuilder` & `OllamaChatGenerator`)
+- [x] **Distributed Processing** (Chain multiple Chipper instances for workload distribution)
+
+#### 🚀 **Upcoming Features**
+
+##### **Core Features**
+
+- [ ] **Expanded Support for Client-Side Model Settings**
+
+##### **Tutorial Section**
+
+- [ ] **Initial Set of 3 Tutorials for New Users**
+
+##### **Testing & Reliability**
+
+- [ ] **Automated Unit Testing Framework**
+
+##### **Intelligent Processing**
+
 - [ ] **Smart Document Splitting and Embedding**
-- [ ] **React-Based Web Application**
+
+##### **User Experience & Interface**
+
+- [ ] **React-Based Web Application** (Modernized UI/UX)
 
 ---
 
