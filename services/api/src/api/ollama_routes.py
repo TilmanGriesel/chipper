@@ -22,7 +22,7 @@ class OllamaRoutes:
                 return self.proxy.chat()
             except Exception as e:
                 logger.error(f"Error in chat endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
     def register_routes(self):
         # Generation endpoints
@@ -116,7 +116,7 @@ class OllamaRoutes:
                 return self.proxy.check_blob(digest)
             except Exception as e:
                 logger.error(f"Error in check_blob endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/blobs/<digest>", methods=["POST"])
         @require_api_key
@@ -125,7 +125,7 @@ class OllamaRoutes:
                 return self.proxy.push_blob(digest)
             except Exception as e:
                 logger.error(f"Error in push_blob endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         # Model listing and status endpoints
         @self.app.route("/api/tags", methods=["GET"])
@@ -135,7 +135,7 @@ class OllamaRoutes:
                 return self.proxy.list_local_models()
             except Exception as e:
                 logger.error(f"Error in list_local_models endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/ps", methods=["GET"])
         @require_api_key
@@ -144,7 +144,7 @@ class OllamaRoutes:
                 return self.proxy.list_running_models()
             except Exception as e:
                 logger.error(f"Error in list_running_models endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
         @self.app.route("/api/version", methods=["GET"])
         @require_api_key
@@ -153,7 +153,7 @@ class OllamaRoutes:
                 return self.proxy.version()
             except Exception as e:
                 logger.error(f"Error in version endpoint: {e}")
-                return {"error": str(e)}, 500
+                return {"error": "An internal error has occurred!"}, 500
 
 
 def setup_ollama_proxy_routes(app):
