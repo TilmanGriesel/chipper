@@ -278,6 +278,6 @@ def handle_standard_response(
             "created_at": datetime.now(timezone.utc).isoformat(),
             "done": True,
             "done_reason": "error",
-            "error": str(e),
+            "error": "An internal error has occurred. Please try again later.",
         }
         return jsonify(error_response)
