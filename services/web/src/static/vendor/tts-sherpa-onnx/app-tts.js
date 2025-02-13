@@ -7,7 +7,7 @@ const speedValue = document.getElementById('speedValue');
 const textArea = document.getElementById('text');
 const soundClips = document.getElementById('sound-clips');
 
-speedValue.innerHTML = speedInput.value;
+speedValue.textContent = speedInput.value;
 
 let index = 0;
 
@@ -36,7 +36,7 @@ Module.onRuntimeInitialized = function() {
 };
 
 speedInput.oninput = function() {
-  speedValue.innerHTML = this.value;
+  speedValue.textContent = this.value;
 };
 
 generateBtn.onclick = function() {
