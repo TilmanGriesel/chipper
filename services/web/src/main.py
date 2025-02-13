@@ -61,7 +61,7 @@ def get_api_health() -> Dict[str, Any]:
         return response.json()
     except Exception as e:
         logger.error(f"API health check failed: {str(e)}")
-        return {"status": "unhealthy", "error": str(e)}
+        return {"status": "unhealthy", "error": "An internal error has occurred."}
 
 
 class SessionManager:
