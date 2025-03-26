@@ -13,6 +13,7 @@ readonly SCRIPT_VERSION="1.4.1"
 
 # container engine configuration
 CONTAINER_ENGINE="${CONTAINER_ENGINE:-docker}"
+export CONTAINER_ENGINE
 
 # common messages
 readonly WARN_CLEAN_PROMPT="⚠️  WARNING: This will delete all %s. Are you sure? [y/N] "
@@ -242,6 +243,7 @@ while [[ $# -gt 0 ]]; do
         -e|--engine)
             validate_container_engine "$2"
             CONTAINER_ENGINE="$2"
+            export CONTAINER_ENGINE
             COMPOSE_CMD=$(detect_compose_cmd "$CONTAINER_ENGINE")
             shift 2
             ;;

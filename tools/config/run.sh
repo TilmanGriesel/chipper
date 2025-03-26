@@ -3,7 +3,6 @@
 set -euo pipefail
 
 IMAGE_NAME="chipper-config"
-CONTAINER_ENGINE=""
 
 OS_TYPE=$(uname -s)
 if [[ "$OS_TYPE" == *"MINGW"* || "$OS_TYPE" == *"MSYS"* ]]; then
@@ -16,16 +15,20 @@ else
     LOCAL_PATH=$1
 fi
 
+export CONTAINER_ENGINE
 detect_container_engine() {
-    if command -v podman &> /dev/null; then
+    if [ -n "${CONTAINER_ENGINE:-}" ]; then
+        echo "Using container engine from environment: $CONTAINER_ENGINE"
+    elif command -v podman &> /dev/null; then
         CONTAINER_ENGINE="podman"
+        echo "Auto-detected container engine: $CONTAINER_ENGINE"
     elif command -v docker &> /dev/null; then
         CONTAINER_ENGINE="docker"
+        echo "Auto-detected container engine: $CONTAINER_ENGINE"
     else
         echo "Error: No container engine (Docker or Podman) found."
         exit 1
     fi
-    echo "Using container engine: $CONTAINER_ENGINE"
 }
 
 build_image() {
