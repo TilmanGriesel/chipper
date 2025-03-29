@@ -11,16 +11,26 @@ ifneq (,$(findstring MINGW,$(OS_TYPE)))
     export MSYS_NO_PATHCONV=1
 endif
 
-# Container engine detection
-CONTAINER_ENGINE := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
-ifeq ($(CONTAINER_ENGINE),)
-    $(error No container engine found. Please install podman or docker)
+# Container engine configuration
+ifndef CONTAINER_ENGINE
+    DOCKER := $(shell command -v docker 2>/dev/null)
+    PODMAN := $(shell command -v podman 2>/dev/null)
+
+    ifneq ($(DOCKER),)
+        CONTAINER_ENGINE := $(DOCKER)
+    else ifneq ($(PODMAN),)
+        CONTAINER_ENGINE := $(PODMAN)
+    else
+        $(error No container engine found. Please install docker or podman)
+    endif
 endif
 
 CONTAINER_CMD := $(shell basename $(CONTAINER_ENGINE))
+$(info Using container engine: $(CONTAINER_CMD))
 
 # Network configuration
 NETWORK = chipper_network
+BACKEND_NETWORK = chipper_backend
 
 dev: stop-dev build-dev run-dev
 

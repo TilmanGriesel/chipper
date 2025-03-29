@@ -3,19 +3,22 @@
 set -euo pipefail
 
 IMAGE_NAME="chipper-cli"
-CONTAINER_ENGINE=""
 NETWORK_NAME="chipper_network"
 
+export CONTAINER_ENGINE
 detect_container_engine() {
-    if command -v podman &> /dev/null; then
+    if [ -n "${CONTAINER_ENGINE:-}" ]; then
+        echo "Using container engine from environment: $CONTAINER_ENGINE"
+    elif command -v podman &> /dev/null; then
         CONTAINER_ENGINE="podman"
+        echo "Auto-detected container engine: $CONTAINER_ENGINE"
     elif command -v docker &> /dev/null; then
         CONTAINER_ENGINE="docker"
+        echo "Auto-detected container engine: $CONTAINER_ENGINE"
     else
         echo "Error: No container engine (Docker or Podman) found."
         exit 1
     fi
-    echo "Using container engine: $CONTAINER_ENGINE"
 }
 
 build_image() {
