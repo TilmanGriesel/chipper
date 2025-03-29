@@ -114,7 +114,7 @@ export class ChatService {
             // Handle error responses
             if (data.error || (data.done && data.done_reason === "error")) {
               console.error(data);
-              onError(data.message.content || "Unknown error occurred");
+              onError(data.message?.content || data.error || "Unknown error occurred");
               return;
             }
 
@@ -238,7 +238,11 @@ export class ChatService {
     // Handle standard message format
     if (data.message?.content) {
       const trimmedContent = data.message.content.trimLeft();
-      onChunk(trimmedContent);
+
+      // Send the content character by character to match streaming behavior
+      for (const char of trimmedContent) {
+        onChunk(char);
+      }
 
       // Handle additional message features
       if (data.message.images && this.onImageCallback) {
@@ -248,20 +252,22 @@ export class ChatService {
         this.onToolCallCallback(data.message.tool_calls);
       }
 
-      // Update messages array
+      // Update messages array with the assistant's response
       this.messages.push({
         role: "assistant",
         content: trimmedContent,
       });
-    }
-    // Handle legacy format
-    else if (data.success && data.messages) {
-      const lastMessage = data.messages[data.messages.length - 1];
-      if (lastMessage.role === "assistant") {
-        const trimmedContent = lastMessage.content.trimLeft();
-        onChunk(trimmedContent);
-        this.messages = data.messages;
-      }
+
+      // Handle TTS for non-streaming responses
+      window.postMessage(
+        {
+          type: "tts-message",
+          text: trimmedContent,
+          sid: 0,
+          speed: 1,
+        },
+        "*",
+      );
     }
 
     // Handle metrics if callback is provided

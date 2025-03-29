@@ -280,16 +280,9 @@ def create_app():
                 )
             else:
                 # non-streaming response
+                logger.info("Processing non-streaming request")
                 response = make_api_request("/api/chat", data)
-                response_data = response.json()
-                formatted_response = {
-                    "message": {
-                        "role": "assistant",
-                        "content": response_data.get("text", ""),
-                    },
-                    "done": True,
-                }
-                return jsonify(formatted_response)
+                return response.json()
 
         except (ConnectionError, Timeout):
             return (
