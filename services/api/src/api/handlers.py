@@ -241,35 +241,24 @@ def handle_standard_response(
             query=query, conversation=conversation, print_response=False
         )
         end_time = time.time_ns()
+        response_content = result
+        eval_count = len(response_content.split()) if response_content else 0
+        response = {
+            "model": config.model_name,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "message": {"role": "assistant", "content": response_content},
+            "done": True,
+            "done_reason": "stop",
+            "total_duration": end_time - start_time,
+            "load_duration": load_duration,
+            "prompt_eval_count": len(conversation) + 1,
+            "prompt_eval_duration": end_time - prompt_start,
+            "eval_count": eval_count,
+            "eval_duration": end_time - prompt_start,
+        }
 
-        if result and "llm" in result and "replies" in result["llm"]:
-            response_content = result["llm"]["replies"][0]
-
-            # Handle structured output if format_schema is provided
-            if format_schema:
-                try:
-                    content = json.loads(response_content)
-                    response_content = json.dumps(content)
-                except json.JSONDecodeError:
-                    raise Exception("Failed to generate valid JSON response")
-
-            eval_count = len(response_content.split()) if response_content else 0
-
-            response = {
-                "model": config.model_name,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "message": {"role": "assistant", "content": response_content},
-                "done": True,
-                "done_reason": "stop",
-                "total_duration": end_time - start_time,
-                "load_duration": load_duration,
-                "prompt_eval_count": len(conversation) + 1,
-                "prompt_eval_duration": end_time - prompt_start,
-                "eval_count": eval_count,
-                "eval_duration": end_time - prompt_start,
-            }
-
-            return jsonify(response)
+        logger.info(f"returning: {response}")
+        return jsonify(response)
 
     except Exception as e:
         logger.error(f"Error in RAG pipeline: {e}", exc_info=True)
