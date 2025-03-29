@@ -48,9 +48,9 @@ Options:
   -e, --engine       - Specify container engine (docker|podman)
 
 Commands:
-  config              - Launch configuration utility
   up                  - Start containers in detached mode
   down                - Stop containers
+  config              - Launch configuration utility
   rebuild             - Clean, rebuild and recreate images and containers
   logs                - Show container logs
   ps                  - Show container status
