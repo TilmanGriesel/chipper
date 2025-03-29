@@ -83,8 +83,12 @@ export class ChatCommandHandler {
       },
     };
 
-    const command = commands[parts[0]];
-    return command ? command() : null;
+    const commandKey = parts[0];
+    if (commands.hasOwnProperty(commandKey) && typeof commands[commandKey] === "function") {
+      return commands[commandKey]();
+    } else {
+      return null;
+    }
   }
 
   getHelpMessage() {
