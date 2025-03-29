@@ -9,7 +9,7 @@ readonly USER_DOCKER_COMPOSE_FILE="docker/docker-compose.user.yml"
 readonly PROJECT_NAME="chipper"
 readonly LOCAL_URL="http://localhost:21200"
 readonly ELASTICVUE_URL="http://localhost:21230"
-readonly SCRIPT_VERSION="1.4.0"
+readonly SCRIPT_VERSION="1.4.1"
 
 # container engine configuration
 CONTAINER_ENGINE="${CONTAINER_ENGINE:-docker}"
@@ -48,9 +48,9 @@ Options:
   -e, --engine       - Specify container engine (docker|podman)
 
 Commands:
-  config              - Launch configuration utility
   up                  - Start containers in detached mode
   down                - Stop containers
+  config              - Launch configuration utility
   rebuild             - Clean, rebuild and recreate images and containers
   logs                - Show container logs
   ps                  - Show container status
@@ -60,7 +60,8 @@ Commands:
   clean-env           - Delete all dotfiles like .env and .systemprompt
   embed [args]        - Run embed tool with optional arguments
   embed-testdata      - Run embed tool with internal testdata
-  scrape [args]       - Run scrape tool with optional arguments
+  scrape [args]       - Run scrape tool with arguments
+  transcribe [args]   - Run transcriptiion tool with arguments
   dev-api             - Start API in development mode
   dev-web             - Start web service in development mode
   dev-docs            - Run local vitepress server
@@ -261,7 +262,7 @@ fi
 
 # pre-command dependency checks
 case "$1" in
-    up|down|logs|ps|rebuild|clean-volumes|embed*|scrape)
+    up|down|logs|ps|rebuild|clean-volumes|embed*|scrape|transcribe)
         check_engine_running
         check_dependency "$CONTAINER_ENGINE"
         ;;
@@ -355,6 +356,12 @@ case "$1" in
 
         [ $# -eq 0 ] && error_exit "Error: ${command} command requires arguments"
 
+        run_in_directory "tools/${command}" ./run.sh "$@"
+        ;;
+    "transcribe")
+        command="$1"
+        shift
+        [ $# -eq 0 ] && error_exit "Error: ${command} command requires path to audio file"
         run_in_directory "tools/${command}" ./run.sh "$@"
         ;;
     "dev-api"|"dev-web")

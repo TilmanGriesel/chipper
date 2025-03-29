@@ -14,9 +14,9 @@ Chipper started as a set of Python scripts designed to experiment with local RAG
 
 <details>
   <summary>Tell me more 💡</summary>
-With our embedded knowledge base, we essentially give our local Ollama model a "notebook" to reference. So, when we ask it something like, "Who is the best golden retriever in the universe?" it quickly checks a database, ElasticSearch in our case, to see if it has any relevant information. The database then returns embeddings to augment the model's response, making the process super fast and awesome!
+With our embedded knowledge base, we essentially give our local Ollama model a "notebook" to reference. So, when we ask it something like, "Who is the best golden retriever in the universe?" it quickly checks a database, ElasticSearch in our case, to see if it has any relevant information. The database then returns embeddings to augment the model's response, making the process super fast!
 
-Chipper essentially provides an end-to-end architecture for experimenting with embeddings right from your command line. It leverages many awesome open-source tools like [Haystack](https://haystack.deepset.ai/) to manage embeddings and queries, [Docker](https://www.docker.com/) to eliminate system dependencies and make setup a breeze, and [TailwindCSS](https://tailwindcss.com/) to simplify visual changes. Plus, it includes many other small but powerful tools to make your exploration effortless and enjoyable. Mostly written in [Python](https://www.python.org/).
+Chipper essentially provides an end-to-end architecture for experimenting with embeddings right from your command line. It leverages many great open-source tools like [Haystack](https://haystack.deepset.ai/) to manage embeddings and queries, [Docker](https://www.docker.com/) to eliminate system dependencies and make setup a breeze, and [TailwindCSS](https://tailwindcss.com/) to simplify visual changes. Plus, it includes many other small but powerful tools to make your exploration effortless and enjoyable. Mostly written in [Python](https://www.python.org/).
 
 **There is way more to learn about RAGs**
 

@@ -51,7 +51,7 @@ class EnvManagerConfig:
 
 class EnvManager:
     def __init__(self, config: Optional[EnvManagerConfig] = None):
-        self.console = Console(force_terminal=True, width=120)
+        self.console = Console(force_terminal=True, width=130)
         self.config = config or EnvManagerConfig()
         if self.config.debug:
             logger.setLevel(logging.DEBUG)
@@ -65,6 +65,8 @@ class EnvManager:
             "prompt": Style(color="bright_magenta", bold=True),
             "error": Style(color="red", bold=True),
             "success": Style(color="bright_green", bold=True),
+            "even_row": Style(bgcolor="grey7"),
+            "odd_row": Style(),
         }
 
     def parse_type(self, value: str) -> Tuple[str, str]:
@@ -166,26 +168,25 @@ class EnvManager:
         table = Table(
             show_header=True,
             header_style=self.styles["header"],
-            box=box.ROUNDED,
+            box=box.SIMPLE_HEAD,
             show_edge=False,
             padding=(0, 1),
         )
 
         table.add_column(
-            "#", style="bright_blue", justify="center", width=4, no_wrap=True
+            "#", style="bright_blue", justify="center", width=3, no_wrap=True
         )
-        table.add_column("Service", style="bright_yellow", width=20, no_wrap=True)
+        table.add_column("Service", style="bright_yellow", width=15, no_wrap=True)
         if self.config.show_full_path:
             table.add_column("Path", style="bright_white", overflow="fold")
 
         current_service = None
-        for env_file in env_files:
+        for i, env_file in enumerate(env_files):
+            row_style = (
+                self.styles["even_row"] if i % 2 == 0 else self.styles["odd_row"]
+            )
+
             if current_service != env_file.service:
-                if current_service is not None:
-                    if self.config.show_full_path:
-                        table.add_row("", "", "", style="dim")
-                    else:
-                        table.add_row("", "", style="dim")
                 current_service = env_file.service
 
             relative_path = env_file.path.relative_to(self.config.start_path)
@@ -194,18 +195,20 @@ class EnvManager:
                     str(env_file.index),
                     Text(env_file.service.capitalize(), style=self.styles["key"]),
                     Text(str(relative_path), style=self.styles["value"]),
+                    style=row_style,
                 )
             else:
                 table.add_row(
                     str(env_file.index),
                     Text(env_file.service.capitalize(), style=self.styles["key"]),
+                    style=row_style,
                 )
 
         self.console.print("\n")
         self.console.print(
             Panel(
                 table,
-                title="[bold]Environment Configuration Files[/bold]",
+                title="[bold]Environment Files[/bold]",
                 border_style="bright_blue",
                 padding=(0, 0),
             )
@@ -258,31 +261,33 @@ class EnvManager:
         table = Table(
             show_header=True,
             header_style=self.styles["header"],
-            box=box.ROUNDED,
+            box=box.SIMPLE_HEAD,
             expand=True,
             show_edge=False,
-            padding=(1, 1),
+            padding=(0, 1),
         )
 
-        table.add_column(
-            "#", style="bright_blue", justify="center", width=4, no_wrap=True
-        )
+        table.add_column("#", style="bright_blue", no_wrap=True)
         table.add_column("Key", style=self.styles["key"], overflow="fold")
         table.add_column("Value", style=self.styles["value"], overflow="fold")
-        table.add_column(
-            "Type", style=self.styles["type"], justify="center", width=8, no_wrap=True
-        )
+        table.add_column("Type", style=self.styles["type"], no_wrap=True)
         table.add_column(
             "Description", style=self.styles["description"], overflow="fold"
         )
 
         for idx, var in enumerate(env_vars.values(), 1):
+            # Determine row style based on even/odd
+            row_style = (
+                self.styles["even_row"] if idx % 2 == 0 else self.styles["odd_row"]
+            )
+
             table.add_row(
                 str(idx),
                 var.key,
                 var.value,
                 var.var_type,
                 var.description or "",
+                style=row_style,
             )
 
         self.console.print("\n")
@@ -292,7 +297,7 @@ class EnvManager:
                 title=f"[bold]{file_path.name}[/bold]",
                 subtitle=f"[dim]{file_path.parent}[/dim]",
                 border_style="bright_blue",
-                padding=(1, 0),
+                padding=(0, 0),
             )
         )
 
@@ -311,7 +316,7 @@ class EnvManager:
             Panel(
                 Text("✓ Changes saved successfully", style=self.styles["success"]),
                 border_style="bright_green",
-                padding=(1, 2),
+                padding=(1, 1),
             )
         )
 
@@ -390,7 +395,7 @@ class EnvManager:
                         Panel(
                             Text("Changes discarded", style="yellow"),
                             border_style="yellow",
-                            padding=(1, 2),
+                            padding=(1, 1),
                         )
                     )
 
@@ -400,7 +405,7 @@ class EnvManager:
                 Panel(
                     Text("Operation cancelled", style="yellow"),
                     border_style="yellow",
-                    padding=(1, 2),
+                    padding=(1, 1),
                 )
             )
         except Exception as e:
