@@ -166,16 +166,6 @@ Check out these Chipper-compatible projects! Want to add yours? Open an issue to
 - [enchanted](https://github.com/gluonfield/enchanted) Enchanted is iOS and macOS app for chatting with private self hosted language models.
 - [Ollamac](https://github.com/kevinhermawan/Ollamac) Mac app for Ollama
 
-## Star History
-
-<a href="https://star-history.com/#TilmanGriesel/chipper&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TilmanGriesel/chipper&type=Date" />
- </picture>
-</a>
-
 ---
 
 Be sure to visit the [Chipper project website](https://chipper.tilmangriesel.com/) for detailed setup instructions and more information.
