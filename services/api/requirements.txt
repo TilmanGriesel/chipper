@@ -85,7 +85,7 @@ filelock==3.18.0
     # via
     #   -r requirements.in
     #   huggingface-hub
-flask==3.1.0
+flask==3.1.1
     # via
     #   -r requirements.in
     #   flask-limiter
@@ -172,6 +172,7 @@ markdown-it-py==3.0.0
 markupsafe==3.0.2
     # via
     #   -r requirements.in
+    #   flask
     #   jinja2
     #   werkzeug
 mdurl==0.1.2
