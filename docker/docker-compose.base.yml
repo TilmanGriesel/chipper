@@ -52,7 +52,7 @@ services:
       - amd
 
   elasticsearch: &elasticsearch-base
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
     ports:
       - 21220:9200
     environment:

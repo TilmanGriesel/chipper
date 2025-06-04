@@ -1,6 +1,6 @@
 <p align="center"><img src="https://raw.githubusercontent.com/TilmanGriesel/chipper/refs/heads/main/docs/public/assets/banner.png" width="640" alt="Logo Chipper RAG Util"/></p>
 <p align="center">
-	<a href="https://chipper.tilmangriesel.com/"><img src="https://img.shields.io/github/actions/workflow/status/TilmanGriesel/chipper/.github%2Fworkflows%2Fdocs-deploy.yml?colorA=1F2229&colorB=ffffff&style=for-the-badge&label=GitHub Pages"></a>
+	  <!-- <a href="https://chipper.tilmangriesel.com/"><img src="https://img.shields.io/github/actions/workflow/status/TilmanGriesel/chipper/.github%2Fworkflows%2Fdocs-deploy.yml?colorA=1F2229&colorB=ffffff&style=for-the-badge&label=GitHub Pages"></a>--><!-- TODO: check why this shield does not work anymore -->
     <a href="https://github.com/TilmanGriesel/chipper/actions"><img src="https://img.shields.io/github/actions/workflow/status/TilmanGriesel/chipper/.github%2Fworkflows%2Fpublish-docker.yml?colorA=1F2229&colorB=ffffff&style=for-the-badge&label=DockerHub"></a>
     <a href="https://github.com/tilmangriesel/chipper/stargazers"><img src="https://img.shields.io/github/stars/tilmangriesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a>
     <a href="https://github.com/tilmangriesel/chipper/issues"><img src="https://img.shields.io/github/issues/tilmangriesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a><a href="https://hub.docker.com/repository/docker/griesel/chipper"><img src="https://img.shields.io/docker/pulls/griesel/chipper?colorA=1F2229&colorB=ffffff&style=for-the-badge"></a>
@@ -17,6 +17,7 @@ If you **find Chipper useful**, **leaving a star ⭐ would be lovely** and will 
 
 ## Overview
 
+- [Overview](#overview)
 - [Installation and Setup](#installation-and-setup)
 - [Features](#features)
 - [Philosophy](#philosophy)
@@ -26,12 +27,19 @@ If you **find Chipper useful**, **leaving a star ⭐ would be lovely** and will 
   - [Reasoning](#reasoning)
   - [CLI Interface](#cli-interface)
   - [Third-Party Clients](#third-party-clients)
-- [Project Roadmap](#project-roadmap)
-  - [Completed Milestones](#completed-milestones)
-  - [Upcoming Features](#upcoming-features)
+  - [**Project Roadmap**](#project-roadmap)
+    - [**Completed Milestones**](#completed-milestones)
+      - [**Core Features**](#core-features)
+      - [**Enhancements \& Optimizations**](#enhancements--optimizations)
+      - [**Integrations \& Extensibility**](#integrations--extensibility)
+    - [**Upcoming Features**](#upcoming-features)
+      - [**Core Features**](#core-features-1)
+      - [**Tutorial Section**](#tutorial-section)
+      - [**Testing \& Reliability**](#testing--reliability)
+      - [**Intelligent Processing**](#intelligent-processing)
+      - [**User Experience \& Interface**](#user-experience--interface)
 - [Acknowledgments](#acknowledgments)
 - [Friends of Chipper](#friends-of-chipper)
-- [Star History](#star-history)
 
 ## Installation and Setup
 
