@@ -273,7 +273,7 @@ referencing==0.36.2
     #   -r requirements.in
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements.in
     #   haystack-ai

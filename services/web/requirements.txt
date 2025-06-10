@@ -49,7 +49,7 @@ pygments==2.19.1
     # via rich
 python-dotenv==1.1.0
     # via -r requirements.in
-requests==2.32.3
+requests==2.32.4
     # via -r requirements.in
 rich==13.9.4
     # via flask-limiter
