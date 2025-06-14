@@ -8,7 +8,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r requirements.in
     #   aiohttp
-aiohttp==3.12.9
+aiohttp==3.12.13
     # via
     #   -r requirements.in
     #   elasticsearch-haystack
@@ -75,7 +75,7 @@ elasticsearch==8.18.1
     # via
     #   -r requirements.in
     #   elasticsearch-haystack
-elasticsearch-haystack==3.0.1
+elasticsearch-haystack==3.1.0
     # via -r requirements.in
 exceptiongroup==1.3.0
     # via
@@ -93,7 +93,7 @@ flask==3.1.1
     #   flask-limiter
 flask-limiter==3.12
     # via -r requirements.in
-frozenlist==1.6.2
+frozenlist==1.7.0
     # via
     #   -r requirements.in
     #   aiohttp
@@ -129,7 +129,7 @@ httpx==0.28.1
     #   -r requirements.in
     #   ollama
     #   openai
-huggingface-hub==0.32.4
+huggingface-hub==0.33.0
     # via -r requirements.in
 idna==3.10
     # via
@@ -161,11 +161,11 @@ jsonschema-specifications==2025.4.1
     #   jsonschema
 kaleido==0.2.1
     # via -r requirements.in
-lazy-imports==0.4.0
+lazy-imports==1.0.0
     # via
     #   -r requirements.in
     #   haystack-ai
-limits==5.2.0
+limits==5.3.0
     # via
     #   -r requirements.in
     #   flask-limiter
@@ -194,7 +194,7 @@ multidict==6.4.4
     #   -r requirements.in
     #   aiohttp
     #   yarl
-narwhals==1.41.0
+narwhals==1.42.1
     # via
     #   -r requirements.in
     #   plotly
@@ -210,9 +210,9 @@ ollama==0.5.1
     # via
     #   -r requirements.in
     #   ollama-haystack
-ollama-haystack==3.0.1
+ollama-haystack==3.3.0
     # via -r requirements.in
-openai==1.84.0
+openai==1.86.0
     # via
     #   -r requirements.in
     #   haystack-ai
@@ -229,18 +229,18 @@ packaging==25.0
     #   plotly
 plotly==6.1.2
     # via -r requirements.in
-posthog==4.2.0
+posthog==4.10.0
     # via
     #   -r requirements.in
     #   haystack-ai
-propcache==0.3.1
+propcache==0.3.2
     # via
     #   -r requirements.in
     #   aiohttp
     #   yarl
 psutil==7.0.0
     # via -r requirements.in
-pydantic==2.11.5
+pydantic==2.11.7
     # via
     #   -r requirements.in
     #   haystack-ai
@@ -273,7 +273,7 @@ referencing==0.36.2
     #   -r requirements.in
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements.in
     #   haystack-ai
@@ -343,7 +343,7 @@ wrapt==1.17.2
     # via
     #   -r requirements.in
     #   deprecated
-yarl==1.20.0
+yarl==1.20.1
     # via
     #   -r requirements.in
     #   aiohttp
