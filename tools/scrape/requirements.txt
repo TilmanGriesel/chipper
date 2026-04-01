@@ -6,9 +6,9 @@
 #
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.9
+aiohttp==3.13.4
     # via -r requirements.in
-aiosignal==1.3.2
+aiosignal==1.4.0
     # via aiohttp
 async-timeout==5.0.1
     # via aiohttp
@@ -46,7 +46,7 @@ lxml==5.4.0
     #   justext
     #   lxml-html-clean
     #   trafilatura
-lxml-html-clean==0.4.2
+lxml-html-clean==0.4.4
     # via lxml
 multidict==6.4.4
     # via
@@ -76,11 +76,12 @@ trafilatura==2.0.0
     # via -r requirements.in
 typing-extensions==4.14.0
     # via
+    #   aiosignal
     #   beautifulsoup4
     #   multidict
 tzlocal==5.3.1
     # via dateparser
-urllib3==2.4.0
+urllib3==2.6.3
     # via
     #   courlan
     #   htmldate
