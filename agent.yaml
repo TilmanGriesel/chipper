@@ -1,0 +1,35 @@
+spec_version: "0.1.0"
+name: chipper
+version: 1.0.0
+description: >
+  Chipper is a modular, hackable, and lightweight RAG (Retrieval-Augmented Generation)
+  agent platform for tinkerers. It provides a web interface, CLI, and fully dockerized
+  service architecture for running local and cloud LLMs with advanced information
+  retrieval — document chunking, web scraping, audio transcription, ElasticSearch
+  vector storage, and an Ollama API proxy layer. Built with Haystack, Ollama, and
+  Hugging Face; runs entirely offline with no cloud dependencies.
+license: MIT
+model:
+  preferred: ollama:llama3
+  alternatives:
+    - ollama:deepseek-r1
+    - ollama:phi4
+    - huggingface:meta-llama/Llama-3-8b-instruct
+runtime:
+  max_turns: 50
+  entrypoint: "python services/api/src/main.py"
+skills:
+  - name: rag-query
+    description: Answer questions using retrieved document context from ElasticSearch
+  - name: document-embed
+    description: Chunk and embed documents into the vector store
+  - name: web-scrape
+    description: Extract and index content from web pages
+  - name: audio-transcribe
+    description: Convert audio files to text and add to the knowledge base
+  - name: ollama-proxy
+    description: Proxy Ollama API requests with server-side RAG and system prompt injection
+compliance:
+  risk_tier: standard
+  supervision:
+    human_in_the_loop: none
